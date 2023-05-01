@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BCAD480A-234A-439D-92C6-61D49E29501B}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>TfmScanWithToken</RootNamespace>
+    <AssemblyName>TfmScanWithToken</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AzureDevOpsScannerFramework\AzureDevOpsScannerFramework.csproj">
+      <Project>{38c26b38-4255-464d-8905-3d6d32758025}</Project>
+      <Name>AzureDevOpsScannerFramework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ContentFilter\ContentFilter.csproj">
+      <Project>{78c79a72-bc53-475b-95e4-bd2da5b078e0}</Project>
+      <Name>ContentFilter</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataModels\RepoScan.DataModels.csproj">
+      <Project>{cf9a7158-d989-4a91-99e9-33fa59549780}</Project>
+      <Name>RepoScan.DataModels</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FileLocator\RepoScan.FileLocator.csproj">
+      <Project>{db2edd2d-9091-457d-bf79-44c2d08ddbfa}</Project>
+      <Name>RepoScan.FileLocator</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FilterConfigurationFromConfigFile\FilterConfigurationFromConfigFile.csproj">
+      <Project>{9ea05cdb-75fd-4248-9733-cb1c8c9fc636}</Project>
+      <Name>FilterConfigurationFromConfigFile</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NpmFileParser\NpmFileParser.csproj">
+      <Project>{f2f7a77a-888b-47ed-b22d-69b6cb85b130}</Project>
+      <Name>NpmFileParser</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NuGetFileParser\NuGetFileParser.csproj">
+      <Project>{be35f49a-ada7-4562-a005-d00c613092ef}</Project>
+      <Name>NuGetFileParser</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OpenSecretsDetection\OpenSecretsDetection.csproj">
+      <Project>{ea62a644-2c15-4735-a6e4-5021f0eb2a9f}</Project>
+      <Name>OpenSecretsDetection</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ProjectScannerSaveToSqlServer\ProjectScannerSaveToSqlServer.csproj">
+      <Project>{67439106-5cc8-4063-81fb-5d26feb54d58}</Project>
+      <Name>ProjectScannerSaveToSqlServer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RepoScan.Storage.SqlServer\RepoScan.Storage.SqlServer.csproj">
+      <Project>{848fc962-7069-46eb-8764-c9b3ac543137}</Project>
+      <Name>RepoScan.Storage.SqlServer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TokenCredentials\TokenCredentials.csproj">
+      <Project>{ae36dd78-329c-470f-a6ee-bff08440803e}</Project>
+      <Name>TokenCredentials</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VisualStudioFileParser\VisualStudioFileParser.csproj">
+      <Project>{bccaa6ae-5a25-44b1-bf2c-28e8891f15b8}</Project>
+      <Name>VisualStudioFileParser</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.props'))" />
+    <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.targets'))" />
+  </Target>
+  <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" />
+</Project>
