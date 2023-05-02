@@ -94,7 +94,7 @@ namespace RepoScan.FileLocator
                             SHA1 = file.SHA1
                         };
 
-                        writer.Write(fileItem, false, false);
+                        writer.Write(fileItem, false, true);
                     }
                 });
             }

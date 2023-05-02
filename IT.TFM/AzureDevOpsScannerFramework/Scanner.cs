@@ -63,6 +63,11 @@ namespace AzureDevOpsScannerFramework
 
                 if (azureProjects.Any())
                 {
+                    if (azureProjects.Count() < projectCount)
+                    {
+                        getMore = false;
+                    }
+
                     foreach (var p in azureProjects)
                     {
                         var project = new Project
