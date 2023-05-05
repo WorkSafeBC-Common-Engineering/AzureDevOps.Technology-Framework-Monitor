@@ -1,5 +1,18 @@
-AzureDevOps.Technology-Framework-Monitor
-Product to gather information about every project within an Azure DevOps organization. The product scans every repository, analyses the projects within each repository, and saves data in a SQL Server database for further analysis and reporting.
+HOW TO RUN THE TECHNOLOGY FRAMEWORK MONITOR WITH 
+VISUAL STUDIO COMMUNITY 2019 or 2022
+
+Introduction
+
+The Technology Framework Monitor (TFM) is an open-source project developed by the WorkSafeBC Common Engineering Team which scans through every project within an organization/repository to analyze files within each repository, then saves the data to an SQL server Database.  The primary goal of the TFM product is to work as a scanner which will iterate through each project with various file extensions within a repository, obtain a file list and store information such as the .NET version, .nuget packages version, as well as the npm package version. The data gathered will be stored in a SQL server database for analysis and reporting purposes. 
+
+Before You Begin
+These instructions use the following technical conventions:
+Microsoft Azure DevOps
+GitHub
+Git 
+Microsoft Visual Studio .Net 2019 or 2022
+Microsoft SQL Server 
+Angular
 
 Requirements:
 You’ll need a personal access token and 2 keys to use TFM.
