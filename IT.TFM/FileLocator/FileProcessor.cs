@@ -44,6 +44,7 @@ namespace RepoScan.FileLocator
                 {
                     orgName = repoItem.OrgName;
                     scanner = ScannerFactory.GetScanner(orgName);
+
                     projectList = scanner.Projects().Select(p => p.Id).ToArray();
                 }
 

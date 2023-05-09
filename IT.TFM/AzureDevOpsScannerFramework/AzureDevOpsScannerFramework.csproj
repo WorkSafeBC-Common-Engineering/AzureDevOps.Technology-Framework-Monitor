@@ -62,7 +62,7 @@
       <HintPath>..\packages\Microsoft.TeamFoundationServer.Client.16.153.0\lib\net45\Microsoft.TeamFoundation.Dashboards.WebApi.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.TeamFoundation.DistributedTask.Common.Contracts, Version=16.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.TeamFoundation.DistributedTask.Common.Contracts.16.205.1\lib\netstandard2.0\Microsoft.TeamFoundation.DistributedTask.Common.Contracts.dll</HintPath>
+      <HintPath>..\lib\Microsoft.TeamFoundation.DistributedTask.Common.Contracts.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.TeamFoundation.Policy.WebApi, Version=16.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.TeamFoundationServer.Client.16.153.0\lib\net45\Microsoft.TeamFoundation.Policy.WebApi.dll</HintPath>
@@ -134,6 +134,10 @@
     <Compile Include="Scanner.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AzureDevOps\AzureDevOps.csproj">
+      <Project>{58d2ceaf-71d0-422e-9fd2-6c702c0320ef}</Project>
+      <Name>AzureDevOps</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CodeFileFiltering\FileFiltering.csproj">
       <Project>{8be34ab2-472f-405a-ac52-8e3ed9587fc3}</Project>
       <Name>FileFiltering</Name>

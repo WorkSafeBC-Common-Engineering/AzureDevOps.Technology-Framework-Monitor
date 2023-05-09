@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.VisualStudio.Services.Client;
@@ -54,6 +55,12 @@ namespace AzureDevOpsScannerFramework
 
         IEnumerable<Project> IScanner.Projects()
         {
+            //TODO: start of migrating to using the AzDo REST APIs
+            var task = TestGetProjects();
+            task.Wait();
+
+
+
             int projectOffset = 0;
             bool getMore = true;
 
@@ -245,6 +252,32 @@ namespace AzureDevOpsScannerFramework
         #endregion
 
         #region Private Methods
+
+        private async Task TestGetProjects()
+        {
+            AzureDevOps.IRestApi api = new AzureDevOps.RestApi
+            {
+                BaseUrl = "dev.azure.com",
+                Organization = "NvisionIdeasRP",
+                Token = Environment.GetEnvironmentVariable("TFM_AdToken")
+            };
+
+            var projects = await api.GetProjectsAsync();
+
+            api.Project = projects.Value[0].Id;
+            var repos = await api.GetRepositoriesAsync();
+
+            api.Repository = repos.Value[0].Id;
+
+            var branchPath = repos.Value[0].DefaultBranch;  // refs/heads/master
+            var branchFields = branchPath.Split('/');
+            var branch = branchFields[branchFields.Length - 1];
+
+            api.RepositoryBranch = branch;
+            api.CheckoutDirectory = @"C:\x\AzureDevOps.Technology-Framework-Monitor\CheckoutDir";
+            await api.DownloadRepositoryAsync();
+        }
+
 
         private void ParseConfiguration(string configuration)
         {
