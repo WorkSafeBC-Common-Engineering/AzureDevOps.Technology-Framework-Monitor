@@ -35,13 +35,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EndOfLifeConfigFile", "EndO
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Filters", "Filters", "{03C1EB17-4DBA-4E97-A615-C69F573F3734}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentFilter", "ContentFilter\ContentFilter.csproj", "{78C79A72-BC53-475B-95E4-BD2DA5B078E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContentFilter", "ContentFilter\ContentFilter.csproj", "{78C79A72-BC53-475B-95E4-BD2DA5B078E0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FilterConfigurationFromConfigFile", "FilterConfigurationFromConfigFile\FilterConfigurationFromConfigFile.csproj", "{9EA05CDB-75FD-4248-9733-CB1C8C9FC636}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FilterConfigurationFromConfigFile", "FilterConfigurationFromConfigFile\FilterConfigurationFromConfigFile.csproj", "{9EA05CDB-75FD-4248-9733-CB1C8C9FC636}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigurationFileData", "ConfigurationFileData\ConfigurationFileData.csproj", "{D4518E0A-EF3A-48C4-A50A-687F6F0F8912}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileFiltering", "CodeFileFiltering\FileFiltering.csproj", "{8BE34AB2-472F-405A-AC52-8E3ED9587FC3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileFiltering", "CodeFileFiltering\FileFiltering.csproj", "{8BE34AB2-472F-405A-AC52-8E3ED9587FC3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Executables", "Executables", "{69451FB6-F75A-48D7-A067-0F444AC23E83}"
 EndProject
