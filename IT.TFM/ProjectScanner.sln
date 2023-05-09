@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectData", "ProjectDataF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectScanner", "ProjectScannerFramework\ProjectScanner.csproj", "{E487398A-0C6B-48A6-9AEA-3333ABDF7686}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureDevOpsScannerFramework", "AzureDevOpsScannerFramework\AzureDevOpsScannerFramework.csproj", "{38C26B38-4255-464D-8905-3D6D32758025}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOpsScannerFramework", "AzureDevOpsScannerFramework\AzureDevOpsScannerFramework.csproj", "{38C26B38-4255-464D-8905-3D6D32758025}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parser", "Parser\Parser.csproj", "{171D31E0-F983-419B-ADF7-F8121C83F125}"
 EndProject
@@ -45,7 +45,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileFiltering", "CodeFileFi
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Executables", "Executables", "{69451FB6-F75A-48D7-A067-0F444AC23E83}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepoScan.FileLocator", "FileLocator\RepoScan.FileLocator.csproj", "{DB2EDD2D-9091-457D-BF79-44C2D08DDBFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RepoScan.FileLocator", "FileLocator\RepoScan.FileLocator.csproj", "{DB2EDD2D-9091-457D-BF79-44C2D08DDBFA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepoScan.DataModels", "DataModels\RepoScan.DataModels.csproj", "{CF9A7158-D989-4A91-99E9-33FA59549780}"
 EndProject
@@ -61,7 +61,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScannerCommon", "ScannerCom
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TokenCredentials", "TokenCredentials\TokenCredentials.csproj", "{AE36DD78-329C-470F-A6EE-BFF08440803E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TfmScanWithToken", "TfmScanWithToken\TfmScanWithToken.csproj", "{BCAD480A-234A-439D-92C6-61D49E29501B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TfmScanWithToken", "TfmScanWithToken\TfmScanWithToken.csproj", "{BCAD480A-234A-439D-92C6-61D49E29501B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSecretsDetection", "OpenSecretsDetection\OpenSecretsDetection.csproj", "{EA62A644-2C15-4735-A6E4-5021F0EB2A9F}"
 EndProject
