@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parser", "Parser\Parser.csp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FileParsers", "FileParsers", "{DAB4B476-8AFA-4AE7-9737-0FA45B6F55C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualStudioFileParser", "VisualStudioFileParser\VisualStudioFileParser.csproj", "{BCCAA6AE-5A25-44B1-BF2C-28E8891F15B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VisualStudioFileParser", "VisualStudioFileParser\VisualStudioFileParser.csproj", "{BCCAA6AE-5A25-44B1-BF2C-28E8891F15B8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NuGetFileParser", "NuGetFileParser\NuGetFileParser.csproj", "{BE35F49A-ADA7-4562-A005-D00C613092EF}"
 EndProject
@@ -63,7 +63,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TokenCredentials", "TokenCr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TfmScanWithToken", "TfmScanWithToken\TfmScanWithToken.csproj", "{BCAD480A-234A-439D-92C6-61D49E29501B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSecretsDetection", "OpenSecretsDetection\OpenSecretsDetection.csproj", "{EA62A644-2C15-4735-A6E4-5021F0EB2A9F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenSecretsDetection", "OpenSecretsDetection\OpenSecretsDetection.csproj", "{EA62A644-2C15-4735-A6E4-5021F0EB2A9F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NpmFileParser", "NpmFileParser\NpmFileParser.csproj", "{F2F7A77A-888B-47ED-B22D-69B6CB85B130}"
 EndProject
