@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scanners", "Scanners", "{10
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Classes and Models", "Classes and Models", "{F45FE4D9-5F3E-429F-A7A8-CB63BFE825E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectData", "ProjectDataFramework\ProjectData.csproj", "{8E47C531-8382-4630-AE9D-94898E829D25}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectData", "ProjectDataFramework\ProjectData.csproj", "{8E47C531-8382-4630-AE9D-94898E829D25}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectScanner", "ProjectScannerFramework\ProjectScanner.csproj", "{E487398A-0C6B-48A6-9AEA-3333ABDF7686}"
 EndProject
@@ -47,7 +47,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Executables", "Executables"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RepoScan.FileLocator", "FileLocator\RepoScan.FileLocator.csproj", "{DB2EDD2D-9091-457D-BF79-44C2D08DDBFA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepoScan.DataModels", "DataModels\RepoScan.DataModels.csproj", "{CF9A7158-D989-4A91-99E9-33FA59549780}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RepoScan.DataModels", "DataModels\RepoScan.DataModels.csproj", "{CF9A7158-D989-4A91-99E9-33FA59549780}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Storage", "Storage", "{5C6A9C89-785D-40BD-B99F-96C9938AF609}"
 EndProject
@@ -57,7 +57,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Credentials", "Credentials"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PromptForCredentials", "PromptForCredentials\PromptForCredentials.csproj", "{AD60EB96-2B88-4382-92AF-A1F521185E57}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScannerCommon", "ScannerCommon\ScannerCommon.csproj", "{E9AFE348-417E-4534-9DED-9B4704CDC9CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScannerCommon", "ScannerCommon\ScannerCommon.csproj", "{E9AFE348-417E-4534-9DED-9B4704CDC9CB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TokenCredentials", "TokenCredentials\TokenCredentials.csproj", "{AE36DD78-329C-470F-A6EE-BFF08440803E}"
 EndProject
