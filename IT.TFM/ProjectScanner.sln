@@ -55,11 +55,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepoScan.Storage.SqlServer"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Credentials", "Credentials", "{802823C6-DBD9-428A-ABF6-BE8533C398F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PromptForCredentials", "PromptForCredentials\PromptForCredentials.csproj", "{AD60EB96-2B88-4382-92AF-A1F521185E57}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PromptForCredentials", "PromptForCredentials\PromptForCredentials.csproj", "{AD60EB96-2B88-4382-92AF-A1F521185E57}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScannerCommon", "ScannerCommon\ScannerCommon.csproj", "{E9AFE348-417E-4534-9DED-9B4704CDC9CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TokenCredentials", "TokenCredentials\TokenCredentials.csproj", "{AE36DD78-329C-470F-A6EE-BFF08440803E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TokenCredentials", "TokenCredentials\TokenCredentials.csproj", "{AE36DD78-329C-470F-A6EE-BFF08440803E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TfmScanWithToken", "TfmScanWithToken\TfmScanWithToken.csproj", "{BCAD480A-234A-439D-92C6-61D49E29501B}"
 EndProject
