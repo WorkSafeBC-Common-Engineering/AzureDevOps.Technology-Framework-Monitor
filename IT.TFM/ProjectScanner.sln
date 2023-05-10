@@ -25,7 +25,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data Sources", "Data Source
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "ProjectScannerDB", "ProjectScannerDB\ProjectScannerDB.sqlproj", "{A730C45A-2106-4017-BE71-211B2837E151}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectScannerSaveToSqlServer", "ProjectScannerSaveToSqlServer\ProjectScannerSaveToSqlServer.csproj", "{67439106-5CC8-4063-81FB-5D26FEB54D58}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectScannerSaveToSqlServer", "ProjectScannerSaveToSqlServer\ProjectScannerSaveToSqlServer.csproj", "{67439106-5CC8-4063-81FB-5D26FEB54D58}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage", "Storage\Storage.csproj", "{2CF976BD-4D42-40BD-90CF-D5D67E611438}"
 EndProject
