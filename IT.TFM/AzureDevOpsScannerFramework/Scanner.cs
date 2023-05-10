@@ -257,8 +257,8 @@ namespace AzureDevOpsScannerFramework
         {
             AzureDevOps.IRestApi api = new AzureDevOps.RestApi
             {
-                BaseUrl = "dev.azure.com",
-                Organization = "NvisionIdeasRP",
+                BaseUrl = "nvisionideas.visualstudio.com",
+                Organization = "",
                 Token = Environment.GetEnvironmentVariable("TFM_AdToken")
             };
 

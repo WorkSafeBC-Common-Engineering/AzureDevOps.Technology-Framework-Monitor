@@ -24,15 +24,15 @@ namespace AzureDevOps
 
         private const string apiVersion = "api-version=7.0";
 
-        private const string getProjectsUrl = "https://{baseUrl}/{organization}/_apis/projects?{apiVersion}";
+        private const string getProjectsUrl = "https://{baseUrl}/{organization}_apis/projects?{apiVersion}";
 
-        private const string getRepositoriesUrl = "https://{baseUrl}/{organization}/{project}/_apis/git/repositories?{apiVersion}";
+        private const string getRepositoriesUrl = "https://{baseUrl}/{organization}{project}/_apis/git/repositories?{apiVersion}";
 
-        private const string getFilesUrl = "https://{baseUrl}/{organization}/{project}/_apis/git/repositories/{repository}/items?{apiVersion}";
+        private const string getFilesUrl = "https://{baseUrl}/{organization}{project}/_apis/git/repositories/{repository}/items?{apiVersion}";
 
-        private const string downloadRepositoryUrl = "https://{baseUrl}/{organization}/{project}/_apis/git/repositories/{repository}/items?recursionLevel=full&format=zip&versionDescriptor.version={branch}&versionDescriptor.versionType=branch&{apiVersion}";
+        private const string downloadRepositoryUrl = "https://{baseUrl}/{organization}{project}/_apis/git/repositories/{repository}/items?recursionLevel=full&format=zip&versionDescriptor.version={branch}&versionDescriptor.versionType=branch&{apiVersion}";
 
-        private RestClient? restClient;
+        private readonly Dictionary<string, RestClient> clients = new();
 
         #endregion
 
@@ -80,9 +80,13 @@ namespace AzureDevOps
 
         private string GetUrl(string urlTemplate)
         {
+            var orgValue = string.IsNullOrWhiteSpace(Organization)
+                ? string.Empty
+                : $"{Organization}/";
+
             return urlTemplate.Replace(fieldBaseUrl, BaseUrl)
                               .Replace(fieldApiVersion, apiVersion)
-                              .Replace(fieldOrganization, Organization)
+                              .Replace(fieldOrganization, orgValue)
                               .Replace(fieldProject, Project)
                               .Replace(fieldRepository, Repository)
                               .Replace(fieldRepositoryBranch, RepositoryBranch);
@@ -95,17 +99,9 @@ namespace AzureDevOps
 
         private async Task<string> CallApiAsync(string url, Method method = Method.Get, string mediaType = "application/json", bool unzipContent = false)
         {
-            var uri = new Uri(url);
-            var baseUri = new Uri(uri.GetLeftPart(UriPartial.Authority));
-            var relativeUri = baseUri.MakeRelativeUri(uri);
+            var restClient = GetClient(url);
 
-            if (restClient == null)
-            {
-                var options = new RestClientOptions(baseUri);
-                restClient = new RestClient(options);
-            }
-
-            var request = new RestRequest(relativeUri)
+            var request = new RestRequest(GetRelativeUri(url))
             {
                 Method = method
             };
@@ -134,8 +130,31 @@ namespace AzureDevOps
                 return string.Empty;
             }
 
-
             return response.Content ?? string.Empty;
+        }
+
+        private RestClient GetClient(string url)
+        {
+            var uri = new Uri(url);
+            var baseUrl = uri.GetLeftPart(UriPartial.Authority);
+
+            if (clients.ContainsKey(baseUrl))
+            {
+                return clients[baseUrl];
+            }
+            else
+            {
+                var client = new RestClient(baseUrl);
+                clients[baseUrl] = client;
+                return client;
+            }
+        }
+
+        private static Uri GetRelativeUri(string url)
+        {
+            var uri = new Uri(url);
+            var baseUri = new Uri(uri.GetLeftPart(UriPartial.Authority));
+            return baseUri.MakeRelativeUri(uri);
         }
 
         #endregion
