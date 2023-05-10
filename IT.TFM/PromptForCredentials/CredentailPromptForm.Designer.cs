@@ -136,7 +136,7 @@
         private System.Windows.Forms.TextBox UsernameText;
         private System.Windows.Forms.TextBox PasswordText;
         private System.Windows.Forms.Label PasswordLabel;
-        private System.Windows.Forms.Button CancelButton;
+        private new System.Windows.Forms.Button CancelButton;
         private System.Windows.Forms.Button OkButton;
     }
 }

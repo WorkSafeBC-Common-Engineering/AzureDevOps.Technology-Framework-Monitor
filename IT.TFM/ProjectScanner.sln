@@ -27,7 +27,7 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "ProjectScannerDB", "Project
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectScannerSaveToSqlServer", "ProjectScannerSaveToSqlServer\ProjectScannerSaveToSqlServer.csproj", "{67439106-5CC8-4063-81FB-5D26FEB54D58}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage", "Storage\Storage.csproj", "{2CF976BD-4D42-40BD-90CF-D5D67E611438}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage", "Storage\Storage.csproj", "{2CF976BD-4D42-40BD-90CF-D5D67E611438}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EndOfLifeCheckers", "EndOfLifeCheckers", "{02202F4C-F9EE-44C9-A176-2FE683F1EF0D}"
 EndProject
@@ -51,7 +51,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepoScan.DataModels", "Data
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Storage", "Storage", "{5C6A9C89-785D-40BD-B99F-96C9938AF609}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepoScan.Storage.SqlServer", "RepoScan.Storage.SqlServer\RepoScan.Storage.SqlServer.csproj", "{848FC962-7069-46EB-8764-C9B3AC543137}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RepoScan.Storage.SqlServer", "RepoScan.Storage.SqlServer\RepoScan.Storage.SqlServer.csproj", "{848FC962-7069-46EB-8764-C9B3AC543137}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Credentials", "Credentials", "{802823C6-DBD9-428A-ABF6-BE8533C398F1}"
 EndProject
