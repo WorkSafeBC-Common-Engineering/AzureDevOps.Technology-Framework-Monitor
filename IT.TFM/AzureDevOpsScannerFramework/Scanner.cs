@@ -33,6 +33,8 @@ namespace AzureDevOpsScannerFramework
 
         private bool useFileFilter = false;
 
+        private static AzureDevOps.IRestApi api = new AzureDevOps.RestApi();
+
         #endregion
 
         #region IScanner Implementation
@@ -42,6 +44,8 @@ namespace AzureDevOpsScannerFramework
             organizationName = name;
             this.configuration = configuration;
             ParseConfiguration(this.configuration);
+
+            api.Initialize(azureDevOpsOrganizationUrl);
 
             Authenticate();
 
@@ -53,41 +57,37 @@ namespace AzureDevOpsScannerFramework
             return new Organization(ProjectSource.AzureDevOps, organizationName, azureDevOpsOrganizationUrl);
         }
 
-        IEnumerable<Project> IScanner.Projects()
+        async IAsyncEnumerable<Project> IScanner.Projects()
         {
-            //TODO: start of migrating to using the AzDo REST APIs
-            var task = TestGetProjects();
-            task.Wait();
-
-
-
             int projectOffset = 0;
+            api.PagingTop = projectCount;
             bool getMore = true;
 
             while (getMore)
             {
-                var azureProjects = LoadProjects(projectCount, projectOffset);
+                api.PagingSkip = projectOffset;
+                var azDoProjects = await api.GetProjectsAsync();
 
-                if (azureProjects.Any())
+                if (azDoProjects.Value.Any())
                 {
-                    if (azureProjects.Count() < projectCount)
+                    if (azDoProjects.Count < projectCount)
                     {
                         getMore = false;
                     }
 
-                    foreach (var p in azureProjects)
+                    foreach (var p in azDoProjects.Value)
                     {
                         var project = new Project
                         {
                             Name = p.Name,
-                            Id = p.Id,
+                            Id = new Guid(p.Id),
                             Abbreviation = p.Abbreviation,
                             Description = p.Description,
-                            LastUpdate = p.LastUpdateTime,
-                            Revision = p.Revision,
-                            State = p.State.ToString(),
+                            LastUpdate = DateTime.Parse(p.LastUpdateTime),
+                            Revision = long.Parse(p.Revision),
+                            State = p.ProjectState,
                             Url = p.Url,
-                            Visibility = p.Visibility.ToString()
+                            Visibility = p.Visibility
                         };
 
                         yield return project;
@@ -102,18 +102,20 @@ namespace AzureDevOpsScannerFramework
             }
         }
 
-        IEnumerable<Repository> IScanner.Repositories(Project project)
+        async IAsyncEnumerable<Repository> IScanner.Repositories(Project project)
         {
-            var azureRepos = LoadRepositories(project.Id);
-            foreach (var r in azureRepos)
+            api.Project = project.Id.ToString();
+            var azDoRepos = await api.GetRepositoriesAsync();
+
+            foreach (var r in azDoRepos.Value)
             {
                 var repo = new Repository
                 {
-                    Id = r.Id,
+                    Id = new Guid(r.Id),
                     Name = r.Name,
                     DefaultBranch = r.DefaultBranch,
                     IsFork = r.IsFork,
-                    Size = r.Size ?? -1,
+                    Size = r.Size,
                     Url = r.Url,
                     RemoteUrl = r.RemoteUrl,
                     WebUrl = r.WebUrl
@@ -225,7 +227,7 @@ namespace AzureDevOpsScannerFramework
 
         IEnumerable<string> IScanner.FilePropertyNames => propertyFields.AsEnumerable();
 
-        void IScanner.Save(IStorageWriter storage)
+        async Task IScanner.Save(IStorageWriter storage)
         {
             var scanner = this as IScanner;
 
@@ -233,11 +235,11 @@ namespace AzureDevOpsScannerFramework
 
             storage.SaveOrganization(organization);
 
-            foreach (var project in scanner.Projects())
+            await foreach (var project in scanner.Projects())
             {
                 storage.SaveProject(project);
 
-                foreach (var repo in scanner.Repositories(project))
+                await foreach (var repo in scanner.Repositories(project))
                 {
                     storage.SaveRepository(repo);
 
@@ -252,32 +254,6 @@ namespace AzureDevOpsScannerFramework
         #endregion
 
         #region Private Methods
-
-        private async Task TestGetProjects()
-        {
-            AzureDevOps.IRestApi api = new AzureDevOps.RestApi
-            {
-                BaseUrl = "nvisionideas.visualstudio.com",
-                Organization = "",
-                Token = Environment.GetEnvironmentVariable("TFM_AdToken")
-            };
-
-            var projects = await api.GetProjectsAsync();
-
-            api.Project = projects.Value[0].Id;
-            var repos = await api.GetRepositoriesAsync();
-
-            api.Repository = repos.Value[0].Id;
-
-            var branchPath = repos.Value[0].DefaultBranch;  // refs/heads/master
-            var branchFields = branchPath.Split('/');
-            var branch = branchFields[branchFields.Length - 1];
-
-            api.RepositoryBranch = branch;
-            api.CheckoutDirectory = @"C:\x\AzureDevOps.Technology-Framework-Monitor\CheckoutDir";
-            await api.DownloadRepositoryAsync();
-        }
-
 
         private void ParseConfiguration(string configuration)
         {

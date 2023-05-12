@@ -20,7 +20,7 @@ namespace RepoScan.FileLocator
 
         #region Public Methods
 
-        public void Scan()
+        public async Task Scan()
         {
             IWriteRepoList writer = StorageFactory.GetRepoListWriter();
 
@@ -30,9 +30,9 @@ namespace RepoScan.FileLocator
                 var scanner = ScannerFactory.GetScanner(name);
 
                 var organization = scanner.GetOrganization();
-                foreach (var project in scanner.Projects())
+                await foreach (var project in scanner.Projects())
                 {
-                    foreach (var repo in scanner.Repositories(project))
+                    await foreach (var repo in scanner.Repositories(project))
                     {
                         var repoItem = new RepositoryItem
                         {

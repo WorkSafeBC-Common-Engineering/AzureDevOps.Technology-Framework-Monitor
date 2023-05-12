@@ -23,6 +23,12 @@ namespace AzureDevOps
 
         string CheckoutDirectory { get; set; }
 
+        int PagingTop { get; set; }
+
+        int PagingSkip { get; set; }
+
+        void Initialize(string organizationUrl);
+
         Task<AzDoProjectList> GetProjectsAsync();
 
         Task<AzDoRepositoryList> GetRepositoriesAsync();

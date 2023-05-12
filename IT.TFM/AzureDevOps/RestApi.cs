@@ -22,9 +22,13 @@ namespace AzureDevOps
 
         private const string fieldApiVersion = "{apiVersion}";
 
+        private const string fieldPagingTop = "{$top}";
+
+        private const string fieldPagingSkip = "{$skip}";
+
         private const string apiVersion = "api-version=7.0";
 
-        private const string getProjectsUrl = "https://{baseUrl}/{organization}_apis/projects?{apiVersion}";
+        private const string getProjectsUrl = "https://{baseUrl}/{organization}_apis/projects?$top={$top}&$skip={$skip}&{apiVersion}";
 
         private const string getRepositoriesUrl = "https://{baseUrl}/{organization}{project}/_apis/git/repositories?{apiVersion}";
 
@@ -51,6 +55,33 @@ namespace AzureDevOps
         public string RepositoryBranch { get; set; } = string.Empty;
 
         public string CheckoutDirectory { get; set; } = string.Empty;
+
+        public int PagingTop { get; set; }
+
+        public int PagingSkip { get; set; }
+
+        void IRestApi.Initialize(string organizationUrl)
+        {
+            var url = organizationUrl.EndsWith("/")
+                ? organizationUrl.Substring(0, organizationUrl.Length - 1)
+                : organizationUrl;
+
+            if (url.EndsWith("visualstudio.com", StringComparison.InvariantCultureIgnoreCase))
+            {
+                BaseUrl = url;
+                Organization = string.Empty;
+            }
+            else
+            {
+                var fields = url.Split(new char[] { '/' });
+
+                BaseUrl = fields[0];
+                Organization = fields[1];
+            }
+
+            Token = Environment.GetEnvironmentVariable("TFM_AdToken");
+        }
+
 
         async Task<AzDoProjectList> IRestApi.GetProjectsAsync()
         {
@@ -89,7 +120,9 @@ namespace AzureDevOps
                               .Replace(fieldOrganization, orgValue)
                               .Replace(fieldProject, Project)
                               .Replace(fieldRepository, Repository)
-                              .Replace(fieldRepositoryBranch, RepositoryBranch);
+                              .Replace(fieldRepositoryBranch, RepositoryBranch)
+                              .Replace(fieldPagingTop, PagingTop.ToString())
+                              .Replace(fieldPagingSkip, PagingSkip.ToString());
         }
 
         private string AuthHeader()

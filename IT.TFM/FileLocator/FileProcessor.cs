@@ -14,7 +14,7 @@ namespace RepoScan.FileLocator
 {
     public class FileProcessor
     {
-        public void GetFiles(int totalThreads)
+        public async Task GetFiles(int totalThreads)
         {
             Settings.Initialize();
 
@@ -45,7 +45,12 @@ namespace RepoScan.FileLocator
                     orgName = repoItem.OrgName;
                     scanner = ScannerFactory.GetScanner(orgName);
 
-                    projectList = scanner.Projects().Select(p => p.Id).ToArray();
+                    List<Guid> pList = new();
+                    await foreach (var p in scanner.Projects())
+                    {
+                        pList.Add(p.Id);
+                    }
+                    projectList = pList.ToArray();
                 }
 
                 // Check whether the project or repo still exists - it might have been moved or deleted.
@@ -63,8 +68,16 @@ namespace RepoScan.FileLocator
                     Name = repoItem.ProjectName
                 };
 
+                bool repoExists = false;
                 var repoList = scanner.Repositories(project);
-                bool repoExists = repoList.Any(r => r.Id == repoItem.RepositoryId);
+                await foreach (var r in repoList)
+                {
+                    if (r.Id == repoItem.RepositoryId)
+                    {
+                        repoExists = true;
+                        break;
+                    }
+                }
 
                 if (!repoExists)
                 {
@@ -80,6 +93,14 @@ namespace RepoScan.FileLocator
                     Id = repoItem.RepositoryId,
                     DefaultBranch = repoItem.RepositoryDefaultBranch
                 };
+
+                
+
+
+
+
+
+
 
                 Parallel.ForEach(scanner.Files(repoItem.ProjectId, repo, false), options, (file) =>
                 {
