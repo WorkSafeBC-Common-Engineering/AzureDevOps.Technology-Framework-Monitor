@@ -33,7 +33,7 @@ namespace AzureDevOpsScannerFramework
 
         private bool useFileFilter = false;
 
-        private static AzureDevOps.IRestApi api = new AzureDevOps.RestApi();
+        private static readonly AzureDevOps.IRestApi api = new AzureDevOps.RestApi();
 
         #endregion
 
@@ -125,30 +125,44 @@ namespace AzureDevOpsScannerFramework
             }
         }
 
-        IEnumerable<FileItem> IScanner.Files(Guid projectId, Repository repository, bool loadDetails)
+        async Task<IEnumerable<FileItem>> IScanner.Files(Guid projectId, Repository repository, bool loadDetails)
         {
             if (repository.DefaultBranch == null)
             {
-                yield break;
+               return null;
             }
 
-            var azureFiles = LoadFiles(repository.Id);
+            var fileList = new List<FileItem>();
 
-            string[] content;
+            api.Project = projectId.ToString();
+            api.Repository = repository.Id.ToString();
 
-            foreach (var f in azureFiles)
+            var azDoFiles = await api.GetFilesAsync();
+            if (loadDetails)
             {
+                await api.DownloadRepositoryAsync();
+            }
+
+            foreach (var f2 in azDoFiles.Value)
+            {
+                if (f2.IsFolder)
+                {
+                    continue;
+                }
+
                 var file = new FileItem
                 {
-                    FileType = f.Path.GetMatchedFileType(),
-                    Id = f.ObjectId,
-                    Path = f.Path,
-                    Url = f.Url,
-                    SHA1 = f.CommitId
+                    FileType = f2.Path.GetMatchedFileType(),
+                    Id = f2.ObjectId,
+                    Path = f2.Path,
+                    Url = f2.Url,
+                    SHA1 = f2.CommitId
                 };
 
                 if (loadDetails)
                 {
+                    string[] content;
+
                     try
                     {
                         content = GetFile(repository.Id, file);
@@ -172,8 +186,51 @@ namespace AzureDevOpsScannerFramework
                     AddPropertyFields(file);
                 }
 
-                yield return file;
+                fileList.Add(file);
             }
+
+            return fileList;
+
+            //var azureFiles = LoadFiles(repository.Id);
+
+            //foreach (var f in azureFiles)
+            //{
+            //    var file = new FileItem
+            //    {
+            //        FileType = f.Path.GetMatchedFileType(),
+            //        Id = f.ObjectId,
+            //        Path = f.Path,
+            //        Url = f.Url,
+            //        SHA1 = f.CommitId
+            //    };
+
+            //    if (loadDetails)
+            //    {
+            //        try
+            //        {
+            //            content = GetFile(repository.Id, file);
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            file.AddProperty("Error", $"Unable to retrieve file. File: {file.Path}, Error Msg: {ex.Message}");
+            //            continue;
+            //        }
+
+            //        if (useFileFilter)
+            //        {
+            //            FileFiltering.Filter.FilterFile(file, content);
+            //        }
+
+            //        if (file.FileType != FileItemType.NoMatch)
+            //        {
+            //            AddFileProperties(file, content);
+            //        }
+
+            //        AddPropertyFields(file);
+            //    }
+
+            //    yield return file;
+            //}
         }
 
         FileItem IScanner.FileDetails(Guid repositoryId, FileItem file)
@@ -243,7 +300,9 @@ namespace AzureDevOpsScannerFramework
                 {
                     storage.SaveRepository(repo);
 
-                    foreach (var file in scanner.Files(project.Id, repo, true))
+                    var fileList = await scanner.Files(project.Id, repo, true);
+
+                    foreach (var file in fileList)
                     {
                         storage.SaveFile(file, repo.Id, true, false);
                     }

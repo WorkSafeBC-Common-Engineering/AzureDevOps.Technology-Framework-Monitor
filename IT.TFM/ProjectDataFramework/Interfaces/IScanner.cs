@@ -14,7 +14,7 @@ namespace ProjectData.Interfaces
 
         IAsyncEnumerable<Repository> Repositories(Project project);
 
-        IEnumerable<FileItem> Files(Guid projectId, Repository repository, bool loadDetails);
+        Task<IEnumerable<FileItem>> Files(Guid projectId, Repository repository, bool loadDetails);
 
         FileItem FileDetails(Guid repositoryId, FileItem file);
 

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace AzureDevOps
 {
-    public class RestApi : IRestApi
+    public class RestApi : IRestApi, IDisposable
     {
         #region Private Members
 
@@ -32,11 +32,13 @@ namespace AzureDevOps
 
         private const string getRepositoriesUrl = "https://{baseUrl}/{organization}{project}/_apis/git/repositories?{apiVersion}";
 
-        private const string getFilesUrl = "https://{baseUrl}/{organization}{project}/_apis/git/repositories/{repository}/items?{apiVersion}";
+        private const string getFilesUrl = "https://{baseUrl}/{organization}{project}/_apis/git/repositories/{repository}/items?recursionLevel=full&{apiVersion}";
 
         private const string downloadRepositoryUrl = "https://{baseUrl}/{organization}{project}/_apis/git/repositories/{repository}/items?recursionLevel=full&format=zip&versionDescriptor.version={branch}&versionDescriptor.versionType=branch&{apiVersion}";
 
-        private readonly Dictionary<string, RestClient> clients = new();
+        private static readonly Dictionary<string, RestClient> clients = new();
+
+        private bool disposedValue;
 
         #endregion
 
@@ -56,6 +58,11 @@ namespace AzureDevOps
 
         public string CheckoutDirectory { get; set; } = string.Empty;
 
+        public string CheckoutRepositoryDirectory
+        {
+            get { return Path.Combine(CheckoutDirectory, Project, Repository); }
+        }
+
         public int PagingTop { get; set; }
 
         public int PagingSkip { get; set; }
@@ -70,6 +77,7 @@ namespace AzureDevOps
             {
                 BaseUrl = url;
                 Organization = string.Empty;
+                CheckoutDirectory = Path.Combine(Environment.CurrentDirectory, BaseUrl);
             }
             else
             {
@@ -77,11 +85,11 @@ namespace AzureDevOps
 
                 BaseUrl = fields[0];
                 Organization = fields[1];
+                CheckoutDirectory = Path.Combine (Environment.CurrentDirectory, Organization);
             }
 
             Token = Environment.GetEnvironmentVariable("TFM_AdToken");
         }
-
 
         async Task<AzDoProjectList> IRestApi.GetProjectsAsync()
         {
@@ -99,10 +107,53 @@ namespace AzureDevOps
             return repositories ?? new AzDoRepositoryList();
         }
 
+        async Task<AzDoFileList> IRestApi.GetFilesAsync()
+        {
+            var content = await CallApiAsync(GetUrl(getFilesUrl));
+
+            var files = JsonConvert.DeserializeObject<AzDoFileList>(content);
+            return files ?? new AzDoFileList();
+        }
+
         async Task<string> IRestApi.DownloadRepositoryAsync()
         {
-
             return await CallApiAsync(GetUrl(downloadRepositoryUrl), mediaType:"application/zip", unzipContent:true);
+        }
+
+        #endregion
+
+        #region IDisposable Implementation
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    foreach (var item in clients)
+                    {
+                        item.Value?.Dispose();
+                    }
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                disposedValue = true;
+            }
+        }
+
+        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+        // ~RestApi()
+        // {
+        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        //     Dispose(disposing: false);
+        // }
+
+        void IDisposable.Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
 
         #endregion
@@ -151,15 +202,15 @@ namespace AzureDevOps
 
             if (unzipContent)
             {
-                if (Directory.Exists(CheckoutDirectory))
+                if (Directory.Exists(CheckoutRepositoryDirectory))
                 {
-                    Directory.Delete(CheckoutDirectory, true);
+                    Directory.Delete(CheckoutRepositoryDirectory, true);
                 }
-                Directory.CreateDirectory(CheckoutDirectory);
+                Directory.CreateDirectory(CheckoutRepositoryDirectory);
 
                 var stream = new MemoryStream(response.RawBytes ?? Array.Empty<byte>());
                 var archive = new ZipArchive(stream);
-                archive.ExtractToDirectory(CheckoutDirectory);
+                archive.ExtractToDirectory(CheckoutRepositoryDirectory);
                 return string.Empty;
             }
 
@@ -189,7 +240,6 @@ namespace AzureDevOps
             var baseUri = new Uri(uri.GetLeftPart(UriPartial.Authority));
             return baseUri.MakeRelativeUri(uri);
         }
-
         #endregion
     }
 }

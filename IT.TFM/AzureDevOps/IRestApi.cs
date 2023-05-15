@@ -23,6 +23,8 @@ namespace AzureDevOps
 
         string CheckoutDirectory { get; set; }
 
+        string CheckoutRepositoryDirectory { get; }
+
         int PagingTop { get; set; }
 
         int PagingSkip { get; set; }
@@ -32,6 +34,8 @@ namespace AzureDevOps
         Task<AzDoProjectList> GetProjectsAsync();
 
         Task<AzDoRepositoryList> GetRepositoriesAsync();
+
+        Task<AzDoFileList> GetFilesAsync();
 
         Task<string> DownloadRepositoryAsync();
     }
