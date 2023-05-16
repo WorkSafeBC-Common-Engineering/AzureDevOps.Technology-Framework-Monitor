@@ -16,7 +16,11 @@ namespace ProjectData.Interfaces
 
         Task<IEnumerable<FileItem>> Files(Guid projectId, Repository repository, bool loadDetails);
 
-        FileItem FileDetails(Guid repositoryId, FileItem file);
+        Task LoadFiles(Guid projectID, Guid repositoryId);
+
+        void DeleteFiles();
+
+        FileItem FileDetails(Guid projectId, Guid repositoryId, FileItem file);
 
         IEnumerable<string> FilePropertyNames { get; }
 

@@ -190,65 +190,36 @@ namespace AzureDevOpsScannerFramework
             }
 
             return fileList;
-
-            //var azureFiles = LoadFiles(repository.Id);
-
-            //foreach (var f in azureFiles)
-            //{
-            //    var file = new FileItem
-            //    {
-            //        FileType = f.Path.GetMatchedFileType(),
-            //        Id = f.ObjectId,
-            //        Path = f.Path,
-            //        Url = f.Url,
-            //        SHA1 = f.CommitId
-            //    };
-
-            //    if (loadDetails)
-            //    {
-            //        try
-            //        {
-            //            content = GetFile(repository.Id, file);
-            //        }
-            //        catch (Exception ex)
-            //        {
-            //            file.AddProperty("Error", $"Unable to retrieve file. File: {file.Path}, Error Msg: {ex.Message}");
-            //            continue;
-            //        }
-
-            //        if (useFileFilter)
-            //        {
-            //            FileFiltering.Filter.FilterFile(file, content);
-            //        }
-
-            //        if (file.FileType != FileItemType.NoMatch)
-            //        {
-            //            AddFileProperties(file, content);
-            //        }
-
-            //        AddPropertyFields(file);
-            //    }
-
-            //    yield return file;
-            //}
         }
 
-        FileItem IScanner.FileDetails(Guid repositoryId, FileItem file)
+        async Task IScanner.LoadFiles(Guid projectId, Guid repositoryId)
+        {
+            api.Project = projectId.ToString();
+            api.Repository = repositoryId.ToString();
+            await api.DownloadRepositoryAsync();
+        }
+
+        void IScanner.DeleteFiles()
+        {
+            if (Directory.Exists(api.CheckoutDirectory))
+            {
+                Directory.Delete(api.CheckoutDirectory, true);
+            }
+        }
+
+        FileItem IScanner.FileDetails(Guid projectId, Guid repositoryId, FileItem file)
         {
             string[] content;
             bool hasProperties = false;
 
-            var azureFile = LoadFile(repositoryId, file.Path);
-            if (azureFile == null)
-            {
-                return null;
-            }
+            var dir = file.Path.StartsWith("/") ? file.Path.Substring(1) : file.Path;
+            var filePath = Path.Combine(api.CheckoutDirectory, dir);
 
-            file.SHA1 = azureFile.CommitId;
+            //file.SHA1 = azureFile.CommitId;
 
             try
             {
-                content = GetFile(repositoryId, file);
+                content = File.ReadAllLines(filePath);
 
                 if (useFileFilter)
                 {

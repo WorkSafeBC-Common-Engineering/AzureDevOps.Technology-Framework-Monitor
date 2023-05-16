@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using RestSharp;
 using System.IO.Compression;
 using System.Text;
+using System.Xml;
 
 namespace AzureDevOps
 {
@@ -58,11 +59,6 @@ namespace AzureDevOps
 
         public string CheckoutDirectory { get; set; } = string.Empty;
 
-        public string CheckoutRepositoryDirectory
-        {
-            get { return Path.Combine(CheckoutDirectory, Project, Repository); }
-        }
-
         public int PagingTop { get; set; }
 
         public int PagingSkip { get; set; }
@@ -78,6 +74,7 @@ namespace AzureDevOps
                 BaseUrl = url;
                 Organization = string.Empty;
                 CheckoutDirectory = Path.Combine(Environment.CurrentDirectory, BaseUrl);
+                CheckoutDirectory = Path.Combine(@"c:\y");
             }
             else
             {
@@ -86,6 +83,7 @@ namespace AzureDevOps
                 BaseUrl = fields[0];
                 Organization = fields[1];
                 CheckoutDirectory = Path.Combine (Environment.CurrentDirectory, Organization);
+                CheckoutDirectory = Path.Combine(@"c:\y");
             }
 
             Token = Environment.GetEnvironmentVariable("TFM_AdToken");
@@ -110,6 +108,11 @@ namespace AzureDevOps
         async Task<AzDoFileList> IRestApi.GetFilesAsync()
         {
             var content = await CallApiAsync(GetUrl(getFilesUrl));
+
+            if (content == string.Empty)
+            {
+                return new AzDoFileList();
+            }
 
             var files = JsonConvert.DeserializeObject<AzDoFileList>(content);
             return files ?? new AzDoFileList();
@@ -197,20 +200,26 @@ namespace AzureDevOps
 
             if (!response.IsSuccessStatusCode)
             {
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    // Repository is empty
+                    return string.Empty;
+                }
+
                 throw new HttpRequestException($"API Request failed: {response.StatusCode} {response.ErrorMessage}");
             }
 
             if (unzipContent)
             {
-                if (Directory.Exists(CheckoutRepositoryDirectory))
+                if (Directory.Exists(CheckoutDirectory))
                 {
-                    Directory.Delete(CheckoutRepositoryDirectory, true);
+                    Directory.Delete(CheckoutDirectory, true);
                 }
-                Directory.CreateDirectory(CheckoutRepositoryDirectory);
+                Directory.CreateDirectory(CheckoutDirectory);
 
                 var stream = new MemoryStream(response.RawBytes ?? Array.Empty<byte>());
                 var archive = new ZipArchive(stream);
-                archive.ExtractToDirectory(CheckoutRepositoryDirectory);
+                archive.ExtractToDirectory(CheckoutDirectory);
                 return string.Empty;
             }
 
@@ -240,6 +249,7 @@ namespace AzureDevOps
             var baseUri = new Uri(uri.GetLeftPart(UriPartial.Authority));
             return baseUri.MakeRelativeUri(uri);
         }
+
         #endregion
     }
 }

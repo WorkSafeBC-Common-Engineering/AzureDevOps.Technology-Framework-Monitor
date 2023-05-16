@@ -23,8 +23,6 @@ namespace AzureDevOps
 
         string CheckoutDirectory { get; set; }
 
-        string CheckoutRepositoryDirectory { get; }
-
         int PagingTop { get; set; }
 
         int PagingSkip { get; set; }

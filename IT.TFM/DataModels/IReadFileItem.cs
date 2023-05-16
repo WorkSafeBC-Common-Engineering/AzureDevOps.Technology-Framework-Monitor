@@ -10,6 +10,8 @@ namespace RepoScan.DataModels
     {
         IEnumerable<FileItem> Read();
 
+        IEnumerable<FileItem> Read(string repoId);
+
         IEnumerable<FileItem> ReadDetails();
     }
 }
