@@ -1,4 +1,6 @@
-﻿using System.Messaging;
+﻿
+/* System.Messaging no longer exists because of NET 6 Framework */
+/*using System.Messaging;*/
 
 namespace RepoScan.DataModels
 {
@@ -6,9 +8,9 @@ namespace RepoScan.DataModels
     {
         FileDetails Read();
 
-        MessageEnumerator GetEnumerator();
+        /*MessageEnumerator GetEnumerator();*/
 
-        FileDetails Read(Message message);
+        /*FileDetails Read(Message message);*/
 
         void Clear();
     }

@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
@@ -7,65 +7,65 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scanners", "Scanners", "{10
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Classes and Models", "Classes and Models", "{F45FE4D9-5F3E-429F-A7A8-CB63BFE825E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectData", "ProjectDataFramework\ProjectData.csproj", "{8E47C531-8382-4630-AE9D-94898E829D25}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectData", "ProjectDataFramework\ProjectData.csproj", "{8E47C531-8382-4630-AE9D-94898E829D25}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectScanner", "ProjectScannerFramework\ProjectScanner.csproj", "{E487398A-0C6B-48A6-9AEA-3333ABDF7686}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectScanner", "ProjectScannerFramework\ProjectScanner.csproj", "{E487398A-0C6B-48A6-9AEA-3333ABDF7686}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureDevOpsScannerFramework", "AzureDevOpsScannerFramework\AzureDevOpsScannerFramework.csproj", "{38C26B38-4255-464D-8905-3D6D32758025}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOpsScannerFramework", "AzureDevOpsScannerFramework\AzureDevOpsScannerFramework.csproj", "{38C26B38-4255-464D-8905-3D6D32758025}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parser", "Parser\Parser.csproj", "{171D31E0-F983-419B-ADF7-F8121C83F125}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parser", "Parser\Parser.csproj", "{171D31E0-F983-419B-ADF7-F8121C83F125}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FileParsers", "FileParsers", "{DAB4B476-8AFA-4AE7-9737-0FA45B6F55C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualStudioFileParser", "VisualStudioFileParser\VisualStudioFileParser.csproj", "{BCCAA6AE-5A25-44B1-BF2C-28E8891F15B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VisualStudioFileParser", "VisualStudioFileParser\VisualStudioFileParser.csproj", "{BCCAA6AE-5A25-44B1-BF2C-28E8891F15B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NuGetFileParser", "NuGetFileParser\NuGetFileParser.csproj", "{BE35F49A-ADA7-4562-A005-D00C613092EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NuGetFileParser", "NuGetFileParser\NuGetFileParser.csproj", "{BE35F49A-ADA7-4562-A005-D00C613092EF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data Sources", "Data Sources", "{AE122355-12E2-4890-8041-3B2B307CDDFB}"
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "ProjectScannerDB", "ProjectScannerDB\ProjectScannerDB.sqlproj", "{A730C45A-2106-4017-BE71-211B2837E151}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectScannerSaveToSqlServer", "ProjectScannerSaveToSqlServer\ProjectScannerSaveToSqlServer.csproj", "{67439106-5CC8-4063-81FB-5D26FEB54D58}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectScannerSaveToSqlServer", "ProjectScannerSaveToSqlServer\ProjectScannerSaveToSqlServer.csproj", "{67439106-5CC8-4063-81FB-5D26FEB54D58}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage", "Storage\Storage.csproj", "{2CF976BD-4D42-40BD-90CF-D5D67E611438}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage", "Storage\Storage.csproj", "{2CF976BD-4D42-40BD-90CF-D5D67E611438}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EndOfLifeCheckers", "EndOfLifeCheckers", "{02202F4C-F9EE-44C9-A176-2FE683F1EF0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EndOfLifeConfigFile", "EndOfLifeConfigFile\EndOfLifeConfigFile.csproj", "{7E7B865C-0B54-4F9A-A704-4FFE75C96650}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EndOfLifeConfigFile", "EndOfLifeConfigFile\EndOfLifeConfigFile.csproj", "{7E7B865C-0B54-4F9A-A704-4FFE75C96650}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Filters", "Filters", "{03C1EB17-4DBA-4E97-A615-C69F573F3734}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentFilter", "ContentFilter\ContentFilter.csproj", "{78C79A72-BC53-475B-95E4-BD2DA5B078E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContentFilter", "ContentFilter\ContentFilter.csproj", "{78C79A72-BC53-475B-95E4-BD2DA5B078E0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FilterConfigurationFromConfigFile", "FilterConfigurationFromConfigFile\FilterConfigurationFromConfigFile.csproj", "{9EA05CDB-75FD-4248-9733-CB1C8C9FC636}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FilterConfigurationFromConfigFile", "FilterConfigurationFromConfigFile\FilterConfigurationFromConfigFile.csproj", "{9EA05CDB-75FD-4248-9733-CB1C8C9FC636}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigurationFileData", "ConfigurationFileData\ConfigurationFileData.csproj", "{D4518E0A-EF3A-48C4-A50A-687F6F0F8912}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConfigurationFileData", "ConfigurationFileData\ConfigurationFileData.csproj", "{D4518E0A-EF3A-48C4-A50A-687F6F0F8912}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileFiltering", "CodeFileFiltering\FileFiltering.csproj", "{8BE34AB2-472F-405A-AC52-8E3ED9587FC3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileFiltering", "CodeFileFiltering\FileFiltering.csproj", "{8BE34AB2-472F-405A-AC52-8E3ED9587FC3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Executables", "Executables", "{69451FB6-F75A-48D7-A067-0F444AC23E83}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepoScan.FileLocator", "FileLocator\RepoScan.FileLocator.csproj", "{DB2EDD2D-9091-457D-BF79-44C2D08DDBFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RepoScan.FileLocator", "FileLocator\RepoScan.FileLocator.csproj", "{DB2EDD2D-9091-457D-BF79-44C2D08DDBFA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepoScan.DataModels", "DataModels\RepoScan.DataModels.csproj", "{CF9A7158-D989-4A91-99E9-33FA59549780}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RepoScan.DataModels", "DataModels\RepoScan.DataModels.csproj", "{CF9A7158-D989-4A91-99E9-33FA59549780}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Storage", "Storage", "{5C6A9C89-785D-40BD-B99F-96C9938AF609}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepoScan.Storage.SqlServer", "RepoScan.Storage.SqlServer\RepoScan.Storage.SqlServer.csproj", "{848FC962-7069-46EB-8764-C9B3AC543137}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RepoScan.Storage.SqlServer", "RepoScan.Storage.SqlServer\RepoScan.Storage.SqlServer.csproj", "{848FC962-7069-46EB-8764-C9B3AC543137}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Credentials", "Credentials", "{802823C6-DBD9-428A-ABF6-BE8533C398F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PromptForCredentials", "PromptForCredentials\PromptForCredentials.csproj", "{AD60EB96-2B88-4382-92AF-A1F521185E57}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PromptForCredentials", "PromptForCredentials\PromptForCredentials.csproj", "{AD60EB96-2B88-4382-92AF-A1F521185E57}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScannerCommon", "ScannerCommon\ScannerCommon.csproj", "{E9AFE348-417E-4534-9DED-9B4704CDC9CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScannerCommon", "ScannerCommon\ScannerCommon.csproj", "{E9AFE348-417E-4534-9DED-9B4704CDC9CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TokenCredentials", "TokenCredentials\TokenCredentials.csproj", "{AE36DD78-329C-470F-A6EE-BFF08440803E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TokenCredentials", "TokenCredentials\TokenCredentials.csproj", "{AE36DD78-329C-470F-A6EE-BFF08440803E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TfmScanWithToken", "TfmScanWithToken\TfmScanWithToken.csproj", "{BCAD480A-234A-439D-92C6-61D49E29501B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TfmScanWithToken", "TfmScanWithToken\TfmScanWithToken.csproj", "{BCAD480A-234A-439D-92C6-61D49E29501B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSecretsDetection", "OpenSecretsDetection\OpenSecretsDetection.csproj", "{EA62A644-2C15-4735-A6E4-5021F0EB2A9F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenSecretsDetection", "OpenSecretsDetection\OpenSecretsDetection.csproj", "{EA62A644-2C15-4735-A6E4-5021F0EB2A9F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NpmFileParser", "NpmFileParser\NpmFileParser.csproj", "{F2F7A77A-888B-47ED-B22D-69B6CB85B130}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NpmFileParser", "NpmFileParser\NpmFileParser.csproj", "{F2F7A77A-888B-47ED-B22D-69B6CB85B130}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
