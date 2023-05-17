@@ -67,6 +67,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenSecretsDetection", "Ope
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NpmFileParser", "NpmFileParser\NpmFileParser.csproj", "{F2F7A77A-888B-47ED-B22D-69B6CB85B130}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOps", "AzureDevOps\AzureDevOps.csproj", "{58D2CEAF-71D0-422E-9FD2-6C702C0320EF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -167,6 +169,10 @@ Global
 		{F2F7A77A-888B-47ED-B22D-69B6CB85B130}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2F7A77A-888B-47ED-B22D-69B6CB85B130}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2F7A77A-888B-47ED-B22D-69B6CB85B130}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58D2CEAF-71D0-422E-9FD2-6C702C0320EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58D2CEAF-71D0-422E-9FD2-6C702C0320EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58D2CEAF-71D0-422E-9FD2-6C702C0320EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58D2CEAF-71D0-422E-9FD2-6C702C0320EF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -197,6 +203,7 @@ Global
 		{BCAD480A-234A-439D-92C6-61D49E29501B} = {69451FB6-F75A-48D7-A067-0F444AC23E83}
 		{EA62A644-2C15-4735-A6E4-5021F0EB2A9F} = {DAB4B476-8AFA-4AE7-9737-0FA45B6F55C1}
 		{F2F7A77A-888B-47ED-B22D-69B6CB85B130} = {DAB4B476-8AFA-4AE7-9737-0FA45B6F55C1}
+		{58D2CEAF-71D0-422E-9FD2-6C702C0320EF} = {10E88914-F313-43A5-9893-24F5D79F51CB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {13E06812-4F34-4E3C-8E19-5A26F31CF9C8}

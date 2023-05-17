@@ -87,6 +87,7 @@
     <None Include="PostDeployment\PopulateFileReferenceTypes.sql" />
     <None Include="PostDeployment\PopulateFileTypes.sql" />
     <None Include="PostDeployment\PopulateScannerTypes.sql" />
+    <None Include="tfmoss.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment.sql" />

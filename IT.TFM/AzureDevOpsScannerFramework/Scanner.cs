@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.VisualStudio.Services.Client;
@@ -32,6 +33,8 @@ namespace AzureDevOpsScannerFramework
 
         private bool useFileFilter = false;
 
+        private static readonly AzureDevOps.IRestApi api = new AzureDevOps.RestApi();
+
         #endregion
 
         #region IScanner Implementation
@@ -41,6 +44,8 @@ namespace AzureDevOpsScannerFramework
             organizationName = name;
             this.configuration = configuration;
             ParseConfiguration(this.configuration);
+
+            api.Initialize(azureDevOpsOrganizationUrl);
 
             Authenticate();
 
@@ -52,35 +57,37 @@ namespace AzureDevOpsScannerFramework
             return new Organization(ProjectSource.AzureDevOps, organizationName, azureDevOpsOrganizationUrl);
         }
 
-        IEnumerable<Project> IScanner.Projects()
+        async IAsyncEnumerable<Project> IScanner.Projects()
         {
             int projectOffset = 0;
+            api.PagingTop = projectCount;
             bool getMore = true;
 
             while (getMore)
             {
-                var azureProjects = LoadProjects(projectCount, projectOffset);
+                api.PagingSkip = projectOffset;
+                var azDoProjects = await api.GetProjectsAsync();
 
-                if (azureProjects.Any())
+                if (azDoProjects.Value.Any())
                 {
-                    if (azureProjects.Count() < projectCount)
+                    if (azDoProjects.Count < projectCount)
                     {
                         getMore = false;
                     }
 
-                    foreach (var p in azureProjects)
+                    foreach (var p in azDoProjects.Value)
                     {
                         var project = new Project
                         {
                             Name = p.Name,
-                            Id = p.Id,
+                            Id = new Guid(p.Id),
                             Abbreviation = p.Abbreviation,
                             Description = p.Description,
-                            LastUpdate = p.LastUpdateTime,
-                            Revision = p.Revision,
-                            State = p.State.ToString(),
+                            LastUpdate = DateTime.Parse(p.LastUpdateTime),
+                            Revision = long.Parse(p.Revision),
+                            State = p.ProjectState,
                             Url = p.Url,
-                            Visibility = p.Visibility.ToString()
+                            Visibility = p.Visibility
                         };
 
                         yield return project;
@@ -95,18 +102,20 @@ namespace AzureDevOpsScannerFramework
             }
         }
 
-        IEnumerable<Repository> IScanner.Repositories(Project project)
+        async IAsyncEnumerable<Repository> IScanner.Repositories(Project project)
         {
-            var azureRepos = LoadRepositories(project.Id);
-            foreach (var r in azureRepos)
+            api.Project = project.Id.ToString();
+            var azDoRepos = await api.GetRepositoriesAsync();
+
+            foreach (var r in azDoRepos.Value)
             {
                 var repo = new Repository
                 {
-                    Id = r.Id,
+                    Id = new Guid(r.Id),
                     Name = r.Name,
                     DefaultBranch = r.DefaultBranch,
                     IsFork = r.IsFork,
-                    Size = r.Size ?? -1,
+                    Size = r.Size,
                     Url = r.Url,
                     RemoteUrl = r.RemoteUrl,
                     WebUrl = r.WebUrl
@@ -116,30 +125,44 @@ namespace AzureDevOpsScannerFramework
             }
         }
 
-        IEnumerable<FileItem> IScanner.Files(Guid projectId, Repository repository, bool loadDetails)
+        async Task<IEnumerable<FileItem>> IScanner.Files(Guid projectId, Repository repository, bool loadDetails)
         {
             if (repository.DefaultBranch == null)
             {
-                yield break;
+               return null;
             }
 
-            var azureFiles = LoadFiles(repository.Id);
+            var fileList = new List<FileItem>();
 
-            string[] content;
+            api.Project = projectId.ToString();
+            api.Repository = repository.Id.ToString();
 
-            foreach (var f in azureFiles)
+            var azDoFiles = await api.GetFilesAsync();
+            if (loadDetails)
             {
+                await api.DownloadRepositoryAsync();
+            }
+
+            foreach (var f2 in azDoFiles.Value)
+            {
+                if (f2.IsFolder)
+                {
+                    continue;
+                }
+
                 var file = new FileItem
                 {
-                    FileType = f.Path.GetMatchedFileType(),
-                    Id = f.ObjectId,
-                    Path = f.Path,
-                    Url = f.Url,
-                    SHA1 = f.CommitId
+                    FileType = f2.Path.GetMatchedFileType(),
+                    Id = f2.ObjectId,
+                    Path = f2.Path,
+                    Url = f2.Url,
+                    SHA1 = f2.CommitId
                 };
 
                 if (loadDetails)
                 {
+                    string[] content;
+
                     try
                     {
                         content = GetFile(repository.Id, file);
@@ -163,26 +186,40 @@ namespace AzureDevOpsScannerFramework
                     AddPropertyFields(file);
                 }
 
-                yield return file;
+                fileList.Add(file);
+            }
+
+            return fileList;
+        }
+
+        async Task IScanner.LoadFiles(Guid projectId, Guid repositoryId)
+        {
+            api.Project = projectId.ToString();
+            api.Repository = repositoryId.ToString();
+            await api.DownloadRepositoryAsync();
+        }
+
+        void IScanner.DeleteFiles()
+        {
+            if (Directory.Exists(api.CheckoutDirectory))
+            {
+                Directory.Delete(api.CheckoutDirectory, true);
             }
         }
 
-        FileItem IScanner.FileDetails(Guid repositoryId, FileItem file)
+        FileItem IScanner.FileDetails(Guid projectId, Guid repositoryId, FileItem file)
         {
             string[] content;
             bool hasProperties = false;
 
-            var azureFile = LoadFile(repositoryId, file.Path);
-            if (azureFile == null)
-            {
-                return null;
-            }
+            var dir = file.Path.StartsWith("/") ? file.Path.Substring(1) : file.Path;
+            var filePath = Path.Combine(api.CheckoutDirectory, dir);
 
-            file.SHA1 = azureFile.CommitId;
+            //file.SHA1 = azureFile.CommitId;
 
             try
             {
-                content = GetFile(repositoryId, file);
+                content = File.ReadAllLines(filePath);
 
                 if (useFileFilter)
                 {
@@ -218,7 +255,7 @@ namespace AzureDevOpsScannerFramework
 
         IEnumerable<string> IScanner.FilePropertyNames => propertyFields.AsEnumerable();
 
-        void IScanner.Save(IStorageWriter storage)
+        async Task IScanner.Save(IStorageWriter storage)
         {
             var scanner = this as IScanner;
 
@@ -226,15 +263,17 @@ namespace AzureDevOpsScannerFramework
 
             storage.SaveOrganization(organization);
 
-            foreach (var project in scanner.Projects())
+            await foreach (var project in scanner.Projects())
             {
                 storage.SaveProject(project);
 
-                foreach (var repo in scanner.Repositories(project))
+                await foreach (var repo in scanner.Repositories(project))
                 {
                     storage.SaveRepository(repo);
 
-                    foreach (var file in scanner.Files(project.Id, repo, true))
+                    var fileList = await scanner.Files(project.Id, repo, true);
+
+                    foreach (var file in fileList)
                     {
                         storage.SaveFile(file, repo.Id, true, false);
                     }

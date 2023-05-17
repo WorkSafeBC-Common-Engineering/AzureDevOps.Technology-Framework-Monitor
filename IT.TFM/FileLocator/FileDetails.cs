@@ -26,44 +26,55 @@ namespace RepoScan.FileLocator
                 MaxDegreeOfParallelism = totalThreads
             };
 
-            Parallel.ForEach(reader.ReadDetails(), options, (fileItem) =>
+            IReadRepoList repoReader = StorageFactory.GetRepoListReader();
+            foreach (var repoItem in repoReader.Read())
             {
-                if (!fileItem.Repository.OrgName.Equals(currentScanner) || scanner == null)
+                if (!repoItem.OrgName.Equals(currentScanner) || scanner == null)
                 {
-                    currentScanner = fileItem.Repository.OrgName;
+                    currentScanner = repoItem.OrgName;
                     scanner = ScannerFactory.GetScanner(currentScanner);
                 }
 
-                var fileInfo = new ProjectData.FileItem
-                {
-                    Id = fileItem.Id,
-                    FileType = fileItem.FileType,
-                    Path = fileItem.Path,
-                    Url = fileItem.Url,
-                    SHA1 = fileItem.SHA1
-                };
+                var task = scanner.LoadFiles(repoItem.ProjectId, repoItem.RepositoryId);
+                task.Wait();
 
-                var fileData = scanner.FileDetails(fileItem.Repository.RepositoryId, fileInfo);
-                if (fileData != null)
+                var fileItems = reader.Read(repoItem.RepositoryId.ToString());
+
+                Parallel.ForEach(fileItems, options, (fileItem) =>
                 {
-                    var fileDetails = new DataModels.FileDetails
+                    var fileInfo = new ProjectData.FileItem
                     {
-                        Repository = fileItem.Repository,
                         Id = fileItem.Id,
                         FileType = fileItem.FileType,
                         Path = fileItem.Path,
                         Url = fileItem.Url,
-                        SHA1 = fileData.SHA1,
-                        References = fileData.References,
-                        UrlReferences = fileData.UrlReferences,
-                        PackageReferences = fileData.PackageReferences,
-                        Properties = new SerializableDictionary<string, string>(fileData.Properties),
-                        FilteredItems = new SerializableDictionary<string, string>(fileData.FilteredItems)
+                        SHA1 = fileItem.SHA1
                     };
 
-                    writer.Write(fileDetails, forceDetails);
-                }
-            });
+                    var fileData = scanner.FileDetails(repoItem.ProjectId, repoItem.RepositoryId, fileInfo);
+                    if (fileData != null)
+                    {
+                        var fileDetails = new DataModels.FileDetails
+                        {
+                            Repository = fileItem.Repository ?? new RepositoryItem { RepositoryId = repoItem.RepositoryId },
+                            Id = fileItem.Id,
+                            FileType = fileItem.FileType,
+                            Path = fileItem.Path,
+                            Url = fileItem.Url,
+                            SHA1 = fileData.SHA1,
+                            References = fileData.References,
+                            UrlReferences = fileData.UrlReferences,
+                            PackageReferences = fileData.PackageReferences,
+                            Properties = new SerializableDictionary<string, string>(fileData.Properties),
+                            FilteredItems = new SerializableDictionary<string, string>(fileData.FilteredItems)
+                        };
+
+                        writer.Write(fileDetails, forceDetails);
+                    }
+                });
+
+                scanner.DeleteFiles();
+            }
         }
     }
 }

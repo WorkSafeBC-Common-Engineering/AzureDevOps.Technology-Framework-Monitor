@@ -33,6 +33,23 @@ namespace RepoScan.Storage.SqlServer
             reader.Close();
         }
 
+        IEnumerable<DataModels.FileItem> IReadFileItem.Read(string repoId)
+        {
+            var reader = GetReader();
+
+            var repoFiles = reader.GetFiles(repoId)
+                                  .ToArray();
+            reader.Close();
+
+            return repoFiles.Select(f => new DataModels.FileItem
+            {
+                Id = f.Id,
+                FileType = f.FileType,
+                Path = f.Path,
+                Url = f.Url
+            });
+        }
+
         IEnumerable<DataModels.FileItem> IReadFileItem.ReadDetails()
         {
             var reader = GetReader();
