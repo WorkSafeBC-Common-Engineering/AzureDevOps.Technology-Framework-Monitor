@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ProjectData.Interfaces
 {
@@ -9,16 +10,20 @@ namespace ProjectData.Interfaces
 
         Organization GetOrganization();
 
-        IEnumerable<Project> Projects();
+        IAsyncEnumerable<Project> Projects();
 
-        IEnumerable<Repository> Repositories(Project project);
+        IAsyncEnumerable<Repository> Repositories(Project project);
 
-        IEnumerable<FileItem> Files(Guid projectId, Repository repository, bool loadDetails);
+        Task<IEnumerable<FileItem>> Files(Guid projectId, Repository repository, bool loadDetails);
 
-        FileItem FileDetails(Guid repositoryId, FileItem file);
+        Task LoadFiles(Guid projectID, Guid repositoryId);
+
+        void DeleteFiles();
+
+        FileItem FileDetails(Guid projectId, Guid repositoryId, FileItem file);
 
         IEnumerable<string> FilePropertyNames { get; }
 
-        void Save(IStorageWriter storage);
+        Task Save(IStorageWriter storage);
     }
 }

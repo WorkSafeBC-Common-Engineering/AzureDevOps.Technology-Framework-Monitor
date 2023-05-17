@@ -15,6 +15,7 @@
     <ProjectReference Include="..\ProjectDataFramework\ProjectData.csproj" />
     <ProjectReference Include="..\ProjectScannerFramework\ProjectScanner.csproj" />
     <ProjectReference Include="..\ScannerCommon\ScannerCommon.csproj" />
+	<ProjectReference Include="..\AzureDevOps\AzureDevOps.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Ben.Demystifier" Version="0.1.3" />

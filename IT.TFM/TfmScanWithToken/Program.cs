@@ -37,7 +37,7 @@ namespace TfmScanWithToken
             Console.WriteLine($"Starting Repo Scan at: {DateTime.Now.ToLongTimeString()}");
 
             var scanner = new RepoScan.FileLocator.Scanner();
-            scanner.Scan();
+            scanner.Scan().Wait();
 
             Console.WriteLine($"Repo Scan complete at: {DateTime.Now.ToLongTimeString()}");
         }
@@ -47,7 +47,7 @@ namespace TfmScanWithToken
             Console.WriteLine($"Starting File Scan at: {DateTime.Now.ToLongTimeString()}");
 
             var fileLister = new RepoScan.FileLocator.FileProcessor();
-            fileLister.GetFiles(threadCount);
+            fileLister.GetFiles(threadCount).Wait();
 
             Console.WriteLine($"File Scan complete at: {DateTime.Now.ToLongTimeString()}");
         }

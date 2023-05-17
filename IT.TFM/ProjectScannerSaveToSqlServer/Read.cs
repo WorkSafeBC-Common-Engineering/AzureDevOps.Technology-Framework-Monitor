@@ -198,6 +198,82 @@ namespace ProjectScannerSaveToSqlServer
             }
         }
 
+        IEnumerable<FileItem> IStorageReader.GetFiles(string id)
+        {
+            var fileList = context.Files.Where(f => f.Repository.RepositoryId == id);
+
+            foreach (var mainFile in fileList)
+            {
+                FileItem fileItem;
+
+                using (var localContext = GetConnection())
+                {
+                    var file = localContext.Files.SingleOrDefault(f => f.Id == mainFile.Id);
+
+                    var fileType = (FileItemType)Enum.Parse(typeof(FileItemType), file.FileType.Value);
+
+                    fileItem = new FileItem
+                    {
+                        Id = file.FileId,
+                        FileType = fileType,
+                        Path = file.Path,
+                        Url = file.Url,
+                        StorageId = file.Id,
+                        RepositoryId = new Guid(file.Repository.RepositoryId)
+                    };
+
+                    var pkgRefs = file.FileReferences
+                                      .Where(pr => pr.FileReferenceTypeId == RefTypePkg)
+                                      .Select(pr => new PackageReference
+                                      {
+                                          Id = pr.Name,
+                                          PackageType = pr.PackageType,
+                                          Version = pr.Version,
+                                          VersionComparator = pr.VersionComparator,
+                                          FrameworkVersion = pr.FrameworkVersion
+                                      });
+
+                    fileItem.PackageReferences.AddRange(pkgRefs);
+
+                    var refs = file.FileReferences
+                                   .Where(r => r.FileReferenceTypeId == RefTypeFile)
+                                   .Select(r => r.Name);
+
+                    fileItem.References.AddRange(refs);
+
+                    var urlRefs = file.FileReferences
+                                      .Where(ur => ur.FileReferenceTypeId == RefTypeUrl)
+                                      .Select(ur => new UrlReference
+                                      {
+                                          Url = ur.Name,
+                                          Path = ur.Path
+                                      });
+
+                    fileItem.UrlReferences.AddRange(urlRefs);
+
+                    var properties = file.FileProperties
+                         .Where(p => p.FilePropertyType.Id == PropertyTypeProperty)
+                         .Select(p => new { Key = p.Name, p.Value });
+
+                    foreach (var property in properties)
+                    {
+                        fileItem.Properties.Add(property.Key, property.Value);
+                    }
+
+                    var filterItems = file.FileProperties
+                                          .Where(fi => fi.PropertyTypeId == PropertyTypeFilteredItem)
+                                          .Select(fi => new { Key = fi.Name, fi.Value });
+
+                    foreach (var filterItem in filterItems)
+                    {
+                        fileItem.FilteredItems.Add(filterItem.Key, filterItem.Value);
+                    }
+                }
+
+                yield return fileItem;
+            }
+        }
+
         void IStorageReader.Close()
         {
             Close();

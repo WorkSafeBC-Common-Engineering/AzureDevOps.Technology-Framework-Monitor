@@ -22,6 +22,8 @@ namespace ProjectData.Interfaces
 
         IEnumerable<FileItem> GetFiles();
 
+        IEnumerable<FileItem> GetFiles(string id);
+
         void Close();
     }
 }
