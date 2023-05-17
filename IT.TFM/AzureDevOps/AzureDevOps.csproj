@@ -12,11 +12,4 @@
     <PackageReference Include="RestSharp" Version="110.2.0" />
     <PackageReference Include="System.Text.Json" Version="7.0.2" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="RestSharp">
-      <HintPath>..\..\lib\RestSharp.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>
