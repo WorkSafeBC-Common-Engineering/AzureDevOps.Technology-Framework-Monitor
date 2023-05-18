@@ -14,7 +14,7 @@ namespace ProjectData.Interfaces
 
         IAsyncEnumerable<Repository> Repositories(Project project);
 
-        Task<IEnumerable<FileItem>> Files(Guid projectId, Repository repository, bool loadDetails);
+        Task<IEnumerable<FileItem>> Files(Guid projectId, Repository repository);
 
         Task LoadFiles(Guid projectID, Guid repositoryId);
 
@@ -23,7 +23,5 @@ namespace ProjectData.Interfaces
         FileItem FileDetails(Guid projectId, Guid repositoryId, FileItem file);
 
         IEnumerable<string> FilePropertyNames { get; }
-
-        Task Save(IStorageWriter storage);
     }
 }

@@ -25,8 +25,6 @@ namespace AzureDevOpsScannerFramework
         private string configuration;
         private string azureDevOpsOrganizationUrl;
 
-        private VssConnection connection;
-
         private readonly List<string> propertyFields = new List<string>();
 
         private string organizationName;
@@ -46,8 +44,6 @@ namespace AzureDevOpsScannerFramework
             ParseConfiguration(this.configuration);
 
             api.Initialize(azureDevOpsOrganizationUrl);
-
-            Authenticate();
 
             UseFileFilter();
         }
@@ -125,7 +121,7 @@ namespace AzureDevOpsScannerFramework
             }
         }
 
-        async Task<IEnumerable<FileItem>> IScanner.Files(Guid projectId, Repository repository, bool loadDetails)
+        async Task<IEnumerable<FileItem>> IScanner.Files(Guid projectId, Repository repository)
         {
             if (repository.DefaultBranch == null)
             {
@@ -138,10 +134,6 @@ namespace AzureDevOpsScannerFramework
             api.Repository = repository.Id.ToString();
 
             var azDoFiles = await api.GetFilesAsync();
-            if (loadDetails)
-            {
-                await api.DownloadRepositoryAsync();
-            }
 
             foreach (var f2 in azDoFiles.Value)
             {
@@ -158,33 +150,6 @@ namespace AzureDevOpsScannerFramework
                     Url = f2.Url,
                     SHA1 = f2.CommitId
                 };
-
-                if (loadDetails)
-                {
-                    string[] content;
-
-                    try
-                    {
-                        content = GetFile(repository.Id, file);
-                    }
-                    catch (Exception ex)
-                    {
-                        file.AddProperty("Error", $"Unable to retrieve file. File: {file.Path}, Error Msg: {ex.Message}");
-                        continue;
-                    }
-
-                    if (useFileFilter)
-                    {
-                        FileFiltering.Filter.FilterFile(file, content);
-                    }
-
-                    if (file.FileType != FileItemType.NoMatch)
-                    {
-                        AddFileProperties(file, content);
-                    }
-
-                    AddPropertyFields(file);
-                }
 
                 fileList.Add(file);
             }
@@ -255,32 +220,6 @@ namespace AzureDevOpsScannerFramework
 
         IEnumerable<string> IScanner.FilePropertyNames => propertyFields.AsEnumerable();
 
-        async Task IScanner.Save(IStorageWriter storage)
-        {
-            var scanner = this as IScanner;
-
-            var organization = scanner.GetOrganization();
-
-            storage.SaveOrganization(organization);
-
-            await foreach (var project in scanner.Projects())
-            {
-                storage.SaveProject(project);
-
-                await foreach (var repo in scanner.Repositories(project))
-                {
-                    storage.SaveRepository(repo);
-
-                    var fileList = await scanner.Files(project.Id, repo, true);
-
-                    foreach (var file in fileList)
-                    {
-                        storage.SaveFile(file, repo.Id, true, false);
-                    }
-                }
-            }
-        }
-
         #endregion
 
         #region Private Methods
@@ -290,98 +229,10 @@ namespace AzureDevOpsScannerFramework
             azureDevOpsOrganizationUrl = configuration;
         }
 
-        private void Authenticate()
-        {
-            try
-            {
-                connection = new VssConnection(new Uri(azureDevOpsOrganizationUrl), GetVssCredentials());
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("{0}: {1}", ex.GetType(), ex.Message);
-            }
-        }
-
-        private IEnumerable<TeamProjectReference> LoadProjects(int amount, int offset)
-        {
-            ProjectHttpClient projectClient = connection.GetClient<ProjectHttpClient>();
-            IEnumerable<TeamProjectReference> projects = projectClient.GetProjects(null, amount, offset, null, null, null).Result;
-
-            return projects;
-        }
-
         public VssCredentials GetVssCredentials()
         {
             var mgr = GetCredentialsManager();
             return mgr.Get();
-        }
-
-        private IEnumerable<GitRepository> LoadRepositories(Guid projectId)
-        {
-            var client = connection.GetClient<GitHttpClient>();
-            return client.GetRepositoriesAsync(projectId).Result.AsEnumerable();
-        }
-
-        private IEnumerable<GitItem> LoadFiles(Guid repoId)
-        {
-            try
-            {
-                var client = connection.GetClient<GitHttpClient>();
-                return client.GetItemsAsync(repoId, null, VersionControlRecursionType.Full).Result.AsEnumerable();
-            }
-            catch (AggregateException ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error retrieving files from {repoId}: {ex}");
-                return new List<GitItem>().AsEnumerable();
-            }
-        }
-
-        private GitItem LoadFile(Guid repoId, string filePath)
-        {
-            GitItem item = null;
-            var retries = 2;
-
-            while (retries > 0)
-            {
-                try
-                {
-                    var client = connection.GetClient<GitHttpClient>();
-                    item = client.GetItemAsync(repoId, filePath).Result;
-                    break;
-                }
-                catch (AggregateException ex)
-                {
-                    var skipFile = false;
-
-                    foreach (var innerEx in ex.InnerExceptions)
-                    {
-                        if (innerEx is VssServiceException vssException && vssException.Message.StartsWith("TF401174:"))
-                        {
-                            // File not found in repo - skip this file
-                            skipFile = true;
-                            break;
-                        }
-                    }
-
-                    if (skipFile)
-                    {
-                        retries = 0;
-                    }
-                    else
-                    {
-                        retries--;
-                        Authenticate();
-                    }
-                }
-            }
-
-            return item;
-        }
-
-        private Stream GetFileStream(Guid repoId, FileItem item)
-        {
-            var client = connection.GetClient<GitHttpClient>();
-            return client.GetItemTextAsync(repoId, item.Path, null, null, null, null, null, null, true).Result;
         }
 
         private void AddFileProperties(FileItem file, string[] content)
@@ -394,21 +245,6 @@ namespace AzureDevOpsScannerFramework
             {
                 file.AddProperty("Error", $"Unable to parse file. File: {file.Path}, Error Msg: {ex.Message}");
                 return;
-            }
-        }
-
-        private string[] GetFile(Guid repositoryId, FileItem item)
-        {
-            var stream = GetFileStream(repositoryId, item);
-            using (var reader = new StreamReader(stream))
-            {
-                var content = new List<string>();
-                while (!reader.EndOfStream)
-                {
-                    content.Add(reader.ReadLineAsync().Result);
-                }
-
-                return content.ToArray();
             }
         }
 

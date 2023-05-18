@@ -94,7 +94,7 @@ namespace RepoScan.FileLocator
                     DefaultBranch = repoItem.RepositoryDefaultBranch
                 };
 
-                var fileList = await scanner.Files(repoItem.ProjectId, repo, false);
+                var fileList = await scanner.Files(repoItem.ProjectId, repo);
 
                 Parallel.ForEach(fileList, options, (file) =>
                 {
