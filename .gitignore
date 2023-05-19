@@ -396,3 +396,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/IT.TFM/TfmScanWithToken/Properties/launchSettings.json
