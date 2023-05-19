@@ -5,27 +5,14 @@ namespace TfmScanWithToken
 {
     class Program
     {
-        private const string tokenVariable = "TFM_AdToken";
-
         static void Main(string[] args)
         {
-            if (args.Length != 1)
-            {
-                Console.WriteLine($"Please provide a single parameter with the AD Token to be used.");
-            }
+            var threadCount = GetTotalThreads();
+            var forceDetails = GetForceDetails();
 
-            else
-            {
-                // Set the token to be used in the environment, will be picked up when connecting to Azure DevOps
-                Environment.SetEnvironmentVariable(tokenVariable, args[0]);
-
-                var threadCount = GetTotalThreads();
-                var forceDetails = GetForceDetails();
-
-                RepoScan();
-                FileScan(threadCount);
-                FileDetails(threadCount, forceDetails);
-            }
+            RepoScan();
+            FileScan(threadCount);
+            FileDetails(threadCount, forceDetails);
 #if DEBUG
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey();

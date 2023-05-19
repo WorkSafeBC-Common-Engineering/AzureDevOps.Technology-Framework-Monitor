@@ -229,12 +229,6 @@ namespace AzureDevOpsScannerFramework
             azureDevOpsOrganizationUrl = configuration;
         }
 
-        public VssCredentials GetVssCredentials()
-        {
-            var mgr = GetCredentialsManager();
-            return mgr.Get();
-        }
-
         private void AddFileProperties(FileItem file, string[] content)
         {
             try
@@ -261,11 +255,6 @@ namespace AzureDevOpsScannerFramework
         {
             var useFilterValue = ConfigurationManager.AppSettings["useFileFiltering"];
             bool.TryParse(useFilterValue, out useFileFilter);
-        }
-
-        private ScannerCommon.Interfaces.ICredentials GetCredentialsManager()
-        {
-            return CredentialsFactory.GetCredentialsManager();
         }
 
         #endregion

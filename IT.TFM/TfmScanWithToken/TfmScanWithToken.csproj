@@ -20,7 +20,6 @@
     <ProjectReference Include="..\OpenSecretsDetection\OpenSecretsDetection.csproj" />
     <ProjectReference Include="..\ProjectScannerSaveToSqlServer\ProjectScannerSaveToSqlServer.csproj" />
     <ProjectReference Include="..\RepoScan.Storage.SqlServer\RepoScan.Storage.SqlServer.csproj" />
-    <ProjectReference Include="..\TokenCredentials\TokenCredentials.csproj" />
     <ProjectReference Include="..\VisualStudioFileParser\VisualStudioFileParser.csproj" />
   </ItemGroup>
   <ItemGroup>
