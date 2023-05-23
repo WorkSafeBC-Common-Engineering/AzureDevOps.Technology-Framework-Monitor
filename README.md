@@ -48,6 +48,7 @@ Microsoft C#
 	d. Master Data Services
 
 	e. Integration Services
+<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/2eb430fc-e77a-4b7a-b243-188691e346d7"></p>
 
 9. After you select all the features, click Next.
 10. Instance Configuration Step: Click **Default Instance**, **Next** (unless you have a named instance already in use, then create a new named instance).
@@ -89,20 +90,21 @@ Microsoft C#
 <p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/8a687942-b0fd-4409-847b-a16476ac995d"></p>
 
 25. Name your database name. The database will be transferred to your created server.
-<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/e8338d00-fa97-46d2-8cb6-2160a7f2e761"></p>
+<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/b28c2689-8408-47b5-85b2-d0db6bfd229a"></p>
 
 26. Click publish, and it will close the window. 
 27. From the Solution Explorer, expand Executables, TfmScanWithToken, then open “App.config”.
-28. In the appSettings section of the XML file within the TfmScanWithToken folder, replace the OrgName with your Azure DevOps Organization name and OrgUrl with your Azure DevOps Organization link (truncate the https:// prefix).
+
+28. In the connectionString section, replace the SERVER_PLACEHOLDER to your server name and DATABASE_PLACEHOLDER with your database name.
 <p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/09493ce0-6757-4775-9806-7d35fe97ea7c"></p>
 <p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/8ccf5680-f845-4d01-a452-cb583536ed01"></p>
 
-29. In the connectionString section, change the data source value to your database name.
+29. In the appSettings section, replace the ORG_NAME_PLACEHOLDER with your Azure DevOps Organization name and ORG_URL_PLACEHOLDER with your Azure DevOps Organization link **(truncate the https:// prefix as below)**.
 <p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/8ae50bba-f457-4dbd-b52c-dc22a7c0c720"></p>
 <p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/f86c85d2-24b6-45f3-ba44-61a0ae48158d"></p>
 
 ### Adding your Personal Access token (PAT) in System environment variable
-30. In your system variables, click on new.
+30. In your system variables, click on **new**.
 31. For the Variable name, enter **TFM_AdToken** and for the Variable value, enter your Personal Access token (PAT). (You will need a PAT from your Azure DevOps Organization)
 <p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/1628b215-9861-41e0-b8a5-5875e59b79ac"></p>
 
