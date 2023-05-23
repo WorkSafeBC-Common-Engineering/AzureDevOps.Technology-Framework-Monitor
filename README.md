@@ -37,7 +37,7 @@ Microsoft C#
 5. Edition Step: Select the free edition with **Developer** selected in the drop-down menu, then click **Next**.
 6. License Terms Step: Click accept terms and conditions, then click **Next**.
 7. Azure Extension for SQL Server Step: **Uncheck Azure Extension**, then click **Next**.
-8. Feature Selection Step: Select the following features, then click **Next**.
+8. Feature Selection Step: Select the following features:
 
 	a. Enable Full-Text
 
@@ -50,7 +50,7 @@ Microsoft C#
 	e. Integration Services
 <p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/2eb430fc-e77a-4b7a-b243-188691e346d7"></p>
 
-9. After you select all the features, click Next.
+9. After you select all the features, click **Next**.
 10. Instance Configuration Step: Click **Default Instance**, **Next** (unless you have a named instance already in use, then create a new named instance).
 <p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/0ed208df-e168-4155-8b95-eb76a2760bdb"></p>
 
@@ -63,43 +63,44 @@ Microsoft C#
 
 ### Configurating SQL Server Management Studio
 
-15. Open your SSMS (SQL Server Management Studio) program.
+15. **Open SSMS** (SQL Server Management Studio) program.
 
-16. Enter your Server name (created from the SQL Server setup)
+16. Enter your **Server name** (created from the SQL Server setup)
 <p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/05064e60-099f-4ca2-b3a1-36f5c999f1d5"></p>
 
-17. Click **Connect**. (Shows your server at the sidebar)
+17. Click **Connect**. (Shows your server at the sidebar below)
 <p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/a15d17b2-3047-42b8-b1f8-8fa5c14e0562"></p>
 
 ### Cloning the TFM Tool
 
-18. To Clone the TFM product, Open Visual Studio 2019 or 2022.
-19. Click Clone a repository.
-20. Enter the TFM repository Url (https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor).
-21. Click clone.
+18. To clone the TFM product, **open Visual Studio 2019 or 2022**.
+19. Click **Clone a repository**.
+20. Enter the **TFM repository Url** (https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor).
+21. Click **Clone**.
 <p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/08027afa-5751-4a76-8be0-2aa315005d1e"></p>
 
 
 ### Configuration for ProjectScanner
 
-22. Open the ProjectScanner.sln once it is cloned (should be in the path you cloned the project to) in AzureDevOps.Technology-Framework-Monitor\IT.TFM.
-23. Expand the **Data Sources** folder, right-click ProjectScannerDB, then right-click to select further options, find and click publish.
+22. **Open the ProjectScanner.sln** once it is cloned (should be in the path you cloned the project to) in AzureDevOps.Technology-Framework-Monitor\IT.TFM.
+23. **Expand the Data Sources** folder, **right-click ProjectScannerDB**, and **click publish**.
 <p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/fd0ee2fe-30ef-43de-b3a7-95c82e16d349"></p>
 
-24. A window will pop up and click edit, then under the browse tab, select the same server you created during the SQL Server setup.
+24. A window will pop up and **click edit**, then under the **browse tab**, **select** the same **server** you created during the SQL Server setup.
 <p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/8a687942-b0fd-4409-847b-a16476ac995d"></p>
 
-25. Name your database name. The database will be transferred to your created server.
+25. **Name your database**. The database will be transferred to your created server as below.
 <p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/b28c2689-8408-47b5-85b2-d0db6bfd229a"></p>
+<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/d5926291-9847-4d99-9ef3-57ca05f34d51"></p>
 
-26. Click publish, and it will close the window. 
-27. From the Solution Explorer, expand Executables, TfmScanWithToken, then open “App.config”.
+26. **Click publish**, and it will close the window. 
+27. From the Solution Explorer, **expand Executables, TfmScanWithToken, then open “App.config**”.
 
-28. In the connectionString section, replace the SERVER_PLACEHOLDER to your server name and DATABASE_PLACEHOLDER with your database name.
+28. In the connectionString section, **replace** the **SERVER_PLACEHOLDER** to **your server name** and **DATABASE_PLACEHOLDER with your database name**.
 <p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/09493ce0-6757-4775-9806-7d35fe97ea7c"></p>
 <p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/8ccf5680-f845-4d01-a452-cb583536ed01"></p>
 
-29. In the appSettings section, replace the ORG_NAME_PLACEHOLDER with your Azure DevOps Organization name and ORG_URL_PLACEHOLDER with your Azure DevOps Organization link **(truncate the https:// prefix as below)**.
+29. In the appSettings section, **replace the ORG_NAME_PLACEHOLDER** with **your Azure DevOps Organization name** and **ORG_URL_PLACEHOLDER** with **your Azure DevOps Organization link** **(ensure to truncate the https:// prefix as below)**.
 <p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/8ae50bba-f457-4dbd-b52c-dc22a7c0c720"></p>
 <p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/f86c85d2-24b6-45f3-ba44-61a0ae48158d"></p>
 
@@ -118,11 +119,11 @@ Microsoft C#
 
 ### Analyzing Data
 
-35. Open a new Microsoft Excel sheet
-36. Under the Data tab, click Get Data, From Database, From SQL Server Database
+35. **Open a new Microsoft Excel** sheet
+36. Under the **Data tab**, click **Get Data**, **From Database**, **From SQL Server Database**
 <p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/8da14e38-eb86-4e8c-a555-7a12ce5a748f"></p>
 
-37. Enter your server and database name in the fields of the SQL Server database pop-up prompt, and click OK.
+37. **Enter your server and database name** in the fields of the SQL Server database pop-up prompt, and **click OK.**
 <p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/abe07801-ff73-4787-99a5-f77043e27f17"></p>
 
 38. Click **Use my current credentials**, click **Connect**, then click **OK** for the Encryption prompt.
