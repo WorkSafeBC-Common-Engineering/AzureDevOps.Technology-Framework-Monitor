@@ -1,137 +1,181 @@
-HOW TO RUN THE TECHNOLOGY FRAMEWORK MONITOR WITH 
-VISUAL STUDIO COMMUNITY 2019 or 2022
+## HOW TO USE THE TECHNOLOGY FRAMEWORK MONITOR WITH VISUAL STUDIO .NET COMMUNITY VERSION 2019 or 2022
 
-Introduction
+### Introduction
 
-The Technology Framework Monitor (TFM) is an open-source project developed by the WorkSafeBC Common Engineering Team which scans through every project within an organization/repository to analyze files within each repository, then saves the data to an SQL server Database.  The primary goal of the TFM product is to work as a scanner which will iterate through each project with various file extensions within a repository, obtain a file list and store information such as the .NET version, .nuget packages version, as well as the npm package version. The data gathered will be stored in a SQL server database for analysis and reporting purposes. 
+The Technology Framework Monitor (TFM) is an open-source project developed by the WorkSafeBC (WSBC) Common Engineering (Ce) team; who are part of the Enterprise Development and Operations (EDO) group within the Innovation and Technology division (I&T). The TFM product will scan through and gather information on every project within an Azure Developer Operations organization, or repository, analyze the files within, and then save the data gathered into a Microsoft Standard Query Language (SQL) server database.  
+Some features of the TFM product are to perform a scan which will iterate through projects with various file extensions, obtain a file list, and store information in the SQL database. The file list information collected can contain which .NET version, .nuget package versions, npm package versions and much more depending on the configuration settings. The data being published is stored in the SQL server database for analysis and reporting purposes. 
 
-Before You Begin
-These instructions use the following technical conventions:
-Microsoft Azure DevOps
-GitHub
-Git 
-Microsoft Visual Studio .Net 2019 or 2022
-Microsoft SQL Server 
-Angular
+## Before You Begin
+To start using the TFM you must have the following equipment and software installed:
 
-Requirements:
-You’ll need a personal access token and 2 keys to use TFM.
+1. A personal computer (PC) or laptop.
+2. A Windows 10 or 11 Operating System (OS).
+3. Microsoft Visual Studio .Net 2019 or 2022.
+4. Git. 
+5. Microsoft SQL Server 2022 Developer Edition.
+6. Microsoft SQL Server Management Studio (SSMS).
+7. A Microsoft Azure Organization account.
+8. Microsoft Excel
 
-Visual Studio: Download all the non-game development packages/features. 
+### Programming Language(s)
 
-Download SQL Server Management Studio (SSMS)
+To use the TFM you must be familiar with the following programming language: 
+Microsoft C#
 
+## Instructions
+
+### Configuration for SQL Server 2022
+
+1. Open your SQL Server Installer for Developer Edition. Click **Custom**, then **Install** after selecting a download path.
+<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/6de04259-4e2d-4e92-85b7-8246a7e960d2"></p>
+
+2. Under the **Installation** tab, click **New SQL Server standalone installation or add features to an existing installation**.
+<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/5e0f0975-f66c-4356-b945-194ddc28a24b"></p>
+
+3. Install Rules Step: Once the operation is completed and you have passed most checks, click **Next** (Firewall may generate a warning).
+4. Installation Type Step: Click **Perform a new installation of SQL Server 2022**, then **Next**.
+5. Edition Step: Select the free edition with **Developer** selected in the drop-down menu, then click **Next**.
+6. License Terms Step: Click accept terms and conditions, then click **Next**.
+7. Azure Extension for SQL Server Step: **Uncheck Azure Extension**, then click **Next**.
+8. Feature Selection Step: Select the following features:
+
+	a. Enable Full-Text
+
+	b. Analysis Services
+
+	c. Database Engine Services
+
+	d. Master Data Services
+
+	e. Integration Services
+<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/2eb430fc-e77a-4b7a-b243-188691e346d7"></p>
+
+9. After you select all the features, click **Next**.
+10. Instance Configuration Step: Click **Default Instance**, **Next** (unless you have a named instance already in use, then create a new named instance).
+<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/0ed208df-e168-4155-8b95-eb76a2760bdb"></p>
+
+11. Server configuration Step: Click **Next**.
+12. Database Engine Configuration Step: Click the “**Add Current User**” button, click **Next**.
+<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/49309a6e-f767-444b-a0e6-88e07880f02f"></p>
+
+13. Analysis Services Configuration Step: Click the “**Add Current User**” button, click **Next**.
+14. Click **Install**, then click **Close**.
+
+### Configurating SQL Server Management Studio
+
+15. **Open SSMS** (SQL Server Management Studio) program.
+
+16. Enter your **Server name** (created from the SQL Server setup)
+<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/05064e60-099f-4ca2-b3a1-36f5c999f1d5"></p>
+
+17. Click **Connect**. (Shows your server at the sidebar below)
+<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/a15d17b2-3047-42b8-b1f8-8fa5c14e0562"></p>
+
+### Cloning the TFM Tool
+
+18. To clone the TFM product, **open Visual Studio 2019 or 2022**.
+19. Click **Clone a repository**.
+20. Enter the **TFM repository Url** (https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor).
+21. Click **Clone**.
+<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/08027afa-5751-4a76-8be0-2aa315005d1e"></p>
+
+
+### Configuration for ProjectScanner
+
+22. **Open the ProjectScanner.sln** once it is cloned (should be in the path you cloned the project to) in AzureDevOps.Technology-Framework-Monitor\IT.TFM.
+23. **Expand the Data Sources** folder, **right-click ProjectScannerDB**, and **click publish**.
+<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/fd0ee2fe-30ef-43de-b3a7-95c82e16d349"></p>
+
+24. A window will pop up and **click edit**, then under the **browse tab**, **select** the same **server** you created during the SQL Server setup.
+<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/8a687942-b0fd-4409-847b-a16476ac995d"></p>
+
+25. **Name your database**. The database will be transferred to your created server as below.
+<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/b28c2689-8408-47b5-85b2-d0db6bfd229a"></p>
+<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/d5926291-9847-4d99-9ef3-57ca05f34d51"></p>
+
+26. **Click publish**, and it will close the window. 
+27. From the Solution Explorer, **expand Executables, TfmScanWithToken, then open “App.config**”.
+
+28. In the connectionString section, **replace** the **SERVER_PLACEHOLDER** to **your server name** and **DATABASE_PLACEHOLDER with your database name**.
+<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/09493ce0-6757-4775-9806-7d35fe97ea7c"></p>
+<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/8ccf5680-f845-4d01-a452-cb583536ed01"></p>
+
+29. In the appSettings section, **replace the ORG_NAME_PLACEHOLDER** with **your Azure DevOps Organization name** and **ORG_URL_PLACEHOLDER** with **your Azure DevOps Organization link** **(ensure to truncate the https:// prefix as below)**.
+<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/8ae50bba-f457-4dbd-b52c-dc22a7c0c720"></p>
+<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/f86c85d2-24b6-45f3-ba44-61a0ae48158d"></p>
+
+### Adding your Personal Access token (PAT) in System environment variable
+30. In your system variables, click on **new**.
+31. For the Variable name, enter **TFM_AdToken** and for the Variable value, enter your Personal Access token (PAT). (You will need a PAT from your Azure DevOps Organization)
+<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/1628b215-9861-41e0-b8a5-5875e59b79ac"></p>
+
+32. Restart your computer/laptop to apply the changes.
+
+### Running the ProjectScanner
+
+33. Go back to Solution Explorer, right-click TfmScanWithToken, click **Set as Startup Project**, then click **Start** at the top. A terminal window should pop up.
+34. Once it completes the scan, it will say “Press any key to exit”.
+<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/febe2542-93b2-4fef-beba-a31c3c0ccb2f"></p>
+
+### Analyzing Data
+
+35. **Open a new Microsoft Excel** sheet
+36. Under the **Data tab**, click **Get Data**, **From Database**, **From SQL Server Database**
+<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/8da14e38-eb86-4e8c-a555-7a12ce5a748f"></p>
+
+37. **Enter your server and database name** in the fields of the SQL Server database pop-up prompt, and **click OK.**
+<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/abe07801-ff73-4787-99a5-f77043e27f17"></p>
+
+38. Click **Use my current credentials**, click **Connect**, then click **OK** for the Encryption prompt.
+
+39. Select **Full Scan**, and click **Load**. (Your Excel sheet will be populated with data)
+40. Under Table Design, click Summarize with PivotTable, click New Worksheet, then click OK.
+<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/dcbfe2c0-9fed-4ba3-96f2-f7b84641998e"></p>
+
+41. A Field List should appear on the side with a series of fields to sort from. (If it is not shown, click Field List under PivotTable Analyze. With this tool, you can analyze all your repositories by choosing what fields you want to see. 
+<p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/73f0f35b-265c-4a7b-bd87-ee09e6ec46b6"></p>
+
+42. Click any field and it will appear under the Rows for ordering (rearrangeable to cater to your preferences). From here you can analyze all your projects to, for example, check package versions to update them to a newer version.
+
+### URL Links
+
+Microsoft Visual Studio .NET Community Download
+https://visualstudio.microsoft.com/downloads/
+
+Microsoft SQL Server Management Studio Download
 https://aka.ms/ssmsfullsetup
 
-Download SQL Server 2022 
-
+Microsoft SQL Server 2022 Developer Edition Download
 https://go.microsoft.com/fwlink/p/?linkid=2215158&clcid=0x409&culture=en-us&country=us
 
-1. Open SQL Server installer. Click Custom, Install.
+WorkSafeBC Common Engineering Github TFM Repository
+https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor
 
-![image](https://user-images.githubusercontent.com/64446306/235730733-a4721bb9-0615-46b1-aca8-784e112187f6.png)
+Git Download
+https://git-scm.com/downloads
 
-2. Under the installation tab, New SQL Server.
+Microsoft Azure
+https://azure.microsoft.com/en-us
 
-![image](https://user-images.githubusercontent.com/64446306/235723215-d745accc-ecd5-43c1-adb8-14d71d7d5a7f.png)
+### Latest Updates:
 
-3. Install Rules: click next (Firewall may generate a warning)
+BCIT Industry Sponsored Student Project Team 5
 
-4. Installation Type: click Perform a new installation of SQL Server 2022, next
+May 9: Updated 22 projects in ProjectScanner Repository to Microsoft .NET 6 Framework in a separate branch called update-branch (Samuel)
 
-5. Edition: free edition, next
+May 16: Merged update-branch into master and dealt with conflicts. (Samuel)
 
-6. License Terms: Accepts terms, next
+May 19: Added placeholders for users to add their Azure DevOps Organization name and URL, SQL server name, and database name and updated .gitignore to protect sensitive user details (Samuel)
 
-7. Azure Extension for SQL Server: Disable Azure Extension, next
+## Authors
+### BCIT Computer Systems Technology Industry Sponsored Student Project (ISSP) Team #5:
+Daniel Chellapan
 
-8. Feature Selection: Select the following features: Enable Full-Text, Analysis Services, Database Engine Services, Master Data Services, and Integration Services, next
+Samuel Tjahjadi
 
-9. Instance Configuration: Default Instance, next (unless name’s already in use, create a new name)
+### WorkSafeBC Ce I&T Division:
+I&T Manager - Willy Schaub
 
-![image](https://user-images.githubusercontent.com/64446306/236272591-75d14fd0-d7f8-4b2f-bcff-365e599bac78.png)
+EDO Delivery Software Developer - Andreas Mertens
 
-10. Server configuration: next
-
-11. Database Engine Configuration: click the “Add Current User” button, next.
-
-12. Analysis Services Configuration: click the “Add Current User” button, next.
-
-13. Install, close.
-
-14. Open SSMS (SQL Server Management Studio)
-
-15. Connect your server.
-
-![image](https://user-images.githubusercontent.com/64446306/236272730-960c1d1a-22ec-419c-aeb8-b3ba8fa96a09.png)
-
-Below is what it should look like in the object explorer
-
-![image](https://user-images.githubusercontent.com/64446306/236272870-15685d29-2e46-4254-abb0-0178602a46e0.png)
-
-16. Go to https://github.com/WorkSafeBC-Common-Engineering, and clone their TFM repo using Visual Studio.
-
-17. Open ProjectScanner.sln (AzureDevOps.Technology-Framework-Monitor\IT.TFM)
-
-![image](https://user-images.githubusercontent.com/64446306/236270599-e7919285-f16e-4f57-b652-cc4a82898461.png)
-
-18. Expand the Data Sources folder, Right-click ProjectScannerDB, and publish.
-
-![image](https://user-images.githubusercontent.com/64446306/236270420-82d8de58-d2ef-4b30-bcbe-80ba2bcb298f.png)
-
-19. A window will pop up and click edit, then under the browse tab, select the same database you created during the SQL Server setup.
-
-![image](https://user-images.githubusercontent.com/64446306/236271560-59c45a82-f713-4cb1-aa82-6d767629b635.png)
-
-20. Name your database name. The database will be transferred to your created server.
-
-![image](https://user-images.githubusercontent.com/64446306/236271634-d004d2b8-d121-431b-a54b-6761a037e3a2.png)
-
-21. Click publish, and it will close the window. You will get these terminal messages.
-
-![image](https://user-images.githubusercontent.com/64446306/236271735-873d6e00-a0ba-476c-a9e0-2bbf375b99e5.png)
-
-22. From the Solution Explorer, expand Executables, expand TfmScanWithToken, and open “App.config”.
-
-![image](https://user-images.githubusercontent.com/64446306/236271780-df1128bf-0d51-4fc9-a1b0-5c4322a47baa.png)
-
-23. In the appSettings section of the XML file, replace OrgName and OrgUrl with the given keys.
-
-![image](https://user-images.githubusercontent.com/64446306/236271835-d634a496-5956-4e21-b3dd-9e1e9676d729.png)
-
-24. In the connectionString section, change the data source value to your database name.
-
-![image](https://user-images.githubusercontent.com/64446306/236271913-237b8c4e-0605-4e8e-bdc7-3f25bd2b26ba.png)
-
-25. Solution Explorer, right-click TfmScanWithToken, and click properties.
-
-26. Debug tab, in the command-line arguments, paste your given personal access token (PAT) key.
-
-![image](https://user-images.githubusercontent.com/64446306/236271971-9f42d900-9c48-43d6-9262-07f0eed45b87.png)
-
-27. Go to system environment variables in your OS and click Environment Variables
-
-![image](https://user-images.githubusercontent.com/64446306/236272102-1e679447-ff0d-4de8-a9c6-1c8ddec9bac7.png)
-![image](https://user-images.githubusercontent.com/64446306/236272151-468487be-88d7-457a-b8fc-97244ab9f46e.png)
-
-28. In your user variables, create a new user variable.
-
-29. For the Variable name, enter tokenVariable.
-
-30. For the Variable value, enter your personal access token.
-
-![image](https://user-images.githubusercontent.com/64446306/236272234-1776dc94-3fa0-4724-9e46-a06a10477d87.png)
-
-31. Go back to Solution Explorer, right-click TfmScanWithToken, click “Set as Startup Project”, then press start at the top.
-
-![image](https://user-images.githubusercontent.com/64446306/236272381-6225c4ac-410e-4294-9495-401b6b72d51f.png)
-
-32. A console window will pop up and your Scanner should be outputting terminal messages.
-
-![image](https://user-images.githubusercontent.com/64446306/236272433-fc7370f5-fcc3-491b-a755-7dbebb3be70d.png)
-
-33. Once it completes the scan, it will say “Press any key to exit”.
-
-![image](https://user-images.githubusercontent.com/64446306/236272481-d0df026d-6e67-44ee-9094-aa1b721e5cec.png)
-
-34. Go to your server in SSMS, your database will be populated with the scanned files.
+EDO Common Engineering Practice Lead - Martin Lacey
