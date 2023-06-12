@@ -94,7 +94,7 @@ namespace RepoScan.Storage.SqlServer
                 FileType = item.FileType,
                 Path = item.Path,
                 Url = item.Url,
-                SHA1 = item.SHA1
+                CommitId = item.CommitId
             };
 
             writer.SaveFile(fileItem, item.Repository.RepositoryId, saveDetails, forceDetails);

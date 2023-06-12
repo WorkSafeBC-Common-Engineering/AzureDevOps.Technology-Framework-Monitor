@@ -15,7 +15,7 @@ namespace ProjectData
 
         public string Url { get; set; }
 
-        public string SHA1 { get; set; }
+        public string CommitId { get; set; }
 
         public int StorageId { get; set; }
 
@@ -30,6 +30,8 @@ namespace ProjectData
         public Dictionary<string, string> FilteredItems { get; } = new Dictionary<string, string>();
 
         public Guid RepositoryId { get; set; } = Guid.Empty;
+
+        public string ErrorMessage { get; set; } = string.Empty;
 
         #endregion
 

@@ -22,7 +22,7 @@ namespace RepoScan.Storage.SqlServer
                 Url = item.Url,
                 FileType = item.FileType,
                 Path = item.Path,
-                SHA1 = item.SHA1
+                CommitId = item.CommitId
             };
 
             foreach (var filteredItem in item.FilteredItems)

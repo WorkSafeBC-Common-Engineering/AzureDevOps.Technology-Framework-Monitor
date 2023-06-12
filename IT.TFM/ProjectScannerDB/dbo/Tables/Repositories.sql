@@ -14,6 +14,7 @@
     [RemoteUrl] NVARCHAR(MAX) NULL, 
     [WebUrl] NVARCHAR(MAX) NULL, 
     [Deleted] BIT NOT NULL DEFAULT 0,
+    [LastCommitId] NVARCHAR(50) NULL DEFAULT '', 
     CONSTRAINT [PK_Repositories] PRIMARY KEY ([Id]), 
     CONSTRAINT [FK_Repositories_ToProject] FOREIGN KEY ([ProjectId]) REFERENCES [dbo].[Projects]([Id])
 )

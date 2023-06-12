@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 using RestSharp;
 using System.IO.Compression;
 using System.Text;
-using System.Xml;
 
 namespace AzureDevOps
 {
@@ -32,6 +31,8 @@ namespace AzureDevOps
         private const string getProjectsUrl = "https://{baseUrl}/{organization}_apis/projects?$top={$top}&$skip={$skip}&{apiVersion}";
 
         private const string getRepositoriesUrl = "https://{baseUrl}/{organization}{project}/_apis/git/repositories?{apiVersion}";
+
+        private const string getRepositoryCommitUrl = "https://{baseUrl}/{organization}/{project}/_apis/git/repositories/{repository}/commits?searchCriteria.$skip=0&searchCriteria.$top=1&{apiVersion}";
 
         private const string getFilesUrl = "https://{baseUrl}/{organization}{project}/_apis/git/repositories/{repository}/items?recursionLevel=full&{apiVersion}";
 
@@ -74,7 +75,6 @@ namespace AzureDevOps
                 BaseUrl = url;
                 Organization = string.Empty;
                 CheckoutDirectory = Path.Combine(Environment.CurrentDirectory, BaseUrl);
-                CheckoutDirectory = Path.Combine(@"c:\y");
             }
             else
             {
@@ -83,7 +83,6 @@ namespace AzureDevOps
                 BaseUrl = fields[0];
                 Organization = fields[1];
                 CheckoutDirectory = Path.Combine (Environment.CurrentDirectory, Organization);
-                CheckoutDirectory = Path.Combine(@"c:\y");
             }
 
             Token = Environment.GetEnvironmentVariable("TFM_AdToken");
@@ -100,8 +99,25 @@ namespace AzureDevOps
         async Task<AzDoRepositoryList> IRestApi.GetRepositoriesAsync()
         {
             var content = await CallApiAsync(GetUrl(getRepositoriesUrl));
-
             var repositories = JsonConvert.DeserializeObject<AzDoRepositoryList>(content);
+
+            foreach (var repo in repositories.Value)
+            {
+                Repository = repo.Id;
+                var commitContent = await CallApiAsync(GetUrl(getRepositoryCommitUrl));
+                if (commitContent == string.Empty)
+                {
+                    repo.LastCommitId = string.Empty;
+                    continue;
+                }
+
+                var commit = JsonConvert.DeserializeObject<AzDoCommitList>(commitContent);
+
+                repo.LastCommitId = commit.Count == 0
+                    ? string.Empty
+                    : commit.Value[0].CommitId;
+            }
+
             return repositories ?? new AzDoRepositoryList();
         }
 
@@ -186,6 +202,11 @@ namespace AzureDevOps
 
         private async Task<string> CallApiAsync(string url, Method method = Method.Get, string mediaType = "application/json", bool unzipContent = false)
         {
+            if (unzipContent && Directory.Exists(CheckoutDirectory))
+            {
+                Directory.Delete(CheckoutDirectory, true);
+            }
+
             var restClient = GetClient(url);
 
             var request = new RestRequest(GetRelativeUri(url))
@@ -195,8 +216,15 @@ namespace AzureDevOps
 
             request.AddHeader("Authorization", AuthHeader());
             request.AddHeader("Accept", mediaType);
-
+#if DEBUG
+            System.Diagnostics.Debug.WriteLine($"API Call: {url}");
+            var startTime = DateTime.Now;
+#endif
             var response = await restClient.ExecuteAsync(request);
+#if DEBUG
+            System.Diagnostics.Debug.WriteLine($"End API Call, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
+            startTime = DateTime.Now;
+#endif
 
             if (!response.IsSuccessStatusCode)
             {
@@ -211,22 +239,26 @@ namespace AzureDevOps
 
             if (unzipContent)
             {
-                if (Directory.Exists(CheckoutDirectory))
-                {
-                    Directory.Delete(CheckoutDirectory, true);
-                }
-                Directory.CreateDirectory(CheckoutDirectory);
+                var tempFile = Path.GetTempFileName();
 
-                var stream = new MemoryStream(response.RawBytes ?? Array.Empty<byte>());
-                var archive = new ZipArchive(stream);
-                archive.ExtractToDirectory(CheckoutDirectory);
+                using (var file = File.OpenWrite(tempFile))
+                {
+                    await file.WriteAsync(response.RawBytes, 0, response.RawBytes == null ? 0 : response.RawBytes.Length);
+                    file.Close();
+                }
+
+                ZipFile.ExtractToDirectory(tempFile, CheckoutDirectory, true);
+                File.Delete(tempFile);
+#if DEBUG
+                System.Diagnostics.Debug.WriteLine($"Unzip, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
+#endif
                 return string.Empty;
             }
 
             return response.Content ?? string.Empty;
         }
 
-        private RestClient GetClient(string url)
+        private static RestClient GetClient(string url)
         {
             var uri = new Uri(url);
             var baseUrl = uri.GetLeftPart(UriPartial.Authority);
@@ -237,7 +269,12 @@ namespace AzureDevOps
             }
             else
             {
-                var client = new RestClient(baseUrl);
+                var options = new RestClientOptions(baseUrl)
+                {
+                    MaxTimeout = 3600000 // 1 hour
+                };
+
+                var client = new RestClient(options);
                 clients[baseUrl] = client;
                 return client;
             }

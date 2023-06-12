@@ -1,50 +1,51 @@
 ﻿using System;
 using System.Configuration;
+using System.Threading.Tasks;
+using RepoFileScan = RepoScan.FileLocator;
 
 namespace TfmScanWithToken
 {
-    class Program
+    static class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             var threadCount = GetTotalThreads();
             var forceDetails = GetForceDetails();
 
-            RepoScan();
-            FileScan(threadCount);
-            FileDetails(threadCount, forceDetails);
+            await RepoScanAsync();
+            await FileScanAsync(threadCount);
+            await FileDetailsAsync(threadCount, forceDetails);
 #if DEBUG
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey();
 #endif
         }
 
-        private static void RepoScan()
+        private static async Task RepoScanAsync()
         {
             Console.WriteLine($"Starting Repo Scan at: {DateTime.Now.ToLongTimeString()}");
 
-            var scanner = new RepoScan.FileLocator.Scanner();
-            scanner.Scan().Wait();
+            var scanner = new RepoFileScan.Scanner();
+            await scanner.ScanAsync();
 
             Console.WriteLine($"Repo Scan complete at: {DateTime.Now.ToLongTimeString()}");
         }
 
-        private static void FileScan(int threadCount)
+        private static async Task FileScanAsync(int threadCount)
         {
             Console.WriteLine($"Starting File Scan at: {DateTime.Now.ToLongTimeString()}");
 
-            var fileLister = new RepoScan.FileLocator.FileProcessor();
-            fileLister.GetFiles(threadCount).Wait();
+            var fileLister = new RepoFileScan.FileProcessor();
+            await fileLister.GetFiles(threadCount);
 
             Console.WriteLine($"File Scan complete at: {DateTime.Now.ToLongTimeString()}");
         }
 
-        private static void FileDetails(int threadCount, bool forceDetails)
+        private static async Task FileDetailsAsync(int threadCount, bool forceDetails)
         {
             Console.WriteLine($"Starting File Details Scan at: {DateTime.Now.ToLongTimeString()}");
 
-            var fileDetailer = new RepoScan.FileLocator.FileDetails();
-            fileDetailer.GetDetails(threadCount, forceDetails);
+            await RepoFileScan.FileDetails.GetDetailsAsync(threadCount, forceDetails);
 
             Console.WriteLine($"File Details Scan complete at: {DateTime.Now.ToLongTimeString()}");
         }

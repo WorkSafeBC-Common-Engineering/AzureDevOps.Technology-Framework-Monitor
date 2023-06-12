@@ -70,9 +70,11 @@ namespace ProjectScannerSaveToSqlServer
                         Name = repo.Name,
                         RemoteUrl = repo.RemoteUrl,
                         Size = repo.Size,
+                        FileCount = repo.Files.Count,
                         Url = repo.Url,
                         WebUrl = repo.WebUrl,
                         Deleted = repo.Deleted,
+                        LastCommitId = repo.LastCommitId
                     };
 
                     project.AddRepository(repository);
@@ -99,6 +101,7 @@ namespace ProjectScannerSaveToSqlServer
             Repository repository = null;
             var repoId = id.ToString("D");
 
+            context.Database.CommandTimeout = 3600;
             var repo = context.Repositories
                            .SingleOrDefaultAsync(r => r.RepositoryId.Equals(repoId, StringComparison.InvariantCultureIgnoreCase)
                                                    && !r.Deleted && !r.Project.Deleted)
@@ -117,7 +120,8 @@ namespace ProjectScannerSaveToSqlServer
                     Url = repo.Url,
                     WebUrl = repo.WebUrl,
                     OrgName = repo.Project.Organization.Name,
-                    Deleted = repo.Deleted
+                    Deleted = repo.Deleted,
+                    LastCommitId = repo.LastCommitId
                 };
             }
 
@@ -126,12 +130,14 @@ namespace ProjectScannerSaveToSqlServer
 
         IEnumerable<FileItem> IStorageReader.GetFiles()
         {
+            context.Database.CommandTimeout = 300;
             foreach (var mainFile in context.Files)
             {
                 FileItem fileItem;
 
                 using (var localContext = GetConnection())
                 {
+                    context.Database.CommandTimeout = 300;
                     var file = localContext.Files.SingleOrDefault(f => f.Id == mainFile.Id);
 
                     var fileType = (FileItemType)Enum.Parse(typeof(FileItemType), file.FileType.Value);
@@ -200,12 +206,14 @@ namespace ProjectScannerSaveToSqlServer
 
         IEnumerable<FileItem> IStorageReader.GetFiles(string id)
         {
+            context.Database.CommandTimeout = 300;
             var fileList = context.Files.Where(f => f.Repository.RepositoryId == id);
 
             foreach (var mainFile in fileList)
             {
                 FileItem fileItem;
 
+                context.Database.CommandTimeout = 300;
                 using (var localContext = GetConnection())
                 {
                     var file = localContext.Files.SingleOrDefault(f => f.Id == mainFile.Id);
@@ -285,6 +293,7 @@ namespace ProjectScannerSaveToSqlServer
 
         private DataModels.Organization GetOrganization()
         {
+            context.Database.CommandTimeout = 300;
             var dbOrganization = context.Organizations
                                       .OrderBy(o => o.Id)
                                       .Where(o => o.Id > organizationId)

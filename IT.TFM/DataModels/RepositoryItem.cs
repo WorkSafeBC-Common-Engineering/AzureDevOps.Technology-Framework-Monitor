@@ -55,6 +55,10 @@ namespace RepoScan.DataModels
 
         public string RepositoryWebUrl { get; set; }
 
+        public long RepositoryTotalFiles { get; set; }
+
+        public string RepositoryLastCommitId { get; set; }
+
         public bool IsDeleted { get; set; }
     }
 }

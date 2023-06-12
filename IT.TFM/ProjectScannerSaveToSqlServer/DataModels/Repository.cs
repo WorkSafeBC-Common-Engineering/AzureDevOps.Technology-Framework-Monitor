@@ -43,6 +43,9 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
         public bool Deleted { get; set; }
 
+        [StringLength(50)]
+        public string LastCommitId { get; set; }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<File> Files { get; set; }
 

@@ -59,9 +59,11 @@ namespace RepoScan.Storage.SqlServer
                             RepositoryName = repo.Name,
                             RepositoryRemoteUrl = repo.RemoteUrl,
                             RepositorySize = repo.Size,
+                            RepositoryTotalFiles = repo.FileCount,
                             RepositoryUrl = repo.Url,
                             RepositoryWebUrl = repo.WebUrl,
-                            IsDeleted = repo.Deleted
+                            IsDeleted = repo.Deleted,
+                            RepositoryLastCommitId = repo.LastCommitId
                         };
 
                         yield return item;
@@ -109,7 +111,8 @@ namespace RepoScan.Storage.SqlServer
                 Size = item.RepositorySize,
                 Url = item.RepositoryUrl,
                 WebUrl = item.RepositoryWebUrl,
-                Deleted = item.IsDeleted
+                Deleted = item.IsDeleted,
+                LastCommitId = item.RepositoryLastCommitId
             };
 
             writer.SaveRepository(repository);

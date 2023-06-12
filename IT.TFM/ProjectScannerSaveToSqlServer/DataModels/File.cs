@@ -22,6 +22,7 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         public int FileTypeId { get; set; }
 
         [Required]
+        [StringLength(50)]
         public string FileId { get; set; }
 
         [Required]
@@ -30,7 +31,8 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         [Required]
         public string Url { get; set; }
 
-        public string SHA1 { get; set; }
+        [StringLength(50)]
+        public string CommitId { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<FileProperty> FileProperties { get; set; }

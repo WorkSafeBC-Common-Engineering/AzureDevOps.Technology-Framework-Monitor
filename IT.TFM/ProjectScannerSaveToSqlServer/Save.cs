@@ -110,7 +110,8 @@ namespace ProjectScannerSaveToSqlServer
                 dbRepo = new Repository
                 {
                     ProjectId = projectId,
-                    RepositoryId = repository.Id.ToString()
+                    RepositoryId = repository.Id.ToString(),
+                    LastCommitId = string.Empty
                 };
 
                 context.Repositories.Add(dbRepo);
@@ -169,15 +170,18 @@ namespace ProjectScannerSaveToSqlServer
                               .Result;
             int repositoryId = repo == null ? 0 : repo.Id;
 
-            var dbFile = context.Files
-                                .SingleOrDefaultAsync(f => f.RepositoryId == repositoryId
+            context.Database.CommandTimeout = 3600;
+            var allFiles = context.Files
+                                .Where(f => f.RepositoryId == repositoryId
                                                         && f.FileId.Equals(file.Id, StringComparison.InvariantCultureIgnoreCase)
                                                         && f.Url.Equals(file.Url, StringComparison.InvariantCultureIgnoreCase))
-                                .Result;
+                                .ToArray();
+
+            var dbFile = allFiles.SingleOrDefault(f => f.Url.Equals(file.Url, StringComparison.InvariantCultureIgnoreCase));
 
             if (dbFile != null && !forceDetails
-                && (    (dbFile.SHA1 == null && (file.SHA1 == null || !saveDetails))
-                     || (dbFile.SHA1 != null && dbFile.SHA1.Equals(file.SHA1, StringComparison.InvariantCultureIgnoreCase))
+                && (    (dbFile.CommitId == null && (file.CommitId == null || !saveDetails))
+                     || (dbFile.CommitId != null && dbFile.CommitId.Equals(file.CommitId, StringComparison.InvariantCultureIgnoreCase))
                      ))
             {
                 // file has not been updated since last scan
@@ -196,7 +200,8 @@ namespace ProjectScannerSaveToSqlServer
                 dbFile = new File
                 {
                     RepositoryId = repositoryId,
-                    FileId = file.Id
+                    FileId = file.Id,
+                    CommitId = string.Empty
                 };
 
                 context.Files.Add(dbFile);
@@ -209,8 +214,6 @@ namespace ProjectScannerSaveToSqlServer
 
             if (saveDetails)
             {
-                dbFile.SHA1 = file.SHA1;
-
                 SaveFileProperties(dbFile, file.Properties, PropertyTypeProperty);
                 SaveFileProperties(dbFile, file.FilteredItems, PropertyTypeFilteredItem);
 

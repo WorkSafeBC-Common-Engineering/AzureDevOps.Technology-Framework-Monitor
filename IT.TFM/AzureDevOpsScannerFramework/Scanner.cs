@@ -114,7 +114,8 @@ namespace AzureDevOpsScannerFramework
                     Size = r.Size,
                     Url = r.Url,
                     RemoteUrl = r.RemoteUrl,
-                    WebUrl = r.WebUrl
+                    WebUrl = r.WebUrl,
+                    LastCommitId = r.LastCommitId
                 };
 
                 yield return repo;
@@ -148,7 +149,7 @@ namespace AzureDevOpsScannerFramework
                     Id = f2.ObjectId,
                     Path = f2.Path,
                     Url = f2.Url,
-                    SHA1 = f2.CommitId
+                    CommitId = f2.CommitId
                 };
 
                 fileList.Add(file);

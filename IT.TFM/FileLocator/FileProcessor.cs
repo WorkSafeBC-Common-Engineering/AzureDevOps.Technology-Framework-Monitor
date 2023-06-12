@@ -69,11 +69,22 @@ namespace RepoScan.FileLocator
                 };
 
                 bool repoExists = false;
+                bool repoUnchanged = false;
+
                 var repoList = scanner.Repositories(project);
                 await foreach (var r in repoList)
                 {
                     if (r.Id == repoItem.RepositoryId)
                     {
+                        if (r.LastCommitId == repoItem.RepositoryLastCommitId)
+                        {
+                            repoUnchanged = true;
+                        }
+                        else
+                        {
+                            repoItem.RepositoryLastCommitId = r.LastCommitId;
+                        }
+
                         repoExists = true;
                         break;
                     }
@@ -87,6 +98,13 @@ namespace RepoScan.FileLocator
 
                     continue;
                 }
+
+                if (repoUnchanged)
+                {
+                    continue;
+                }
+
+                repoWriter.Write(repoItem);
 
                 var repo = new Repository
                 {
@@ -107,7 +125,7 @@ namespace RepoScan.FileLocator
                             Id = file.Id,
                             Path = file.Path,
                             Url = file.Url,
-                            SHA1 = file.SHA1
+                            CommitId = file.CommitId
                         };
 
                         writer.Write(fileItem, false, true);

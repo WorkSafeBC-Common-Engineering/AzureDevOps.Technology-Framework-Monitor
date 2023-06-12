@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace RepoScan.FileLocator
 {
-    public class FileDetails
+    public static class FileDetails
     {
-        public void GetDetails(int totalThreads, bool forceDetails)
+        public static async Task GetDetailsAsync(int totalThreads, bool forceDetails)
         {
             Settings.Initialize();
 
@@ -29,14 +29,29 @@ namespace RepoScan.FileLocator
             IReadRepoList repoReader = StorageFactory.GetRepoListReader();
             foreach (var repoItem in repoReader.Read())
             {
+                var errorMsg = string.Empty;
+                bool hasError = false;
+
                 if (!repoItem.OrgName.Equals(currentScanner) || scanner == null)
                 {
                     currentScanner = repoItem.OrgName;
                     scanner = ScannerFactory.GetScanner(currentScanner);
                 }
 
-                var task = scanner.LoadFiles(repoItem.ProjectId, repoItem.RepositoryId);
-                task.Wait();
+                if (repoItem.RepositoryTotalFiles == 0)
+                {
+                    continue;
+                }
+
+                try
+                {
+                    await scanner.LoadFiles(repoItem.ProjectId, repoItem.RepositoryId);
+                }
+                catch (OutOfMemoryException)
+                {
+                    errorMsg = "OutOfMemoryException - unable to download repository.";
+                    hasError = true;
+                }
 
                 var fileItems = reader.Read(repoItem.RepositoryId.ToString());
 
@@ -48,28 +63,32 @@ namespace RepoScan.FileLocator
                         FileType = fileItem.FileType,
                         Path = fileItem.Path,
                         Url = fileItem.Url,
-                        SHA1 = fileItem.SHA1
+                        CommitId = fileItem.CommitId,
+                        ErrorMessage = errorMsg
                     };
 
-                    var fileData = scanner.FileDetails(repoItem.ProjectId, repoItem.RepositoryId, fileInfo);
-                    if (fileData != null)
+                    if (!hasError)
                     {
-                        var fileDetails = new DataModels.FileDetails
+                        var fileData = scanner.FileDetails(repoItem.ProjectId, repoItem.RepositoryId, fileInfo);
+                        if (fileData != null)
                         {
-                            Repository = fileItem.Repository ?? new RepositoryItem { RepositoryId = repoItem.RepositoryId },
-                            Id = fileItem.Id,
-                            FileType = fileItem.FileType,
-                            Path = fileItem.Path,
-                            Url = fileItem.Url,
-                            SHA1 = fileData.SHA1,
-                            References = fileData.References,
-                            UrlReferences = fileData.UrlReferences,
-                            PackageReferences = fileData.PackageReferences,
-                            Properties = new SerializableDictionary<string, string>(fileData.Properties),
-                            FilteredItems = new SerializableDictionary<string, string>(fileData.FilteredItems)
-                        };
+                            var fileDetails = new DataModels.FileDetails
+                            {
+                                Repository = fileItem.Repository ?? new RepositoryItem { RepositoryId = repoItem.RepositoryId },
+                                Id = fileItem.Id,
+                                FileType = fileItem.FileType,
+                                Path = fileItem.Path,
+                                Url = fileItem.Url,
+                                CommitId = fileData.CommitId,
+                                References = fileData.References,
+                                UrlReferences = fileData.UrlReferences,
+                                PackageReferences = fileData.PackageReferences,
+                                Properties = new SerializableDictionary<string, string>(fileData.Properties),
+                                FilteredItems = new SerializableDictionary<string, string>(fileData.FilteredItems)
+                            };
 
-                        writer.Write(fileDetails, forceDetails);
+                            writer.Write(fileDetails, forceDetails);
+                        }
                     }
                 });
 

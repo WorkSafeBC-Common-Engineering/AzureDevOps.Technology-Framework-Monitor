@@ -24,7 +24,7 @@ namespace RepoScan.DataModels
 
         public string Url { get; set; }
 
-        public string SHA1 { get; set; }
+        public string CommitId { get; set; }
 
         public List<string> References { get; set; }
 
