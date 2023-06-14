@@ -53,42 +53,55 @@ namespace RepoScan.FileLocator
                     hasError = true;
                 }
 
+                if (hasError)
+                {
+                    // TODO: update repo.TooBig = true
+                    continue;
+                }
+
                 var fileItems = reader.Read(repoItem.RepositoryId.ToString());
+                var fileList = await scanner.Files(repoItem.ProjectId, 
+                                                   new ProjectData.Repository { Id = repoItem.RepositoryId,
+                                                                                DefaultBranch = repoItem.RepositoryDefaultBranch });
 
                 Parallel.ForEach(fileItems, options, (fileItem) =>
                 {
+                    var azDoFiles = fileList.Where(f => f.Id == fileItem.Id);
+                    var azDoFile = azDoFiles.SingleOrDefault(f => f.Path == fileItem.Path);
+                    if (azDoFile == null || azDoFile.CommitId == fileItem.CommitId)
+                    {
+                        // TODO - flag file as deleted
+                        return;
+                    }
+
                     var fileInfo = new ProjectData.FileItem
                     {
                         Id = fileItem.Id,
                         FileType = fileItem.FileType,
                         Path = fileItem.Path,
                         Url = fileItem.Url,
-                        CommitId = fileItem.CommitId,
-                        ErrorMessage = errorMsg
+                        CommitId = azDoFile.CommitId
                     };
 
-                    if (!hasError)
+                    var fileData = scanner.FileDetails(repoItem.ProjectId, repoItem.RepositoryId, fileInfo);
+                    if (fileData != null)
                     {
-                        var fileData = scanner.FileDetails(repoItem.ProjectId, repoItem.RepositoryId, fileInfo);
-                        if (fileData != null)
+                        var fileDetails = new DataModels.FileDetails
                         {
-                            var fileDetails = new DataModels.FileDetails
-                            {
-                                Repository = fileItem.Repository ?? new RepositoryItem { RepositoryId = repoItem.RepositoryId },
-                                Id = fileItem.Id,
-                                FileType = fileItem.FileType,
-                                Path = fileItem.Path,
-                                Url = fileItem.Url,
-                                CommitId = fileData.CommitId,
-                                References = fileData.References,
-                                UrlReferences = fileData.UrlReferences,
-                                PackageReferences = fileData.PackageReferences,
-                                Properties = new SerializableDictionary<string, string>(fileData.Properties),
-                                FilteredItems = new SerializableDictionary<string, string>(fileData.FilteredItems)
-                            };
+                            Repository = fileItem.Repository ?? new RepositoryItem { RepositoryId = repoItem.RepositoryId },
+                            Id = fileItem.Id,
+                            FileType = fileItem.FileType,
+                            Path = fileItem.Path,
+                            Url = fileItem.Url,
+                            CommitId = fileData.CommitId,
+                            References = fileData.References,
+                            UrlReferences = fileData.UrlReferences,
+                            PackageReferences = fileData.PackageReferences,
+                            Properties = new SerializableDictionary<string, string>(fileData.Properties),
+                            FilteredItems = new SerializableDictionary<string, string>(fileData.FilteredItems)
+                        };
 
-                            writer.Write(fileDetails, forceDetails);
-                        }
+                        writer.Write(fileDetails, forceDetails);
                     }
                 });
 

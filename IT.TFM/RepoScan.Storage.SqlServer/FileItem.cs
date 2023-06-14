@@ -46,7 +46,8 @@ namespace RepoScan.Storage.SqlServer
                 Id = f.Id,
                 FileType = f.FileType,
                 Path = f.Path,
-                Url = f.Url
+                Url = f.Url,
+                CommitId = f.CommitId
             });
         }
 

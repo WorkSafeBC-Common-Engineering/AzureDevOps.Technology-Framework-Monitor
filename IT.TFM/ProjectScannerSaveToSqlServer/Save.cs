@@ -125,6 +125,7 @@ namespace ProjectScannerSaveToSqlServer
             dbRepo.Url = repository.Url;
             dbRepo.WebUrl = repository.WebUrl;
             dbRepo.Deleted = repository.Deleted;
+            dbRepo.LastCommitId = repository.LastCommitId;
 
             // remove all the tildes and carrrots in spreadsheet
 
@@ -211,6 +212,7 @@ namespace ProjectScannerSaveToSqlServer
                                                .Result;
             dbFile.Path = file.Path;
             dbFile.Url = file.Url;
+            dbFile.CommitId = file.CommitId;
 
             if (saveDetails)
             {

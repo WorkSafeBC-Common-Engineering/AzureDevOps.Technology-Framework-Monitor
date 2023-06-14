@@ -32,6 +32,9 @@ namespace RepoScan.FileLocator
 
             IEnumerable<Guid> projectList = new List<Guid>().AsEnumerable();
 
+            var lastProject = Guid.Empty;
+            IEnumerable<Repository> repoList = null;
+
             foreach (var repoItem in reader.Read())
             {
                 // Skip any repos that have been flagged as deleted
@@ -62,32 +65,35 @@ namespace RepoScan.FileLocator
                     continue;
                 }
 
-                var project = new Project
+                if (lastProject != repoItem.ProjectId)
                 {
-                    Id = repoItem.ProjectId,
-                    Name = repoItem.ProjectName
-                };
+                    var project = new Project
+                    {
+                        Id = repoItem.ProjectId,
+                        Name = repoItem.ProjectName
+                    };
+
+                    repoList = await scanner.Repositories(project);
+                    lastProject = repoItem.ProjectId;
+                }
 
                 bool repoExists = false;
                 bool repoUnchanged = false;
 
-                var repoList = scanner.Repositories(project);
-                await foreach (var r in repoList)
-                {
-                    if (r.Id == repoItem.RepositoryId)
-                    {
-                        if (r.LastCommitId == repoItem.RepositoryLastCommitId)
-                        {
-                            repoUnchanged = true;
-                        }
-                        else
-                        {
-                            repoItem.RepositoryLastCommitId = r.LastCommitId;
-                        }
+                var r = repoList?.FirstOrDefault(r => r.Id == repoItem.RepositoryId);
 
-                        repoExists = true;
-                        break;
+                if (r != null)
+                {
+                    if (r.LastCommitId == repoItem.RepositoryLastCommitId)
+                    {
+                        repoUnchanged = true;
                     }
+                    else
+                    {
+                        repoItem.RepositoryLastCommitId = r.LastCommitId;
+                    }
+
+                    repoExists = true;
                 }
 
                 if (!repoExists)

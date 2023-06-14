@@ -12,7 +12,7 @@ namespace ProjectData.Interfaces
 
         IAsyncEnumerable<Project> Projects();
 
-        IAsyncEnumerable<Repository> Repositories(Project project);
+        Task<IEnumerable<Repository>> Repositories(Project project);
 
         Task<IEnumerable<FileItem>> Files(Guid projectId, Repository repository);
 

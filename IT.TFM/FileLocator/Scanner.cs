@@ -32,7 +32,9 @@ namespace RepoScan.FileLocator
                 var organization = scanner.GetOrganization();
                 await foreach (var project in scanner.Projects())
                 {
-                    await foreach (var repo in scanner.Repositories(project))
+                    var repos = await scanner.Repositories(project);
+
+                    foreach (var repo in repos)
                     {
                         var repoItem = new RepositoryItem
                         {
