@@ -45,6 +45,8 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
         public bool Deleted { get; set; }
 
+        public bool NoScan { get; set; }
+
         public virtual Organization Organization { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
