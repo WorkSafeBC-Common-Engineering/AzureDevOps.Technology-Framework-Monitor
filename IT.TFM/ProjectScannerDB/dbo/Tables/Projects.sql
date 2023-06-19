@@ -12,6 +12,7 @@
     [Url] NVARCHAR(MAX) NOT NULL, 
     [Visibility] NVARCHAR(50) NULL, 
     [Deleted] BIT NOT NULL DEFAULT 0, 
+    [NoScan] BIT NOT NULL DEFAULT 0, 
     CONSTRAINT [PK_Projects] PRIMARY KEY ([Id]), 
     CONSTRAINT [FK_Projects_ToOrganization] FOREIGN KEY ([OrganizationId]) REFERENCES [dbo].[Organizations]([Id]),
 )
