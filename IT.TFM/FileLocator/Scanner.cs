@@ -20,7 +20,7 @@ namespace RepoScan.FileLocator
 
         #region Public Methods
 
-        public async Task Scan()
+        public async Task ScanAsync()
         {
             IWriteRepoList writer = StorageFactory.GetRepoListWriter();
 
@@ -32,7 +32,9 @@ namespace RepoScan.FileLocator
                 var organization = scanner.GetOrganization();
                 await foreach (var project in scanner.Projects())
                 {
-                    await foreach (var repo in scanner.Repositories(project))
+                    var repos = await scanner.Repositories(project);
+
+                    foreach (var repo in repos)
                     {
                         var repoItem = new RepositoryItem
                         {
@@ -58,6 +60,7 @@ namespace RepoScan.FileLocator
                             RepositoryUrl = repo.Url,
                             RepositoryRemoteUrl = repo.RemoteUrl,
                             RepositoryWebUrl = repo.WebUrl,
+                            RepositoryLastCommitId = repo.LastCommitId
                         };
 
                         // Write repo item to queue

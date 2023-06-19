@@ -25,6 +25,8 @@ namespace AzureDevOps.Models
         public bool IsFork { get; set; } = false;
 
         public bool IsDisabled { get; set; } = false;
+
+        public string LastCommitId { get; set; } = string.Empty;
     }
 
     public class AzDoRepositoryList

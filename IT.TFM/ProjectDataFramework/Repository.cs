@@ -35,9 +35,13 @@ namespace ProjectData
             get { return files.AsEnumerable(); }
         }
 
+        public long FileCount { get; set; }
+
         public string OrgName { get; set; }
 
         public bool Deleted { get; set; }
+
+        public string LastCommitId { get; set; }
 
         #endregion
 

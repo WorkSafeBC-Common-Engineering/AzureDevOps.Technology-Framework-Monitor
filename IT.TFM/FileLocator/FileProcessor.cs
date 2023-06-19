@@ -32,6 +32,9 @@ namespace RepoScan.FileLocator
 
             IEnumerable<Guid> projectList = new List<Guid>().AsEnumerable();
 
+            var lastProject = Guid.Empty;
+            IEnumerable<Repository> repoList = null;
+
             foreach (var repoItem in reader.Read())
             {
                 // Skip any repos that have been flagged as deleted
@@ -62,21 +65,35 @@ namespace RepoScan.FileLocator
                     continue;
                 }
 
-                var project = new Project
+                if (lastProject != repoItem.ProjectId)
                 {
-                    Id = repoItem.ProjectId,
-                    Name = repoItem.ProjectName
-                };
+                    var project = new Project
+                    {
+                        Id = repoItem.ProjectId,
+                        Name = repoItem.ProjectName
+                    };
+
+                    repoList = await scanner.Repositories(project);
+                    lastProject = repoItem.ProjectId;
+                }
 
                 bool repoExists = false;
-                var repoList = scanner.Repositories(project);
-                await foreach (var r in repoList)
+                bool repoUnchanged = false;
+
+                var r = repoList?.FirstOrDefault(r => r.Id == repoItem.RepositoryId);
+
+                if (r != null)
                 {
-                    if (r.Id == repoItem.RepositoryId)
+                    if (r.LastCommitId == repoItem.RepositoryLastCommitId)
                     {
-                        repoExists = true;
-                        break;
+                        repoUnchanged = true;
                     }
+                    else
+                    {
+                        repoItem.RepositoryLastCommitId = r.LastCommitId;
+                    }
+
+                    repoExists = true;
                 }
 
                 if (!repoExists)
@@ -87,6 +104,13 @@ namespace RepoScan.FileLocator
 
                     continue;
                 }
+
+                if (repoUnchanged)
+                {
+                    continue;
+                }
+
+                repoWriter.Write(repoItem);
 
                 var repo = new Repository
                 {
@@ -107,7 +131,7 @@ namespace RepoScan.FileLocator
                             Id = file.Id,
                             Path = file.Path,
                             Url = file.Url,
-                            SHA1 = file.SHA1
+                            CommitId = file.CommitId
                         };
 
                         writer.Write(fileItem, false, true);

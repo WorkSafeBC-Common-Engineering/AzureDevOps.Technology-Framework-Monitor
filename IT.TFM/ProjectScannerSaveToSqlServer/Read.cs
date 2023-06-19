@@ -70,9 +70,11 @@ namespace ProjectScannerSaveToSqlServer
                         Name = repo.Name,
                         RemoteUrl = repo.RemoteUrl,
                         Size = repo.Size,
+                        FileCount = repo.Files.Count,
                         Url = repo.Url,
                         WebUrl = repo.WebUrl,
                         Deleted = repo.Deleted,
+                        LastCommitId = repo.LastCommitId
                     };
 
                     project.AddRepository(repository);
@@ -99,6 +101,7 @@ namespace ProjectScannerSaveToSqlServer
             Repository repository = null;
             var repoId = id.ToString("D");
 
+            context.Database.CommandTimeout = 3600;
             var repo = context.Repositories
                            .SingleOrDefaultAsync(r => r.RepositoryId.Equals(repoId, StringComparison.InvariantCultureIgnoreCase)
                                                    && !r.Deleted && !r.Project.Deleted)
@@ -117,7 +120,8 @@ namespace ProjectScannerSaveToSqlServer
                     Url = repo.Url,
                     WebUrl = repo.WebUrl,
                     OrgName = repo.Project.Organization.Name,
-                    Deleted = repo.Deleted
+                    Deleted = repo.Deleted,
+                    LastCommitId = repo.LastCommitId
                 };
             }
 
@@ -126,12 +130,14 @@ namespace ProjectScannerSaveToSqlServer
 
         IEnumerable<FileItem> IStorageReader.GetFiles()
         {
+            context.Database.CommandTimeout = 300;
             foreach (var mainFile in context.Files)
             {
                 FileItem fileItem;
 
                 using (var localContext = GetConnection())
                 {
+                    context.Database.CommandTimeout = 300;
                     var file = localContext.Files.SingleOrDefault(f => f.Id == mainFile.Id);
 
                     var fileType = (FileItemType)Enum.Parse(typeof(FileItemType), file.FileType.Value);
@@ -200,6 +206,7 @@ namespace ProjectScannerSaveToSqlServer
 
         IEnumerable<FileItem> IStorageReader.GetFiles(string id)
         {
+            context.Database.CommandTimeout = 3600;
             var fileList = context.Files.Where(f => f.Repository.RepositoryId == id);
 
             foreach (var mainFile in fileList)
@@ -208,61 +215,70 @@ namespace ProjectScannerSaveToSqlServer
 
                 using (var localContext = GetConnection())
                 {
-                    var file = localContext.Files.SingleOrDefault(f => f.Id == mainFile.Id);
-
-                    var fileType = (FileItemType)Enum.Parse(typeof(FileItemType), file.FileType.Value);
+                    var fileType = (FileItemType)Enum.Parse(typeof(FileItemType), mainFile.FileType.Value);
 
                     fileItem = new FileItem
                     {
-                        Id = file.FileId,
+                        Id = mainFile.FileId,
                         FileType = fileType,
-                        Path = file.Path,
-                        Url = file.Url,
-                        StorageId = file.Id,
-                        RepositoryId = new Guid(file.Repository.RepositoryId)
+                        Path = mainFile.Path,
+                        Url = mainFile.Url,
+                        StorageId = mainFile.Id,
+                        RepositoryId = new Guid(mainFile.Repository.RepositoryId),
+                        CommitId = mainFile.CommitId
                     };
 
-                    var pkgRefs = file.FileReferences
-                                      .Where(pr => pr.FileReferenceTypeId == RefTypePkg)
-                                      .Select(pr => new PackageReference
-                                      {
-                                          Id = pr.Name,
-                                          PackageType = pr.PackageType,
-                                          Version = pr.Version,
-                                          VersionComparator = pr.VersionComparator,
-                                          FrameworkVersion = pr.FrameworkVersion
-                                      });
+                    localContext.Database.CommandTimeout = 3600;
+                    var pkgRefs = localContext.FileReferences
+                                              .Where(fr => fr.FileId == mainFile.Id
+                                                        && fr.FileReferenceTypeId == RefTypePkg)
+                                              .Select(fr => new PackageReference
+                                              {
+                                                  Id = fr.Name,
+                                                  PackageType = fr.PackageType,
+                                                  Version = fr.Version,
+                                                  VersionComparator = fr.VersionComparator,
+                                                  FrameworkVersion = fr.FrameworkVersion
+                                              });
 
                     fileItem.PackageReferences.AddRange(pkgRefs);
 
-                    var refs = file.FileReferences
-                                   .Where(r => r.FileReferenceTypeId == RefTypeFile)
-                                   .Select(r => r.Name);
+                    localContext.Database.CommandTimeout = 3600;
+                    var refs = localContext.FileReferences
+                                           .Where(fr => fr.FileId == mainFile.Id
+                                                     && fr.FileReferenceTypeId == RefTypeFile)
+                                           .Select(fr => fr.Name);
 
                     fileItem.References.AddRange(refs);
 
-                    var urlRefs = file.FileReferences
-                                      .Where(ur => ur.FileReferenceTypeId == RefTypeUrl)
-                                      .Select(ur => new UrlReference
-                                      {
-                                          Url = ur.Name,
-                                          Path = ur.Path
-                                      });
+                    localContext.Database.CommandTimeout = 3600;
+                    var urlRefs = localContext.FileReferences
+                                              .Where(fr => fr.FileId == mainFile.Id
+                                                        && fr.FileReferenceTypeId == RefTypeUrl)
+                                              .Select(fr => new UrlReference
+                                              {
+                                                  Url = fr.Name,
+                                                  Path = fr.Path
+                                              });
 
                     fileItem.UrlReferences.AddRange(urlRefs);
 
-                    var properties = file.FileProperties
-                         .Where(p => p.FilePropertyType.Id == PropertyTypeProperty)
-                         .Select(p => new { Key = p.Name, p.Value });
+                    localContext.Database.CommandTimeout = 3600;
+                    var properties = localContext.FileProperties
+                                                 .Where(fp => fp.FileId == mainFile.Id
+                                                           && fp.FilePropertyType.Id == PropertyTypeProperty)
+                                                 .Select(fp => new { Key = fp.Name, fp.Value });
 
                     foreach (var property in properties)
                     {
                         fileItem.Properties.Add(property.Key, property.Value);
                     }
 
-                    var filterItems = file.FileProperties
-                                          .Where(fi => fi.PropertyTypeId == PropertyTypeFilteredItem)
-                                          .Select(fi => new { Key = fi.Name, fi.Value });
+                    localContext.Database.CommandTimeout = 3600;
+                    var filterItems = localContext.FileProperties
+                                                  .Where(fp => fp.FileId == mainFile.Id
+                                                            && fp.PropertyTypeId == PropertyTypeFilteredItem)
+                                                  .Select(fp => new { Key = fp.Name, fp.Value });
 
                     foreach (var filterItem in filterItems)
                     {
@@ -285,6 +301,7 @@ namespace ProjectScannerSaveToSqlServer
 
         private DataModels.Organization GetOrganization()
         {
+            context.Database.CommandTimeout = 300;
             var dbOrganization = context.Organizations
                                       .OrderBy(o => o.Id)
                                       .Where(o => o.Id > organizationId)

@@ -98,8 +98,10 @@ namespace AzureDevOpsScannerFramework
             }
         }
 
-        async IAsyncEnumerable<Repository> IScanner.Repositories(Project project)
+        async Task<IEnumerable<Repository>> IScanner.Repositories(Project project)
         {
+            var repoList = new List<Repository>();
+
             api.Project = project.Id.ToString();
             var azDoRepos = await api.GetRepositoriesAsync();
 
@@ -114,11 +116,14 @@ namespace AzureDevOpsScannerFramework
                     Size = r.Size,
                     Url = r.Url,
                     RemoteUrl = r.RemoteUrl,
-                    WebUrl = r.WebUrl
+                    WebUrl = r.WebUrl,
+                    LastCommitId = r.LastCommitId
                 };
 
-                yield return repo;
+                repoList.Add(repo);
             }
+
+            return repoList.AsEnumerable();
         }
 
         async Task<IEnumerable<FileItem>> IScanner.Files(Guid projectId, Repository repository)
@@ -135,20 +140,20 @@ namespace AzureDevOpsScannerFramework
 
             var azDoFiles = await api.GetFilesAsync();
 
-            foreach (var f2 in azDoFiles.Value)
+            foreach (var f in azDoFiles.Value)
             {
-                if (f2.IsFolder)
+                if (f.IsFolder)
                 {
                     continue;
                 }
 
                 var file = new FileItem
                 {
-                    FileType = f2.Path.GetMatchedFileType(),
-                    Id = f2.ObjectId,
-                    Path = f2.Path,
-                    Url = f2.Url,
-                    SHA1 = f2.CommitId
+                    FileType = f.Path.GetMatchedFileType(),
+                    Id = f.ObjectId,
+                    Path = f.Path,
+                    Url = f.Url,
+                    CommitId = f.CommitId
                 };
 
                 fileList.Add(file);

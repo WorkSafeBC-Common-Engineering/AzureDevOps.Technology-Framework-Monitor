@@ -88,8 +88,12 @@
     <None Include="PostDeployment\PopulateFileTypes.sql" />
     <None Include="PostDeployment\PopulateScannerTypes.sql" />
     <None Include="tfmoss.publish.xml" />
+    <None Include="ProjectScannerDB.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="ProjectScannerDB.refactorlog" />
   </ItemGroup>
 </Project>

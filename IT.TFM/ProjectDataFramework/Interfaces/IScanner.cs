@@ -12,11 +12,11 @@ namespace ProjectData.Interfaces
 
         IAsyncEnumerable<Project> Projects();
 
-        IAsyncEnumerable<Repository> Repositories(Project project);
+        Task<IEnumerable<Repository>> Repositories(Project project);
 
         Task<IEnumerable<FileItem>> Files(Guid projectId, Repository repository);
 
-        Task LoadFiles(Guid projectID, Guid repositoryId);
+        Task LoadFiles(Guid projectId, Guid repositoryId);
 
         void DeleteFiles();
 

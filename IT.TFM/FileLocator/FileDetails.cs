@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace RepoScan.FileLocator
 {
-    public class FileDetails
+    public static class FileDetails
     {
-        public void GetDetails(int totalThreads, bool forceDetails)
+        public static async Task GetDetailsAsync(int totalThreads, bool forceDetails)
         {
             Settings.Initialize();
 
@@ -29,26 +29,58 @@ namespace RepoScan.FileLocator
             IReadRepoList repoReader = StorageFactory.GetRepoListReader();
             foreach (var repoItem in repoReader.Read())
             {
+                var errorMsg = string.Empty;
+                bool hasError = false;
+
                 if (!repoItem.OrgName.Equals(currentScanner) || scanner == null)
                 {
                     currentScanner = repoItem.OrgName;
                     scanner = ScannerFactory.GetScanner(currentScanner);
                 }
 
-                var task = scanner.LoadFiles(repoItem.ProjectId, repoItem.RepositoryId);
-                task.Wait();
+                if (repoItem.RepositoryTotalFiles == 0)
+                {
+                    continue;
+                }
+
+                try
+                {
+                    await scanner.LoadFiles(repoItem.ProjectId, repoItem.RepositoryId);
+                }
+                catch (OutOfMemoryException)
+                {
+                    errorMsg = "OutOfMemoryException - unable to download repository.";
+                    hasError = true;
+                }
+
+                if (hasError)
+                {
+                    // TODO: update repo.TooBig = true
+                    continue;
+                }
 
                 var fileItems = reader.Read(repoItem.RepositoryId.ToString());
+                var fileList = await scanner.Files(repoItem.ProjectId, 
+                                                   new ProjectData.Repository { Id = repoItem.RepositoryId,
+                                                                                DefaultBranch = repoItem.RepositoryDefaultBranch });
 
                 Parallel.ForEach(fileItems, options, (fileItem) =>
                 {
+                    var azDoFiles = fileList.Where(f => f.Id == fileItem.Id);
+                    var azDoFile = azDoFiles.SingleOrDefault(f => f.Path == fileItem.Path);
+                    if (azDoFile == null || azDoFile.CommitId == fileItem.CommitId)
+                    {
+                        // TODO - flag file as deleted
+                        return;
+                    }
+
                     var fileInfo = new ProjectData.FileItem
                     {
                         Id = fileItem.Id,
                         FileType = fileItem.FileType,
                         Path = fileItem.Path,
                         Url = fileItem.Url,
-                        SHA1 = fileItem.SHA1
+                        CommitId = azDoFile.CommitId
                     };
 
                     var fileData = scanner.FileDetails(repoItem.ProjectId, repoItem.RepositoryId, fileInfo);
@@ -61,7 +93,7 @@ namespace RepoScan.FileLocator
                             FileType = fileItem.FileType,
                             Path = fileItem.Path,
                             Url = fileItem.Url,
-                            SHA1 = fileData.SHA1,
+                            CommitId = fileData.CommitId,
                             References = fileData.References,
                             UrlReferences = fileData.UrlReferences,
                             PackageReferences = fileData.PackageReferences,
