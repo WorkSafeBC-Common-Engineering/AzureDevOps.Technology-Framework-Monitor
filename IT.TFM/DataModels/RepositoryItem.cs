@@ -39,6 +39,8 @@ namespace RepoScan.DataModels
 
         public bool ProjectIsDeleted { get; set; }
 
+        public bool ProjectNoScan { get; set; } = false;
+
         public Guid RepositoryId { get; set; }
 
         public string RepositoryName { get; set; }
@@ -60,5 +62,7 @@ namespace RepoScan.DataModels
         public string RepositoryLastCommitId { get; set; }
 
         public bool IsDeleted { get; set; }
+
+        public bool RepositoryNoScan { get; set; } = false;
     }
 }

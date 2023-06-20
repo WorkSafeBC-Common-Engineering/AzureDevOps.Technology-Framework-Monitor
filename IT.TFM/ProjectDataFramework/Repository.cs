@@ -43,6 +43,8 @@ namespace ProjectData
 
         public string LastCommitId { get; set; }
 
+        public bool NoScan { get; set; }
+
         #endregion
 
         #region Public Methods

@@ -127,7 +127,7 @@ namespace ProjectScannerSaveToSqlServer
             dbRepo.Deleted = repository.Deleted;
             dbRepo.LastCommitId = repository.LastCommitId;
 
-            // remove all the tildes and carrrots in spreadsheet
+            // remove all the tildes and carets in spreadsheet
 
             // This code was added here as there are a few different calls into here and this processing should most likely be done for all of them.
             // Most of the repos are named as such "[Portfolio Name]-[Project Name]-[Component Name]", The projects with a first token of "zzz" are obsolete so skip if found

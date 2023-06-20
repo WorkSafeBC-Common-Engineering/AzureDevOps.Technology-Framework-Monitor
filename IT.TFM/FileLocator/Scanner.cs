@@ -25,6 +25,7 @@ namespace RepoScan.FileLocator
             IWriteRepoList writer = StorageFactory.GetRepoListWriter();
 
             Settings.Initialize();
+
             foreach (var name in Settings.Scanners)
             {
                 var scanner = ScannerFactory.GetScanner(name);
@@ -32,6 +33,8 @@ namespace RepoScan.FileLocator
                 var organization = scanner.GetOrganization();
                 await foreach (var project in scanner.Projects())
                 {
+                    bool repoOnly = false;
+
                     var repos = await scanner.Repositories(project);
 
                     foreach (var repo in repos)
@@ -64,7 +67,10 @@ namespace RepoScan.FileLocator
                         };
 
                         // Write repo item to queue
-                        writer.Write(repoItem);
+                        // TODO: change this to include a flag, indicating only writing the repo.
+                        // Otherwise we are re-writing the Org and Project with the same data for each repo
+                        writer.Write(repoItem, repoOnly);
+                        repoOnly = true;
                     }
                 }
             }

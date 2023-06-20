@@ -37,8 +37,8 @@ namespace RepoScan.FileLocator
 
             foreach (var repoItem in reader.Read())
             {
-                // Skip any repos that have been flagged as deleted
-                if (repoItem.ProjectIsDeleted || repoItem.IsDeleted)
+                // Skip any repos that have been flagged as deleted or No Scan
+                if (repoItem.ProjectNoScan || repoItem.ProjectIsDeleted || repoItem.RepositoryNoScan || repoItem.IsDeleted)
                 {
                     continue;
                 }
@@ -60,7 +60,7 @@ namespace RepoScan.FileLocator
                 if (!projectList.Any(p => p == repoItem.ProjectId))
                 {
                     repoItem.ProjectIsDeleted = true;
-                    repoWriter.Write(repoItem);
+                    repoWriter.Write(repoItem, false);
 
                     continue;
                 }
@@ -100,7 +100,7 @@ namespace RepoScan.FileLocator
                 {
                     // flag repo as deleted.
                     repoItem.IsDeleted = true;
-                    repoWriter.Write(repoItem);
+                    repoWriter.Write(repoItem, false);
 
                     continue;
                 }
@@ -110,7 +110,7 @@ namespace RepoScan.FileLocator
                     continue;
                 }
 
-                repoWriter.Write(repoItem);
+                repoWriter.Write(repoItem, false);
 
                 var repo = new Repository
                 {
