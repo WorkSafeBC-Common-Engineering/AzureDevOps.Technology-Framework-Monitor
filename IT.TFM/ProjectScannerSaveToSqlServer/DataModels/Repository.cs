@@ -43,6 +43,8 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
         public bool Deleted { get; set; }
 
+        public bool NoScan { get; set; }
+
         [StringLength(50)]
         public string LastCommitId { get; set; }
 

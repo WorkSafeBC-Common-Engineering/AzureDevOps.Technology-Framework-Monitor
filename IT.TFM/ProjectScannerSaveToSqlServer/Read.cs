@@ -46,7 +46,7 @@ namespace ProjectScannerSaveToSqlServer
 
             foreach(var dbProject in dbOrganization.Projects)
             {
-                var project = new Project
+                var dataProject = new Project
                 {
                     Id = new Guid(dbProject.ProjectId),
                     Name = dbProject.Name,
@@ -57,7 +57,8 @@ namespace ProjectScannerSaveToSqlServer
                     State = dbProject.State,
                     Url = dbProject.Url,
                     Visibility = dbProject.Visibility,
-                    Deleted = dbProject.Deleted
+                    Deleted = dbProject.Deleted,
+                    NoScan = dbProject.NoScan
                 };
 
                 foreach (var repo in dbProject.Repositories)
@@ -74,13 +75,14 @@ namespace ProjectScannerSaveToSqlServer
                         Url = repo.Url,
                         WebUrl = repo.WebUrl,
                         Deleted = repo.Deleted,
-                        LastCommitId = repo.LastCommitId
+                        LastCommitId = repo.LastCommitId,
+                        NoScan = repo.NoScan                        
                     };
 
-                    project.AddRepository(repository);
+                    dataProject.AddRepository(repository);
                 }
 
-                organization.AddProject(project);
+                organization.AddProject(dataProject);
             }
 
             return organization;

@@ -46,6 +46,8 @@ namespace ProjectData
 
         public bool Deleted { get; set; }
 
+        public bool NoScan { get; set; }
+
         public IEnumerable<Repository> Repositories
         {
             get { return repositories.AsEnumerable(); }

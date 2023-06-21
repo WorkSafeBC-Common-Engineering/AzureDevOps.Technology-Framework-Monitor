@@ -52,6 +52,7 @@ namespace RepoScan.Storage.SqlServer
                             ProjectUrl = project.Url,
                             ProjectVisibility = project.Visibility,
                             ProjectIsDeleted = project.Deleted,
+                            ProjectNoScan = project.NoScan,
 
                             RepositoryDefaultBranch = repo.DefaultBranch,
                             RepositoryId = repo.Id,
@@ -63,7 +64,8 @@ namespace RepoScan.Storage.SqlServer
                             RepositoryUrl = repo.Url,
                             RepositoryWebUrl = repo.WebUrl,
                             IsDeleted = repo.Deleted,
-                            RepositoryLastCommitId = repo.LastCommitId
+                            RepositoryLastCommitId = repo.LastCommitId,
+                            RepositoryNoScan = repo.NoScan
                         };
 
                         yield return item;
@@ -78,28 +80,31 @@ namespace RepoScan.Storage.SqlServer
 
         #region IWriteRepoList Implementation
 
-        void IWriteRepoList.Write(RepositoryItem item)
+        void IWriteRepoList.Write(RepositoryItem item, bool repoOnly)
         {
             var writer = GetWriter();
 
-            var organization = new Organization(item.Source, item.OrgName, item.OrgUrl);
-            writer.SaveOrganization(organization);
-
-            var project = new Project()
+            if (!repoOnly)
             {
-                Id = item.ProjectId,
-                Url = item.ProjectUrl,
-                Abbreviation = item.ProjectAbbreviation,
-                Description = item.ProjectDescription,
-                LastUpdate = item.ProjectLastUpdate,
-                Name = item.ProjectName,
-                Revision = item.ProjectRevision,
-                State = item.ProjectState,
-                Visibility = item.ProjectVisibility,
-                Deleted = item.ProjectIsDeleted,
-            };
+                var organization = new Organization(item.Source, item.OrgName, item.OrgUrl);
+                writer.SaveOrganization(organization);
 
-            writer.SaveProject(project);
+                var project = new Project()
+                {
+                    Id = item.ProjectId,
+                    Url = item.ProjectUrl,
+                    Abbreviation = item.ProjectAbbreviation,
+                    Description = item.ProjectDescription,
+                    LastUpdate = item.ProjectLastUpdate,
+                    Name = item.ProjectName,
+                    Revision = item.ProjectRevision,
+                    State = item.ProjectState,
+                    Visibility = item.ProjectVisibility,
+                    Deleted = item.ProjectIsDeleted
+                };
+
+                writer.SaveProject(project);
+            }
 
             var repository = new Repository
             {

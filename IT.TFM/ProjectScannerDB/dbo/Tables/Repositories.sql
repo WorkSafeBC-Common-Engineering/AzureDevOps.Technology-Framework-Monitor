@@ -16,6 +16,7 @@
     [Deleted] BIT NOT NULL DEFAULT 0,
     [LastCommitId] NVARCHAR(50) NULL DEFAULT '', 
     [TooBig] BIT NOT NULL DEFAULT 0, 
+    [NoScan] BIT NOT NULL DEFAULT 0, 
     CONSTRAINT [PK_Repositories] PRIMARY KEY ([Id]), 
     CONSTRAINT [FK_Repositories_ToProject] FOREIGN KEY ([ProjectId]) REFERENCES [dbo].[Projects]([Id])
 )
