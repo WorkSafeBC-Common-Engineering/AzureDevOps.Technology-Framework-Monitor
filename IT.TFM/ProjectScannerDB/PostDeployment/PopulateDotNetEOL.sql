@@ -9,6 +9,7 @@ BEGIN
 	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'net46', N'2020-01-14', NULL, N'.Net Framework 4.6')
 	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'net461', N'2020-01-14', NULL, N'.Net Framework 4.6.1')
 	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'net462', N'2022-01-11', NULL, N'.Net Framework 4.6.2')
+	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'net4.6.2', N'2022-01-11', NULL, N'.Net Framework 4.6.2')
 	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'net47', N'2020-01-14', NULL, N'.Net Framework 4.7')
 	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'net471', N'2022-01-11', NULL, N'.Net Framework 4.7.1')
 	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'net472', N'2024-01-09', NULL, N'.Net Framework 4.7.2')
@@ -36,9 +37,18 @@ BEGIN
 	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'v4.7.1', N'2022-01-11', NULL, N'.Net Framework 4.7.1')
 	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'v4.7.2', N'2024-01-09', NULL, N'.Net Framework 4.7.2')
 	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'v4.8', N'2024-01-09', NULL, N'.Net Framework 4.8')
+	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'v4.8.1', N'2024-01-09', NULL, N'.Net Framework 4.8.1')
 	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'net5.0', N'2022-05-08', NULL, N'.Net 5.0')
 	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'net50', N'2022-05-08', NULL, N'.Net 5.0')
 	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'netcoreapp5.0', N'2022-05-08', NULL, N'.Net 5.0')
+	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'.NetCoreApp,Version=v5.0', N'2022-05-08', NULL, N'.Net 5.0')
+
+	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'netstandard1.0', NULL, NULL, N'.Net Standard 1.0')
+	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'netstandard1.3', NULL, NULL, N'.Net Standard 1.3')
+	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'netstandard1.4', NULL, NULL, N'.Net Standard 1.4')
+	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'netstandard1.5', NULL, NULL, N'.Net Standard 1.5')
+	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'netstandard2.0', NULL, NULL, N'.Net Standard 2.0')
+	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'netstandard2.1', NULL, NULL, N'.Net Standard 2.1')
 
 	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'@angular/core 2', N'2020-12-24', NULL, N'@angular/core 2')
 	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'@angular/core 3', N'2020-12-24', NULL, N'@angular/core 3')
@@ -52,6 +62,8 @@ BEGIN
 	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'@angular/core 11', N'2022-05-11', NULL, N'@angular/core 11')
 	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'@angular/core 12', N'2022-11-12', NULL, N'@angular/core 12')
 	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'@angular/core 13', N'2023-05-04', NULL, N'@angular/core 13')
-	
+	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'@angular/core 14', N'2023-11-18', NULL, N'@angular/core 14')
+	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'@angular/core 15', N'2024-05-18', NULL, N'@angular/core 15')
+	INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display]) VALUES (N'@angular/core 16', N'2024-11-08', NULL, N'@angular/core 16')	
 
 END
