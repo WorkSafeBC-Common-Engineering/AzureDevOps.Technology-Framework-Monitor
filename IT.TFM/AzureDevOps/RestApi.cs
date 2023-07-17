@@ -1,6 +1,9 @@
 ﻿using AzureDevOps.Models;
+
 using Newtonsoft.Json;
+
 using RestSharp;
+
 using System.IO.Compression;
 using System.Text;
 
@@ -221,6 +224,7 @@ namespace AzureDevOps
             var startTime = DateTime.Now;
 #endif
             var response = await restClient.ExecuteAsync(request);
+            ThrottleApi(response);
 #if DEBUG
             System.Diagnostics.Debug.WriteLine($"End API Call, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
             startTime = DateTime.Now;
@@ -285,6 +289,67 @@ namespace AzureDevOps
             var uri = new Uri(url);
             var baseUri = new Uri(uri.GetLeftPart(UriPartial.Authority));
             return baseUri.MakeRelativeUri(uri);
+        }
+
+        private static void ThrottleApi(RestResponse response)
+        {
+            var headers = response.Headers;
+            if (headers == null)
+            {
+                return;
+            }
+
+            foreach (var header in headers)
+            {
+                var headerName = header.Name?.ToLower();
+                if (headerName == null)
+                {
+                    continue;
+                }
+
+                var headerValue = header.Value?.ToString();
+#if DEBUG
+                if ( headerName.StartsWith("x-ratelimit") || headerName.Equals("retry-after"))
+                {
+                    System.Diagnostics.Debug.WriteLine($"Azure API Throttling: {headerName} = {headerValue ?? "<null>"}");
+                }
+#endif
+                if (headerValue == null)
+                {
+                    // invalid value, skip for now
+                    continue;
+                }
+
+                if (!int.TryParse(headerValue, out int value))
+                {
+                    // unable to parse value - skipping
+                    continue;
+                }
+
+                switch (headerName)
+                {
+                    case "retry-after":
+                        Thread.Sleep(value * 1000);
+                        break;
+
+                    case "x-ratelimit-resource":
+                        // should only be displayed, not used for computation
+                        break;
+
+                    case "x-ratelimit-delay":
+                        break;
+
+                    case "x-ratelimit-limit":
+                        break;
+
+                    case "x-ratelimit-remaining":
+                        break;
+
+                    case "x-ratelimit-reset":
+                        var resetTime = DateTimeOffset.FromUnixTimeSeconds(value);
+                        break;
+                }
+            }
         }
 
         #endregion
