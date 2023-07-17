@@ -43,6 +43,8 @@ namespace AzureDevOps
 
         private static readonly Dictionary<string, RestClient> clients = new();
 
+        private static readonly Mutex mutex = new Mutex();
+
         private bool disposedValue;
 
         #endregion
@@ -205,6 +207,8 @@ namespace AzureDevOps
 
         private async Task<string> CallApiAsync(string url, Method method = Method.Get, string mediaType = "application/json", bool unzipContent = false)
         {
+            mutex.WaitOne();
+
             if (unzipContent && Directory.Exists(CheckoutDirectory))
             {
                 Directory.Delete(CheckoutDirectory, true);
@@ -258,6 +262,8 @@ namespace AzureDevOps
 #endif
                 return string.Empty;
             }
+
+            mutex.ReleaseMutex();
 
             return response.Content ?? string.Empty;
         }
