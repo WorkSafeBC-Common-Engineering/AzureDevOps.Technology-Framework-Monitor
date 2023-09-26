@@ -227,6 +227,51 @@ namespace ProjectScannerSaveToSqlServer
             _ = context.SaveChangesAsync().Result;
         }
 
+        void IStorageWriter.DeleteFile(ProjData.FileItem file, Guid repoId)
+        {
+            var id = repoId.ToString("D").ToLower();
+            var repo = context.Repositories
+                              .SingleOrDefaultAsync(r => r.RepositoryId == id)
+                              .Result;
+            int repositoryId = repo == null ? 0 : repo.Id;
+
+            context.Database.CommandTimeout = 3600;
+            var allFiles = context.Files
+                                .Where(f => f.RepositoryId == repositoryId
+                                                        && f.FileId.Equals(file.Id, StringComparison.InvariantCultureIgnoreCase)
+                                                        && f.Url.Equals(file.Url, StringComparison.InvariantCultureIgnoreCase))
+                                .ToArray();
+
+            var dbFile = allFiles.SingleOrDefault(f => f.Url.Equals(file.Url, StringComparison.InvariantCultureIgnoreCase));
+
+            if (dbFile == null)
+            {
+                return;
+            }
+
+            if (dbFile.FileReferences.Count > 0)
+            {
+                var fileRefList = dbFile.FileReferences.ToArray();
+                foreach (var fileRef in fileRefList)
+                {
+                    context.FileReferences.Remove(fileRef);
+                }
+            }
+
+            if (dbFile.FileProperties.Count > 0)
+            {
+                var filePropList = dbFile.FileProperties.ToArray();
+                foreach (var fileProp in filePropList)
+                {
+                    context.FileProperties.Remove(fileProp);
+                }
+            }
+
+            context.Files.Remove(dbFile);
+
+            _ = context.SaveChangesAsync().Result;
+        }
+
         #endregion
 
         #region Private Methods

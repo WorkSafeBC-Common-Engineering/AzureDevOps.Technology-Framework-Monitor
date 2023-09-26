@@ -153,7 +153,8 @@ namespace AzureDevOpsScannerFramework
                     Id = f.ObjectId,
                     Path = f.Path,
                     Url = f.Url,
-                    CommitId = f.CommitId
+                    CommitId = f.CommitId,
+                    RepositoryId = repository.Id
                 };
 
                 fileList.Add(file);

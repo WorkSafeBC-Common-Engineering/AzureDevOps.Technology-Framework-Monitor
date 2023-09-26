@@ -103,6 +103,18 @@ namespace RepoScan.Storage.SqlServer
             writer.Close();
         }
 
+        void IWriteFileItem.Delete(DataModels.FileItem item)
+        {
+            var writer = GetWriter();
+
+            var fileItem = new ProjectData.FileItem
+            {
+                Id = item.Id,
+            };
+
+            writer.DeleteFile(fileItem, item.Repository.RepositoryId);
+        }
+
         #endregion
 
         #region Private Methods
