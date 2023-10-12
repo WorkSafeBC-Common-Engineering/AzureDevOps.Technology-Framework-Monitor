@@ -74,9 +74,24 @@ namespace RepoScan.FileLocator
                 {
                     var azDoFiles = fileList.Where(f => f.Id == fileItem.Id);
                     var azDoFile = azDoFiles.SingleOrDefault(f => f.Path == fileItem.Path);
-                    if (azDoFile == null || azDoFile.CommitId == fileItem.CommitId)
+
+                    if (azDoFile == null)
                     {
-                        // TODO - flag file as deleted
+                        DataModels.FileDetails fileDetails = new()
+                        {
+                            Id = fileItem.Id,
+                            Url = fileItem.Url,
+                            FileType = fileItem.FileType,
+                            Path = fileItem.Path,
+                            CommitId = fileItem.CommitId, 
+                            Repository = new RepositoryItem { RepositoryId = repoItem.RepositoryId }
+                        }; 
+
+                        writer.Delete(fileDetails);
+                        return;
+                    }
+                    if (azDoFile.CommitId == fileItem.CommitId && !forceDetails)
+                    {
                         return;
                     }
 

@@ -111,8 +111,6 @@ namespace RepoScan.FileLocator
                     continue;
                 }
 
-                repoWriter.Write(repoItem, false);
-
                 var repo = new Repository
                 {
                     Id = repoItem.RepositoryId,
@@ -123,10 +121,10 @@ namespace RepoScan.FileLocator
 
                 Parallel.ForEach(fileList, options, (file) =>
                 {
-                    if (!file.RepositoryId.Equals(new Guid("1aea9a89-b095-4184-8e07-8445fad0f0b9")))
-                    {
-                        return;
-                    }
+                    //if (!file.RepositoryId.Equals(new Guid("1aea9a89-b095-4184-8e07-8445fad0f0b9")))
+                    //{
+                    //    return;
+                    //}
 
                     if (file.FileType != FileItemType.NoMatch || FileFiltering.Filter.CanFilterFile(file))
                     {
@@ -144,21 +142,23 @@ namespace RepoScan.FileLocator
                     }
                 });
 
+                repoWriter.Write(repoItem, false);
 
-                var repoIds = fileList.Select(f => f.RepositoryId.ToString()).Distinct();
-                Parallel.ForEach(repoIds, options, (repoId) =>
-                {
-                    // Here we want to interate verify whether the file exists in the database but not in the fileList.
-                    // If this is the case, the file was moved or deleted, and the one the database should be removed.
-                    var dbFiles = fileReader.Read(repoId);
-                    foreach (var dbFile in dbFiles)
-                    {
-                        if (!fileList.Any(f => f.Id.Equals(dbFile.Id)))
-                        {
-                            writer.Delete(dbFile);
-                        }
-                    }
-                });
+                //var repoIds = fileList.Select(f => f.RepositoryId.ToString()).Distinct();
+                //Parallel.ForEach(repoIds, options, (repoId) =>
+                //{
+                //    // Here we want to interate verify whether the file exists in the database but not in the fileList.
+                //    // If this is the case, the file was moved or deleted, and the one the database should be removed.
+                //    var dbFiles = fileReader.Read(repoId);
+                //    foreach (var dbFile in dbFiles)
+                //    {
+                //        if (!fileList.Any(f => f.Id.Equals(dbFile.Id)))
+                //        {
+                //            dbFile.Repository = new RepositoryItem { RepositoryId = new Guid(repoId) };
+                //            writer.Delete(dbFile);
+                //        }
+                //    }
+                //});
             }
         }
     }
