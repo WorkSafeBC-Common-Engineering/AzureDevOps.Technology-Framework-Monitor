@@ -22,10 +22,9 @@ namespace AzureDevOpsScannerFramework
 
         private const int projectCount = 100;
 
-        private string configuration;
         private string azureDevOpsOrganizationUrl;
 
-        private readonly List<string> propertyFields = new List<string>();
+        private readonly List<string> propertyFields = new();
 
         private string organizationName;
 
@@ -40,8 +39,7 @@ namespace AzureDevOpsScannerFramework
         void IScanner.Initialize(string name, string configuration)
         {
             organizationName = name;
-            this.configuration = configuration;
-            ParseConfiguration(this.configuration);
+            ParseConfiguration(configuration);
 
             api.Initialize(azureDevOpsOrganizationUrl);
 
