@@ -43,7 +43,7 @@ namespace AzureDevOps
 
         private static readonly Dictionary<string, RestClient> clients = new();
 
-        private static readonly Mutex mutex = new Mutex();
+        private static readonly Semaphore waitOnApiCall = new(1, 1);
 
         private bool disposedValue;
 
@@ -207,7 +207,8 @@ namespace AzureDevOps
 
         private async Task<string> CallApiAsync(string url, Method method = Method.Get, string mediaType = "application/json", bool unzipContent = false)
         {
-            mutex.WaitOne();
+            //var mutexResult = mutex.WaitOne();
+            var semResult = waitOnApiCall.WaitOne();
 
             if (unzipContent && Directory.Exists(CheckoutDirectory))
             {
@@ -263,7 +264,8 @@ namespace AzureDevOps
                 return string.Empty;
             }
 
-            mutex.ReleaseMutex();
+            //mutex.ReleaseMutex();
+            waitOnApiCall.Release();
 
             return response.Content ?? string.Empty;
         }
