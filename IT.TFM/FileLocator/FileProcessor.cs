@@ -19,7 +19,6 @@ namespace RepoScan.FileLocator
             Settings.Initialize();
 
             IReadRepoList reader = StorageFactory.GetRepoListReader();
-            IWriteFileItem writer = StorageFactory.GetFileItemWriter();
             IWriteRepoList repoWriter = StorageFactory.GetRepoListWriter();
             IReadFileItem fileReader = StorageFactory.GetFileItemReader();
 
@@ -138,27 +137,16 @@ namespace RepoScan.FileLocator
                             CommitId = file.CommitId
                         };
 
+                        // TODO: create a pool of these writer items, one per totalThreads.
+                        // Then each thread could have this created ahead of time without
+                        // the cost of creating a fresh DB connection every time.
+                        IWriteFileItem writer = StorageFactory.GetFileItemWriter();
+
                         writer.Write(fileItem, false, true);
                     }
                 });
 
                 repoWriter.Write(repoItem, false);
-
-                //var repoIds = fileList.Select(f => f.RepositoryId.ToString()).Distinct();
-                //Parallel.ForEach(repoIds, options, (repoId) =>
-                //{
-                //    // Here we want to interate verify whether the file exists in the database but not in the fileList.
-                //    // If this is the case, the file was moved or deleted, and the one the database should be removed.
-                //    var dbFiles = fileReader.Read(repoId);
-                //    foreach (var dbFile in dbFiles)
-                //    {
-                //        if (!fileList.Any(f => f.Id.Equals(dbFile.Id)))
-                //        {
-                //            dbFile.Repository = new RepositoryItem { RepositoryId = new Guid(repoId) };
-                //            writer.Delete(dbFile);
-                //        }
-                //    }
-                //});
             }
         }
     }

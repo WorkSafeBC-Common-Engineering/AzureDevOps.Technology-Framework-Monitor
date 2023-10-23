@@ -207,67 +207,70 @@ namespace AzureDevOps
 
         private async Task<string> CallApiAsync(string url, Method method = Method.Get, string mediaType = "application/json", bool unzipContent = false)
         {
-            //var mutexResult = mutex.WaitOne();
-            var semResult = waitOnApiCall.WaitOne();
-
-            if (unzipContent && Directory.Exists(CheckoutDirectory))
+            try
             {
-                Directory.Delete(CheckoutDirectory, true);
-            }
+                var semResult = waitOnApiCall.WaitOne();
 
-            var restClient = GetClient(url);
-
-            var request = new RestRequest(GetRelativeUri(url))
-            {
-                Method = method
-            };
-
-            request.AddHeader("Authorization", AuthHeader());
-            request.AddHeader("Accept", mediaType);
-#if DEBUG
-            System.Diagnostics.Debug.WriteLine($"API Call: {url}");
-            var startTime = DateTime.Now;
-#endif
-            var response = await restClient.ExecuteAsync(request);
-            ThrottleApi(response);
-#if DEBUG
-            System.Diagnostics.Debug.WriteLine($"End API Call, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
-            startTime = DateTime.Now;
-#endif
-
-            if (!response.IsSuccessStatusCode)
-            {
-                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                if (unzipContent && Directory.Exists(CheckoutDirectory))
                 {
-                    // Repository is empty
+                    Directory.Delete(CheckoutDirectory, true);
+                }
+
+                var restClient = GetClient(url);
+
+                var request = new RestRequest(GetRelativeUri(url))
+                {
+                    Method = method
+                };
+
+                request.AddHeader("Authorization", AuthHeader());
+                request.AddHeader("Accept", mediaType);
+#if DEBUG
+                System.Diagnostics.Debug.WriteLine($"API Call: {url}");
+                var startTime = DateTime.Now;
+#endif
+                var response = await restClient.ExecuteAsync(request);
+                ThrottleApi(response);
+#if DEBUG
+                System.Diagnostics.Debug.WriteLine($"End API Call, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
+                startTime = DateTime.Now;
+#endif
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    {
+                        // Repository is empty
+                        return string.Empty;
+                    }
+
+                    throw new HttpRequestException($"API Request failed: {response.StatusCode} {response.ErrorMessage}");
+                }
+
+                if (unzipContent)
+                {
+                    var tempFile = Path.GetTempFileName();
+
+                    using (var file = File.OpenWrite(tempFile))
+                    {
+                        await file.WriteAsync(response.RawBytes, 0, response.RawBytes == null ? 0 : response.RawBytes.Length);
+                        file.Close();
+                    }
+
+                    ZipFile.ExtractToDirectory(tempFile, CheckoutDirectory, true);
+                    File.Delete(tempFile);
+#if DEBUG
+                    System.Diagnostics.Debug.WriteLine($"Unzip, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
+#endif
                     return string.Empty;
                 }
 
-                throw new HttpRequestException($"API Request failed: {response.StatusCode} {response.ErrorMessage}");
+                return response.Content ?? string.Empty;
             }
-
-            if (unzipContent)
+            finally
             {
-                var tempFile = Path.GetTempFileName();
-
-                using (var file = File.OpenWrite(tempFile))
-                {
-                    await file.WriteAsync(response.RawBytes, 0, response.RawBytes == null ? 0 : response.RawBytes.Length);
-                    file.Close();
-                }
-
-                ZipFile.ExtractToDirectory(tempFile, CheckoutDirectory, true);
-                File.Delete(tempFile);
-#if DEBUG
-                System.Diagnostics.Debug.WriteLine($"Unzip, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
-#endif
-                return string.Empty;
+                waitOnApiCall.Release();
             }
-
-            //mutex.ReleaseMutex();
-            waitOnApiCall.Release();
-
-            return response.Content ?? string.Empty;
         }
 
         private static RestClient GetClient(string url)
