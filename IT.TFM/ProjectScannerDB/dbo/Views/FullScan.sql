@@ -23,7 +23,7 @@ SELECT		'AzureDevOps' AS ScanSource,
 			FPP.[ApiKey Open Secret], FPP.[DB Open Secret],
 			
 			EOL.[Display] AS [Package Version],
-			CASE WHEN EOL.EOL <= GETDATE() THEN 'YES' ELSE '' END AS [Package - EOL],
+			CASE WHEN EOL.EOL IS NOT NULL AND EOL.EOL <= GETDATE() THEN 'YES' ELSE '' END AS [Package - EOL],
 			EOL.EOL AS [Package - Date EOL],
 			CASE WHEN EOL.EOL <= DATEADD(MONTH, 3, GETDATE()) THEN 'YES' ELSE '' END AS [Package EOL - 3 Months],
 			CASE WHEN EOL.EOL <= DATEADD(MONTH, 6, GETDATE()) THEN 'YES' ELSE '' END AS [Package EOL - 6 Months],
@@ -50,6 +50,9 @@ LEFT JOIN	FileReferences FN ON F.Id = FN.FileId AND FN.FileReferenceTypeId = 3
 LEFT JOIN	dotNetEndOfLife EOL ON (FPP.TargetFramework = EOL.[Version] OR FPP.TargetFrameworkVersion = EOL.[Version] 
 	-- this is to help with combining 'angular/core [major version]' as we do not need minor version for EOL calculation
 	OR FN.Name + ' ' + LEFT(Fn.Version, abs(charindex('.', Fn.Version) - 1))  = EOL.Version)
+WHERE		P.NoScan = 0
+	AND		R.NoScan = 0
+
 
 
 
