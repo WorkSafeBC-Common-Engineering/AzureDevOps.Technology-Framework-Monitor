@@ -1,6 +1,9 @@
 ﻿using AzureDevOps.Models;
+
 using Newtonsoft.Json;
+
 using RestSharp;
+
 using System.IO.Compression;
 using System.Text;
 
@@ -39,6 +42,8 @@ namespace AzureDevOps
         private const string downloadRepositoryUrl = "https://{baseUrl}/{organization}{project}/_apis/git/repositories/{repository}/items?recursionLevel=full&format=zip&versionDescriptor.version={branch}&versionDescriptor.versionType=branch&{apiVersion}";
 
         private static readonly Dictionary<string, RestClient> clients = new();
+
+        private static readonly Semaphore waitOnApiCall = new(1, 1);
 
         private bool disposedValue;
 
@@ -202,60 +207,70 @@ namespace AzureDevOps
 
         private async Task<string> CallApiAsync(string url, Method method = Method.Get, string mediaType = "application/json", bool unzipContent = false)
         {
-            if (unzipContent && Directory.Exists(CheckoutDirectory))
+            try
             {
-                Directory.Delete(CheckoutDirectory, true);
-            }
+                var semResult = waitOnApiCall.WaitOne();
 
-            var restClient = GetClient(url);
-
-            var request = new RestRequest(GetRelativeUri(url))
-            {
-                Method = method
-            };
-
-            request.AddHeader("Authorization", AuthHeader());
-            request.AddHeader("Accept", mediaType);
-#if DEBUG
-            System.Diagnostics.Debug.WriteLine($"API Call: {url}");
-            var startTime = DateTime.Now;
-#endif
-            var response = await restClient.ExecuteAsync(request);
-#if DEBUG
-            System.Diagnostics.Debug.WriteLine($"End API Call, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
-            startTime = DateTime.Now;
-#endif
-
-            if (!response.IsSuccessStatusCode)
-            {
-                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                if (unzipContent && Directory.Exists(CheckoutDirectory))
                 {
-                    // Repository is empty
+                    Directory.Delete(CheckoutDirectory, true);
+                }
+
+                var restClient = GetClient(url);
+
+                var request = new RestRequest(GetRelativeUri(url))
+                {
+                    Method = method
+                };
+
+                request.AddHeader("Authorization", AuthHeader());
+                request.AddHeader("Accept", mediaType);
+#if DEBUG
+                System.Diagnostics.Debug.WriteLine($"API Call: {url}");
+                var startTime = DateTime.Now;
+#endif
+                var response = await restClient.ExecuteAsync(request);
+                ThrottleApi(response);
+#if DEBUG
+                System.Diagnostics.Debug.WriteLine($"End API Call, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
+                startTime = DateTime.Now;
+#endif
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    {
+                        // Repository is empty
+                        return string.Empty;
+                    }
+
+                    throw new HttpRequestException($"API Request failed: {response.StatusCode} {response.ErrorMessage}");
+                }
+
+                if (unzipContent)
+                {
+                    var tempFile = Path.GetTempFileName();
+
+                    using (var file = File.OpenWrite(tempFile))
+                    {
+                        await file.WriteAsync(response.RawBytes, 0, response.RawBytes == null ? 0 : response.RawBytes.Length);
+                        file.Close();
+                    }
+
+                    ZipFile.ExtractToDirectory(tempFile, CheckoutDirectory, true);
+                    File.Delete(tempFile);
+#if DEBUG
+                    System.Diagnostics.Debug.WriteLine($"Unzip, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
+#endif
                     return string.Empty;
                 }
 
-                throw new HttpRequestException($"API Request failed: {response.StatusCode} {response.ErrorMessage}");
+                return response.Content ?? string.Empty;
             }
-
-            if (unzipContent)
+            finally
             {
-                var tempFile = Path.GetTempFileName();
-
-                using (var file = File.OpenWrite(tempFile))
-                {
-                    await file.WriteAsync(response.RawBytes, 0, response.RawBytes == null ? 0 : response.RawBytes.Length);
-                    file.Close();
-                }
-
-                ZipFile.ExtractToDirectory(tempFile, CheckoutDirectory, true);
-                File.Delete(tempFile);
-#if DEBUG
-                System.Diagnostics.Debug.WriteLine($"Unzip, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
-#endif
-                return string.Empty;
+                waitOnApiCall.Release();
             }
-
-            return response.Content ?? string.Empty;
         }
 
         private static RestClient GetClient(string url)
@@ -285,6 +300,67 @@ namespace AzureDevOps
             var uri = new Uri(url);
             var baseUri = new Uri(uri.GetLeftPart(UriPartial.Authority));
             return baseUri.MakeRelativeUri(uri);
+        }
+
+        private static void ThrottleApi(RestResponse response)
+        {
+            var headers = response.Headers;
+            if (headers == null)
+            {
+                return;
+            }
+
+            foreach (var header in headers)
+            {
+                var headerName = header.Name?.ToLower();
+                if (headerName == null)
+                {
+                    continue;
+                }
+
+                var headerValue = header.Value?.ToString();
+#if DEBUG
+                if ( headerName.StartsWith("x-ratelimit") || headerName.Equals("retry-after"))
+                {
+                    System.Diagnostics.Debug.WriteLine($"Azure API Throttling: {headerName} = {headerValue ?? "<null>"}");
+                }
+#endif
+                if (headerValue == null)
+                {
+                    // invalid value, skip for now
+                    continue;
+                }
+
+                if (!int.TryParse(headerValue, out int value))
+                {
+                    // unable to parse value - skipping
+                    continue;
+                }
+
+                switch (headerName)
+                {
+                    case "retry-after":
+                        Thread.Sleep(value * 1000);
+                        break;
+
+                    case "x-ratelimit-resource":
+                        // should only be displayed, not used for computation
+                        break;
+
+                    case "x-ratelimit-delay":
+                        break;
+
+                    case "x-ratelimit-limit":
+                        break;
+
+                    case "x-ratelimit-remaining":
+                        break;
+
+                    case "x-ratelimit-reset":
+                        var resetTime = DateTimeOffset.FromUnixTimeSeconds(value);
+                        break;
+                }
+            }
         }
 
         #endregion

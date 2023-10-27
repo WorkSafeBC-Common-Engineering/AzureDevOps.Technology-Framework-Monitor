@@ -2,6 +2,7 @@
 using ProjectScanner;
 using RepoScan.DataModels;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,7 +17,6 @@ namespace RepoScan.FileLocator
             Settings.Initialize();
 
             IReadFileItem reader = StorageFactory.GetFileItemReader();
-            IWriteFileDetails writer = StorageFactory.GetFileDetailsWriter();
 
             IScanner scanner = null;
             var currentScanner = string.Empty;
@@ -70,13 +70,37 @@ namespace RepoScan.FileLocator
                                                    new ProjectData.Repository { Id = repoItem.RepositoryId,
                                                                                 DefaultBranch = repoItem.RepositoryDefaultBranch });
 
+                var deleteList = new ConcurrentBag<DataModels.FileDetails>();
                 Parallel.ForEach(fileItems, options, (fileItem) =>
                 {
+                    System.Diagnostics.Debug.WriteLine($"*** Thread Start: {Environment.CurrentManagedThreadId}");
+
+                    //TODO: Create a pool of writer items (one per totalThread) to create the necessary DB connections ahead of time.
+                    IWriteFileDetails writer = StorageFactory.GetFileDetailsWriter();
+
                     var azDoFiles = fileList.Where(f => f.Id == fileItem.Id);
                     var azDoFile = azDoFiles.SingleOrDefault(f => f.Path == fileItem.Path);
-                    if (azDoFile == null || azDoFile.CommitId == fileItem.CommitId)
+
+                    if (azDoFile == null)
                     {
-                        // TODO - flag file as deleted
+                        DataModels.FileDetails fileDetails = new()
+                        {
+                            Id = fileItem.Id,
+                            Url = fileItem.Url,
+                            FileType = fileItem.FileType,
+                            Path = fileItem.Path,
+                            CommitId = fileItem.CommitId, 
+                            Repository = new RepositoryItem { RepositoryId = repoItem.RepositoryId }
+                        }; 
+
+                        deleteList.Add(fileDetails );
+
+                        System.Diagnostics.Debug.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId}");
+                        return;
+                    }
+                    if (azDoFile.CommitId == fileItem.CommitId && !forceDetails)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId}");
                         return;
                     }
 
@@ -109,7 +133,18 @@ namespace RepoScan.FileLocator
 
                         writer.Write(fileDetails, forceDetails);
                     }
+
+                    System.Diagnostics.Debug.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId}");
                 });
+
+                if (!deleteList.IsEmpty)
+                {
+                    IWriteFileDetails writer = StorageFactory.GetFileDetailsWriter();
+                    foreach (var fileDetails in deleteList)
+                    {
+                        writer.Delete(fileDetails);
+                    }
+                }
 
                 scanner.DeleteFiles();
             }
