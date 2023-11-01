@@ -238,11 +238,20 @@ namespace AzureDevOps
 
                 if (!response.IsSuccessStatusCode)
                 {
+                    // log an entry for a failed response
                     if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                     {
                         // Repository is empty
                         return string.Empty;
                     }
+
+#if DEBUG
+                    if (response.StatusCode == 0)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"API Request failed, with StatusCode = 0");
+                        return string.Empty;
+                    }
+#endif
 
                     throw new HttpRequestException($"API Request failed: {response.StatusCode} {response.ErrorMessage}");
                 }
