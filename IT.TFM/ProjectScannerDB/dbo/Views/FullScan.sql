@@ -4,10 +4,10 @@ SELECT		'AzureDevOps' AS ScanSource,
 			O.[Name] AS [Org. Name],
 			P.[Name] AS [Project Name], P.ProjectId AS [Project ID], P.[Description] AS [Project Description],
 			P.LastUpdate AS [Project Last Update], P.Revision AS [Project Revision], P.[State] AS [Project State],
-			P.[Url] AS [Project Url], P.Visibility AS [Project Visibility], P.Deleted AS [Project Deleted],
+			P.[Url] AS [Project Url], P.Visibility AS [Project Visibility],
 			R.[Name] AS [Repository Name], R.[Portfolio] AS [Portfolio Name], R.[ApplicationProjectName] AS [Application Project Name],			
 			R.[ComponentName] AS [Component Name],R.RepositoryId AS [Repository ID],
-			R.DefaultBranch AS [Repository Default Branch], R.[Url] AS [Repository URL], R.Deleted AS [Repository Deleted],
+			R.DefaultBranch AS [Repository Default Branch], R.[Url] AS [Repository URL],
 			FT.[Value] AS [File Type], F.FileId AS [File ID], F.[Path] AS [File Path], F.[Url] AS [File URL],
 
 			FPP.AndroidApp AS PROP_AndroidApp, FPP.DBSchemaProvider AS PROP_DBSchemaProvider, FPP.Error AS PROP_Error,
@@ -52,8 +52,8 @@ LEFT JOIN	dotNetEndOfLife EOL ON (FPP.TargetFramework = EOL.[Version] OR FPP.Tar
 	OR FN.Name + ' ' + LEFT(Fn.Version, abs(charindex('.', Fn.Version) - 1))  = EOL.Version)
 WHERE		P.NoScan = 0
 	AND		R.NoScan = 0
-
-
+	AND		P.Deleted = 0
+	AND		R.Deleted = 0
 
 
 

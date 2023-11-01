@@ -19,8 +19,8 @@ namespace RepoScan.FileLocator
             Settings.Initialize();
 
             IReadRepoList reader = StorageFactory.GetRepoListReader();
-            IWriteFileItem writer = StorageFactory.GetFileItemWriter();
             IWriteRepoList repoWriter = StorageFactory.GetRepoListWriter();
+            IReadFileItem fileReader = StorageFactory.GetFileItemReader();
 
             var orgName = string.Empty;
             IScanner scanner = null;
@@ -110,8 +110,6 @@ namespace RepoScan.FileLocator
                     continue;
                 }
 
-                repoWriter.Write(repoItem, false);
-
                 var repo = new Repository
                 {
                     Id = repoItem.RepositoryId,
@@ -122,6 +120,11 @@ namespace RepoScan.FileLocator
 
                 Parallel.ForEach(fileList, options, (file) =>
                 {
+                    //if (!file.RepositoryId.Equals(new Guid("1aea9a89-b095-4184-8e07-8445fad0f0b9")))
+                    //{
+                    //    return;
+                    //}
+
                     if (file.FileType != FileItemType.NoMatch || FileFiltering.Filter.CanFilterFile(file))
                     {
                         var fileItem = new DataModels.FileItem
@@ -134,9 +137,16 @@ namespace RepoScan.FileLocator
                             CommitId = file.CommitId
                         };
 
+                        // TODO: create a pool of these writer items, one per totalThreads.
+                        // Then each thread could have this created ahead of time without
+                        // the cost of creating a fresh DB connection every time.
+                        IWriteFileItem writer = StorageFactory.GetFileItemWriter();
+
                         writer.Write(fileItem, false, true);
                     }
                 });
+
+                repoWriter.Write(repoItem, false);
             }
         }
     }
