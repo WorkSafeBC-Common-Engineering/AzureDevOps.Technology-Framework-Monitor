@@ -14,7 +14,6 @@ namespace RepoScan.DataModels
     {
         #region Constants
 
-        private const string DictionaryNodeName = "Dictionary";
         private const string ItemNodeName = "Item";
         private const string KeyNodeName = "Key";
         private const string ValueNodeName = "Value";

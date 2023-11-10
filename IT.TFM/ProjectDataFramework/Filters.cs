@@ -17,7 +17,6 @@ namespace ProjectData
         private const string configurationSection = "unity";
         private const string dependencyInjectionContainer = "FilterContainer";
         private const string contentFilter = "Content";
-        private const string fileFilter = "FileContent";
 
         private static readonly IUnityContainer _container;
 

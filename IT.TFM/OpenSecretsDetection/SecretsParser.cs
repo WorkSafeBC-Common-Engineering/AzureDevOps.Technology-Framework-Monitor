@@ -19,8 +19,6 @@ namespace OpenSecretsDetection
         private const string connectionsPath = @"/configuration/connectionStrings/add";
 
 
-        private const string startConnectionStrings = "<connectionStrings>";
-        private const string endConnectionStrings = "</connectionStrings>";
         private const string connectionStringAttribute = "connectionString";
         private const string connectionName = "name";
         private readonly string[] connectionSecrets =
