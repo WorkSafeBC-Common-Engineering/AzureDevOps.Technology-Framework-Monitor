@@ -152,7 +152,7 @@ namespace OpenSecretsDetection
                     }
                 }
 
-                if (connectionNames.Any())
+                if (connectionNames.Count != 0)
                 {
                     var allConnections = string.Join(", ", connectionNames.ToArray());
                     file.AddProperty(dbSecretProperty, allConnections);
@@ -173,7 +173,7 @@ namespace OpenSecretsDetection
             GetApiKeySecrets(xmlDoc, apiKeyPath, secretsList);
             GetApiKeySecrets(xmlDoc, es2KeyPath, secretsList);
 
-            if (secretsList.Any())
+            if (secretsList.Count != 0)
             {
                 var allSecrets = string.Join(", ", secretsList.ToArray());
                 file.AddProperty(apiKeySecretProperty, allSecrets);
@@ -191,7 +191,7 @@ namespace OpenSecretsDetection
             var xmlDoc = GetXml(content);
             SearchAppSettings(xmlDoc, oauthSearchOn, oAuthList);
 
-            if (oAuthList.Any())
+            if (oAuthList.Count != 0)
             {
                 var allOAuth = string.Join(", ", oAuthList.ToArray());
                 file.AddProperty(oauthSecretProperty, allOAuth);

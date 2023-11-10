@@ -62,7 +62,7 @@ namespace AzureDevOpsScannerFramework
                 api.PagingSkip = projectOffset;
                 var azDoProjects = await api.GetProjectsAsync();
 
-                if (azDoProjects.Value.Any())
+                if (azDoProjects.Value.Length != 0)
                 {
                     if (azDoProjects.Count < projectCount)
                     {
@@ -250,7 +250,7 @@ namespace AzureDevOpsScannerFramework
                 }
 
                 AddPropertyFields(file);
-                hasProperties = file.Properties.Any() || file.References.Any() || file.UrlReferences.Any() || file.PackageReferences.Any();
+                hasProperties = file.Properties.Count != 0 || file.References.Count != 0 || file.UrlReferences.Count != 0 || file.PackageReferences.Count != 0;
 
             }
             catch (Exception ex)
