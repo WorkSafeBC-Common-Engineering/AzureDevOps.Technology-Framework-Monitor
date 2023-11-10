@@ -69,6 +69,8 @@ namespace AzureDevOps
 
         public int PagingSkip { get; set; }
 
+        private static readonly char[] separator = new char[] { '/' };
+
         void IRestApi.Initialize(string organizationUrl)
         {
             var url = organizationUrl.EndsWith("/")
@@ -83,7 +85,7 @@ namespace AzureDevOps
             }
             else
             {
-                var fields = url.Split(new char[] { '/' });
+                var fields = url.Split(separator);
 
                 BaseUrl = fields[0];
                 Organization = fields[1];

@@ -57,6 +57,7 @@ namespace Parser
         protected const string propertyAzureFunction = @"AzureFunction";
 
         protected XmlNamespaceManager mgr;
+        private static readonly char[] separator = new char[] { '/' };
 
         #endregion
 
@@ -146,7 +147,7 @@ namespace Parser
 
         protected static string NamespacePath(string path)
         {
-            var fields = path.Split(new char[] { '/' });
+            var fields = path.Split(separator);
             var newFields = fields.Select(f => "msbld:" + f);
             return string.Join("/", newFields);
         }

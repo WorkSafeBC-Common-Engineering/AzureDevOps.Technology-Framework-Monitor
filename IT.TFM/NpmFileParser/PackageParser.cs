@@ -16,6 +16,7 @@ namespace NpmFileParser
         private const string jsonJoinChar = " ";
         private const string dependenciesProperty = "dependencies";
         private const string npmPackageType = "NPM";
+        private static readonly char[] separator = new char[] { ':' };
 
         #endregion
 
@@ -38,7 +39,7 @@ namespace NpmFileParser
                 var dependencyString = dependency.ToString();
                 var cleanDependency = dependencyString.Replace("\"", string.Empty)
                                                       .Replace(@"://", "-");
-                var fields = cleanDependency.Split(new char[] { ':' });
+                var fields = cleanDependency.Split(separator);
                 if (fields.Length != 2)
                 {
                     dependency = dependency.Next;
