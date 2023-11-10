@@ -62,7 +62,7 @@ namespace VisualStudioFileParser
             var position = cleanLine.LastIndexOf(' ');
             if (position > -1 && position < cleanLine.Length - 1)
             {
-                file.AddProperty(property, cleanLine.Substring(position + 1));
+                file.AddProperty(property, cleanLine[(position + 1)..]);
             }
         }
 

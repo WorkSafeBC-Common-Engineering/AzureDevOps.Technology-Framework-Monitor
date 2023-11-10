@@ -49,12 +49,12 @@ namespace NpmFileParser
                 var id = fields[0].Trim();
                 var version = fields[1].Trim(); ;
                 
-                var comparator = version.Substring(0, 1);
+                var comparator = version[..1];
                 
                 // if we have a ^ or ~ in the version, strip it
                 if (comparator == "^" || comparator == "~")
                 {
-                    version = version.Substring(1).Trim();
+                    version = version[1..].Trim();
                 }
                 else
                 {

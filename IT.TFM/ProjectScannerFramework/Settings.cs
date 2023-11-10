@@ -78,7 +78,7 @@ namespace ProjectScanner
                     var allKeys = appSettings.AllKeys.Where(k => k.StartsWith(scannerKey));
                     foreach (var key in allKeys)
                     {
-                        scanners.Add(key.Substring(key.IndexOf(separator) + separator.Length), appSettings[key]);
+                        scanners.Add(key[(key.IndexOf(separator) + separator.Length)..], appSettings[key]);
                     }
 
                     IsInitialized = true;

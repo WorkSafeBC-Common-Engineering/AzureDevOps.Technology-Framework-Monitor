@@ -68,16 +68,12 @@ namespace EndOfLifeConfigFile
 
         private static DateTime? GetDate(ComponentTypeEnum componentType, string version)
         {
-            switch (componentType)
+            return componentType switch
             {
-                case ComponentTypeEnum.DotNet:
-                    return GetDate(eolDotNetList, version);
-
-                case ComponentTypeEnum.Component:
-                    return GetDate(eolComponentList, version);
-            }
-
-            return null;
+                ComponentTypeEnum.DotNet => GetDate(eolDotNetList, version),
+                ComponentTypeEnum.Component => GetDate(eolComponentList, version),
+                _ => null,
+            };
         }
 
         private static DateTime? GetDate(Dictionary<string, DateTime> dictionary, string key)

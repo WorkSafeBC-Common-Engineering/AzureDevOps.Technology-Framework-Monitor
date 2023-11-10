@@ -82,7 +82,7 @@ namespace VisualStudioFileParser
             int endPos = line.IndexOf('"', startPos + 1);
             
             return endPos < 0
-                ? line.Substring(startPos + 1)
+                ? line[(startPos + 1)..]
                 : line.Substring(startPos + 1, endPos - startPos - 1);
         }
 
@@ -107,43 +107,41 @@ namespace VisualStudioFileParser
             var xmlText = string.Concat(content);
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(xmlText)))
             {
-                using (XmlReader reader = XmlReader.Create(stream, settings))
+                using XmlReader reader = XmlReader.Create(stream, settings);
+                while (reader.Read())
                 {
-                    while (reader.Read())
+                    if (reader.NodeType == XmlNodeType.EndElement)
                     {
-                        if (reader.NodeType == XmlNodeType.EndElement)
+                        stack.Pop();
+                        continue;
+                    }
+
+                    if (reader.NodeType == XmlNodeType.Element)
+                    {
+                        stack.Push(reader.LocalName);
+
+                        if (reader.HasAttributes)
+                        {
+                            while (reader.MoveToNextAttribute())
+                            {
+                                if (reader.Value.Equals(url, StringComparison.InvariantCultureIgnoreCase))
+                                {
+                                    paths.Add(GetPath(stack, reader.LocalName));
+                                }
+                            }
+
+                            reader.MoveToElement();
+                        }
+
+                        if (reader.IsEmptyElement)
                         {
                             stack.Pop();
                             continue;
                         }
 
-                        if (reader.NodeType == XmlNodeType.Element)
+                        if (reader.HasValue && reader.Value.Contains(url))
                         {
-                            stack.Push(reader.LocalName);
-
-                            if (reader.HasAttributes)
-                            {
-                                while (reader.MoveToNextAttribute())
-                                {
-                                    if (reader.Value.Equals(url, StringComparison.InvariantCultureIgnoreCase))
-                                    {
-                                        paths.Add(GetPath(stack, reader.LocalName));
-                                    }
-                                }
-
-                                reader.MoveToElement();
-                            }
-
-                            if (reader.IsEmptyElement)
-                            {
-                                stack.Pop();
-                                continue;
-                            }
-
-                            if (reader.HasValue && reader.Value.Contains(url))
-                            {
-                                paths.Add(GetPath(stack, string.Empty));
-                            }
+                            paths.Add(GetPath(stack, string.Empty));
                         }
                     }
                 }

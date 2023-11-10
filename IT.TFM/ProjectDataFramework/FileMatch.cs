@@ -25,75 +25,58 @@ namespace ProjectData
 
         internal static FileMatch MatchOnFile(FileItemType fileType)
         {
-            switch (fileType)
+            return fileType switch
             {
-                case FileItemType.VSSolution:
-                    return new FileMatch
-                    {
-                        MatchType = MatchType.EndsWith,
-                        MatchOn = ".sln",
-                        Exceptions = Array.Empty<string>()
+                FileItemType.VSSolution => new FileMatch
+                {
+                    MatchType = MatchType.EndsWith,
+                    MatchOn = ".sln",
+                    Exceptions = Array.Empty<string>()
+                },
+                FileItemType.VB6Project => new FileMatch
+                {
+                    MatchType = MatchType.EndsWith,
+                    MatchOn = ".vbp",
+                    Exceptions = Array.Empty<string>()
+                },
+                FileItemType.CSProject => new FileMatch
+                {
+                    MatchType = MatchType.EndsWith,
+                    MatchOn = ".csproj",
+                    Exceptions = Array.Empty<string>()
+                },
+                FileItemType.VBProject => new FileMatch
+                {
+                    MatchType = MatchType.EndsWith,
+                    MatchOn = ".vbproj",
+                    Exceptions = Array.Empty<string>()
+                },
+                FileItemType.SqlProject => new FileMatch
+                {
+                    MatchType = MatchType.EndsWith,
+                    MatchOn = ".sqlproj",
+                    Exceptions = Array.Empty<string>()
+                },
+                FileItemType.VSConfig => new FileMatch
+                {
+                    MatchType = MatchType.EndsWith,
+                    MatchOn = ".config",
+                    Exceptions = new string[] { "packages.config" }
+                },
+                FileItemType.NuGetPkgConfig => new FileMatch
+                {
+                    MatchType = MatchType.Exact,
+                    MatchOn = "packages.config",
+                    Exceptions = Array.Empty<string>()
+                },
+                FileItemType.NpmPackage => new FileMatch
+                {
+                    MatchType = MatchType.Exact,
+                    MatchOn = "package.json",
+                    Exceptions = Array.Empty<string>()
+                },
+                _ => throw new ArgumentException("Invalid parameter - value does not exist", nameof(fileType)),
             };
-
-                case FileItemType.VB6Project:
-                    return new FileMatch
-                    {
-                        MatchType = MatchType.EndsWith,
-                        MatchOn = ".vbp",
-                        Exceptions = Array.Empty<string>()
-                    };
-
-                case FileItemType.CSProject:
-                    return new FileMatch
-                    {
-                        MatchType = MatchType.EndsWith,
-                        MatchOn = ".csproj",
-                        Exceptions = Array.Empty<string>()
-                    };
-
-                case FileItemType.VBProject:
-                    return new FileMatch
-                    {
-                        MatchType = MatchType.EndsWith,
-                        MatchOn = ".vbproj",
-                        Exceptions = Array.Empty<string>()
-                    };
-
-                case FileItemType.SqlProject:
-                    return new FileMatch
-                    {
-                        MatchType = MatchType.EndsWith,
-                        MatchOn = ".sqlproj",
-                        Exceptions = Array.Empty<string>()
-                    };
-
-                case FileItemType.VSConfig:
-                    return new FileMatch
-                    {
-                        MatchType = MatchType.EndsWith,
-                        MatchOn = ".config",
-                        Exceptions = new string[] { "packages.config" }
-                    };
-
-                case FileItemType.NuGetPkgConfig:
-                    return new FileMatch
-                    {
-                        MatchType = MatchType.Exact,
-                        MatchOn = "packages.config",
-                        Exceptions = Array.Empty<string>()
-                    };
-
-                case FileItemType.NpmPackage:
-                    return new FileMatch
-                    {
-                        MatchType = MatchType.Exact,
-                        MatchOn = "package.json",
-                        Exceptions = Array.Empty<string>()
-                    };
-
-                default:
-                    throw new ArgumentException("Invalid parameter - value does not exist", nameof(fileType));
-            }
         }
     }
 

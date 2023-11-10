@@ -24,8 +24,8 @@ namespace VisualStudioFileParser
                 var position = line.IndexOf('=');
                 if (position > 0)
                 {
-                    var key = line.Substring(0, position);
-                    var value = StripQuotes(line.Substring(position + 1));
+                    var key = line[..position];
+                    var value = StripQuotes(line[(position + 1)..]);
 
                     switch (key.ToLower())
                     {
