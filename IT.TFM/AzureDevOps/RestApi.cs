@@ -2,8 +2,6 @@
 
 using Newtonsoft.Json;
 
-using RestSharp;
-
 using System.IO.Compression;
 using System.Text;
 
@@ -42,8 +40,6 @@ namespace AzureDevOps
         private const string downloadRepositoryUrl = "https://{baseUrl}/{organization}{project}/_apis/git/repositories/{repository}/items?recursionLevel=full&format=zip&versionDescriptor.version={branch}&versionDescriptor.versionType=branch&{apiVersion}";
 
         private const string getPipelinesUrl = "https://{baseUrl}/{organization}/{project}/_apis/pipelines?{apiVersion}";
-
-        private static readonly Dictionary<string, RestClient> clients = new();
 
         private static readonly Dictionary<string, HttpClient> httpClients = new();
 
@@ -94,7 +90,7 @@ namespace AzureDevOps
                 CheckoutDirectory = Path.Combine (Environment.CurrentDirectory, Organization);
             }
 
-            Token = Environment.GetEnvironmentVariable("TFM_AdToken");
+            Token = Environment.GetEnvironmentVariable("TFM_AdToken") ?? string.Empty;
         }
 
         async Task<AzDoProjectList> IRestApi.GetProjectsAsync()
@@ -110,6 +106,11 @@ namespace AzureDevOps
             var content = await CallApiAsync2(GetUrl(getRepositoriesUrl));
             var repositories = JsonConvert.DeserializeObject<AzDoRepositoryList>(content);
 
+            if (repositories == null || repositories.Value == null)
+            {
+                return new AzDoRepositoryList();
+            }
+
             foreach (var repo in repositories.Value)
             {
                 Repository = repo.Id;
@@ -122,9 +123,16 @@ namespace AzureDevOps
 
                 var commit = JsonConvert.DeserializeObject<AzDoCommitList>(commitContent);
 
-                repo.LastCommitId = commit.Count == 0
-                    ? string.Empty
-                    : commit.Value[0].CommitId;
+                if (commit == null || commit.Value == null)
+                {
+                    repo.LastCommitId = string.Empty;
+                }
+                else
+                {
+                    repo.LastCommitId = commit.Count == 0
+                        ? string.Empty
+                        : commit.Value[0].CommitId;
+                }
             }
 
             return repositories ?? new AzDoRepositoryList();
@@ -199,7 +207,7 @@ namespace AzureDevOps
             {
                 if (disposing)
                 {
-                    foreach (var item in clients)
+                    foreach (var item in httpClients)
                     {
                         item.Value?.Dispose();
                     }
