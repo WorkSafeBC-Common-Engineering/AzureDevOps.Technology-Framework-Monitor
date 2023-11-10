@@ -82,9 +82,7 @@ namespace EndOfLifeConfigFile
 
         private static DateTime? GetDate(Dictionary<string, DateTime> dictionary, string key)
         {
-            return dictionary.ContainsKey(key)
-                ? dictionary[key]
-                : new DateTime?();
+            return dictionary.TryGetValue(key, out DateTime value) ? value : new DateTime?();
         }
 
         #endregion
