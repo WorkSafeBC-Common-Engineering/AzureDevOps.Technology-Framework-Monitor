@@ -314,7 +314,7 @@ namespace ProjectScannerSaveToSqlServer
             return dbOrganization;
         }
 
-        private FileItem GetFile(DataModels.File dbFile)
+        private static FileItem GetFile(DataModels.File dbFile)
         {
             var fileType = (FileItemType)Enum.Parse(typeof(FileItemType), dbFile.FileType.Value);
 

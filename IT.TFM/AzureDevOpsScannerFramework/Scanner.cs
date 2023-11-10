@@ -282,7 +282,7 @@ namespace AzureDevOpsScannerFramework
             azureDevOpsOrganizationUrl = configuration;
         }
 
-        private void AddFileProperties(FileItem file, string[] content)
+        private static void AddFileProperties(FileItem file, string[] content)
         {
             try
             {

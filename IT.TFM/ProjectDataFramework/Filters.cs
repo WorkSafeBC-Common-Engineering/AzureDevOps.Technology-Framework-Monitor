@@ -73,7 +73,7 @@ namespace ProjectData
 
         #region Private Methods
 
-        private IFilter GetFilterInstance(FilterData data)
+        private static IFilter GetFilterInstance(FilterData data)
         {
             var filter = _container.Resolve<IFilter>(data.FilterType);
             filter.Initialize(data.Data);

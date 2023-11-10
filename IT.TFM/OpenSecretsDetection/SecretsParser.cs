@@ -160,7 +160,7 @@ namespace OpenSecretsDetection
             }
         }
 
-        private void ScanForApiKeySecrets(FileItem file, string[] content)
+        private static void ScanForApiKeySecrets(FileItem file, string[] content)
         {
             if (file.FileType != FileItemType.VSConfig)
             {
@@ -180,7 +180,7 @@ namespace OpenSecretsDetection
             }
         }
 
-        private void ScanForOAuthSecrets(FileItem file, string[] content)
+        private static void ScanForOAuthSecrets(FileItem file, string[] content)
         {
             if (file.FileType != FileItemType.VSConfig)
             {
@@ -198,7 +198,7 @@ namespace OpenSecretsDetection
             }
         }
 
-        private XmlDocument GetXml(string[] content)
+        private static XmlDocument GetXml(string[] content)
         {
             var data = string.Concat(content);
             var xml = new XmlDocument();
@@ -207,7 +207,7 @@ namespace OpenSecretsDetection
             return xml;
         }
 
-        private void GetApiKeySecrets(XmlDocument xmlDoc, string nodePath, List<string> secretsList)
+        private static void GetApiKeySecrets(XmlDocument xmlDoc, string nodePath, List<string> secretsList)
         {
             var nodes = xmlDoc.SelectNodes(nodePath);
             if (nodes.Count == 0)
@@ -239,7 +239,7 @@ namespace OpenSecretsDetection
             }
         }
 
-        private void SearchAppSettings(XmlDocument xmlDoc, string searchTerm, List<string> list)
+        private static void SearchAppSettings(XmlDocument xmlDoc, string searchTerm, List<string> list)
         {
             var settings = xmlDoc.SelectSingleNode(appSettingsPath);
             if (settings == null)
@@ -276,7 +276,7 @@ namespace OpenSecretsDetection
         //    return line.Substring(startPos, endPost - startPos);
         //}
 
-        private bool IsKeyVaultToken(string value)
+        private static bool IsKeyVaultToken(string value)
         {
             var trimmedValue = value.Trim();
             return trimmedValue.StartsWith(KeyVaultTokenPrefix) && trimmedValue.EndsWith(KeyVaultTokenPostfix);

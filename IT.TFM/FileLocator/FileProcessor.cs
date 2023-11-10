@@ -14,7 +14,7 @@ namespace RepoScan.FileLocator
 {
     public class FileProcessor
     {
-        public async Task GetFiles(int totalThreads)
+        public static async Task GetFiles(int totalThreads)
         {
             Settings.Initialize();
 

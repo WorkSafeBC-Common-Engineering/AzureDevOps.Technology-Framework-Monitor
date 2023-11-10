@@ -119,12 +119,12 @@ namespace RepoScan.Storage.SqlServer
 
         #region Private Methods
 
-        private IStorageWriter GetWriter()
+        private static IStorageWriter GetWriter()
         {
             return DataStorage.StorageFactory.GetStorageWriter();
         }
 
-        private IStorageReader GetReader()
+        private static IStorageReader GetReader()
         {
             return DataStorage.StorageFactory.GetStorageReader();
         }

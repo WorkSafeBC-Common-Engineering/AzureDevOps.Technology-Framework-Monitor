@@ -71,7 +71,7 @@ namespace VisualStudioFileParser
 
         #region Private Methods
 
-        private string GetUrl(string line)
+        private static string GetUrl(string line)
         {
             int startPos = line.IndexOf(UrlHttps, StringComparison.InvariantCultureIgnoreCase);
             if (startPos < 0)
@@ -86,12 +86,12 @@ namespace VisualStudioFileParser
                 : line.Substring(startPos + 1, endPos - startPos - 1);
         }
 
-        private bool IgnoreThisUrl(string url)
+        private static bool IgnoreThisUrl(string url)
         {
             return ignoreUrls.Any(u => url.StartsWith(u, StringComparison.InvariantCultureIgnoreCase));
         }
 
-        private IEnumerable<string> GetPaths(string[] content, string url)
+        private static IEnumerable<string> GetPaths(string[] content, string url)
         {
             List<string> paths = new List<string>();
             var stack = new Stack<string>();
@@ -152,7 +152,7 @@ namespace VisualStudioFileParser
             return paths.AsEnumerable();
         }
 
-        private string GetPath(Stack<string> stack, string attribute)
+        private static string GetPath(Stack<string> stack, string attribute)
         {
             var path = string.Join("/", stack.Reverse());
             if (!string.IsNullOrEmpty(attribute))
