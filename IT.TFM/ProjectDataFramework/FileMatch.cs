@@ -92,7 +92,7 @@ namespace ProjectData
                     };
 
                 default:
-                    throw new ArgumentException("Invalid parameter - value does not exist", "itemType");
+                    throw new ArgumentException("Invalid parameter - value does not exist", nameof(fileType));
             }
         }
     }
