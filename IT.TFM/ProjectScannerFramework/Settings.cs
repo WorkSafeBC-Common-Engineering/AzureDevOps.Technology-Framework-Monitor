@@ -94,12 +94,9 @@ namespace ProjectScanner
             var fields = configuration.Split(fieldSeparator, StringSplitOptions.None);
             var enumName = Enum.GetNames(typeof(ProjectSource)).SingleOrDefault(e => e.Equals(fields[0], StringComparison.InvariantCultureIgnoreCase));
 
-            if (enumName == null)
-            {
-                throw new ArgumentException($"Invalid Scanner type for configuration {name} : {configuration}");
-            }
-
-            return (ProjectSource)Enum.Parse(typeof(ProjectSource), enumName);
+            return enumName == null
+                ? throw new ArgumentException($"Invalid Scanner type for configuration {name} : {configuration}")
+                : (ProjectSource)Enum.Parse(typeof(ProjectSource), enumName);
         }
 
         public static string GetConfigurationData(string name)
