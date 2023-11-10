@@ -12,7 +12,7 @@ namespace AzureDevOps
         #region Private Members
 
         private const string fieldBaseUrl = "{baseUrl}";
-        
+
         private const string fieldOrganization = "{organization}";
 
         private const string fieldProject = "{project}";
@@ -89,7 +89,7 @@ namespace AzureDevOps
 
                 BaseUrl = fields[0];
                 Organization = fields[1];
-                CheckoutDirectory = Path.Combine (Environment.CurrentDirectory, Organization);
+                CheckoutDirectory = Path.Combine(Environment.CurrentDirectory, Organization);
             }
 
             Token = Environment.GetEnvironmentVariable("TFM_AdToken") ?? string.Empty;
@@ -155,7 +155,7 @@ namespace AzureDevOps
 
         async Task<string> IRestApi.DownloadRepositoryAsync()
         {
-            return await CallApiAsync2(GetUrl(downloadRepositoryUrl), mediaType:"application/zip", unzipContent:true);
+            return await CallApiAsync2(GetUrl(downloadRepositoryUrl), mediaType: "application/zip", unzipContent: true);
         }
 
         async Task<AzDoPipelineList> IRestApi.GetPipelinesAsync()
