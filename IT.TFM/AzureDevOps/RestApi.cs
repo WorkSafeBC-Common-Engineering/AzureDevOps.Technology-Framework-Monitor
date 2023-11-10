@@ -41,7 +41,11 @@ namespace AzureDevOps
 
         private const string downloadRepositoryUrl = "https://{baseUrl}/{organization}{project}/_apis/git/repositories/{repository}/items?recursionLevel=full&format=zip&versionDescriptor.version={branch}&versionDescriptor.versionType=branch&{apiVersion}";
 
+        private const string getPipelinesUrl = "https://{baseUrl}/{organization}/{project}/_apis/pipelines?{apiVersion}";
+
         private static readonly Dictionary<string, RestClient> clients = new();
+
+        private static readonly Dictionary<string, HttpClient> httpClients = new();
 
         private static readonly Semaphore waitOnApiCall = new(1, 1);
 
@@ -95,7 +99,7 @@ namespace AzureDevOps
 
         async Task<AzDoProjectList> IRestApi.GetProjectsAsync()
         {
-            var content = await CallApiAsync(GetUrl(getProjectsUrl));
+            var content = await CallApiAsync2(GetUrl(getProjectsUrl));
 
             var projects = JsonConvert.DeserializeObject<AzDoProjectList>(content);
             return projects ?? new AzDoProjectList();
@@ -103,13 +107,13 @@ namespace AzureDevOps
 
         async Task<AzDoRepositoryList> IRestApi.GetRepositoriesAsync()
         {
-            var content = await CallApiAsync(GetUrl(getRepositoriesUrl));
+            var content = await CallApiAsync2(GetUrl(getRepositoriesUrl));
             var repositories = JsonConvert.DeserializeObject<AzDoRepositoryList>(content);
 
             foreach (var repo in repositories.Value)
             {
                 Repository = repo.Id;
-                var commitContent = await CallApiAsync(GetUrl(getRepositoryCommitUrl));
+                var commitContent = await CallApiAsync2(GetUrl(getRepositoryCommitUrl));
                 if (commitContent == string.Empty)
                 {
                     repo.LastCommitId = string.Empty;
@@ -128,7 +132,7 @@ namespace AzureDevOps
 
         async Task<AzDoFileList> IRestApi.GetFilesAsync()
         {
-            var content = await CallApiAsync(GetUrl(getFilesUrl));
+            var content = await CallApiAsync2(GetUrl(getFilesUrl));
 
             if (content == string.Empty)
             {
@@ -141,7 +145,48 @@ namespace AzureDevOps
 
         async Task<string> IRestApi.DownloadRepositoryAsync()
         {
-            return await CallApiAsync(GetUrl(downloadRepositoryUrl), mediaType:"application/zip", unzipContent:true);
+            return await CallApiAsync2(GetUrl(downloadRepositoryUrl), mediaType:"application/zip", unzipContent:true);
+        }
+
+        async Task<AzDoPipelineList> IRestApi.GetPipelinesAsync()
+        {
+            var content = await CallApiAsync2(GetUrl(getPipelinesUrl));
+
+            if (content == string.Empty)
+            {
+                return new AzDoPipelineList();
+            }
+
+            var pipelines = JsonConvert.DeserializeObject<AzDoPipelineList>(content);
+            if (pipelines == null || pipelines.Value == null)
+            {
+                return new AzDoPipelineList();
+            }
+
+            foreach (var pipeline in pipelines.Value)
+            {
+                if (string.IsNullOrEmpty(pipeline.Url))
+                {
+                    continue;
+                }
+
+                var pipelineContent = await CallApiAsync2(pipeline.Url);
+                if (pipelineContent == string.Empty)
+                {
+                    continue;
+                }
+
+                var pipelineDetails = JsonConvert.DeserializeObject<AzDoPipeline>(pipelineContent);
+                if (pipelineDetails == null)
+                {
+                    continue;
+                }
+
+                pipeline.Configuration = pipelineDetails.Configuration;
+            }
+
+
+            return pipelines ?? new AzDoPipelineList();
         }
 
         #endregion
@@ -205,7 +250,7 @@ namespace AzureDevOps
             return $"Basic {Convert.ToBase64String(Encoding.ASCII.GetBytes($":{Token}"))}";
         }
 
-        private async Task<string> CallApiAsync(string url, Method method = Method.Get, string mediaType = "application/json", bool unzipContent = false)
+        private async Task<string> CallApiAsync2(string url, string mediaType = "application/json", bool unzipContent = false)
         {
             try
             {
@@ -216,26 +261,21 @@ namespace AzureDevOps
                     Directory.Delete(CheckoutDirectory, true);
                 }
 
-                var restClient = GetClient(url);
+                HttpClient httpClient = GetClient2(url);
 
-                var request = new RestRequest(GetRelativeUri(url))
-                {
-                    Method = method
-                };
-
-                request.AddHeader("Authorization", AuthHeader());
-                request.AddHeader("Accept", mediaType);
+                using var request = new HttpRequestMessage(HttpMethod.Get, url);
+                request.Headers.Add("Authorization", AuthHeader());
+                request.Headers.Add("Accept", mediaType);
 #if DEBUG
                 System.Diagnostics.Debug.WriteLine($"API Call: {url}");
                 var startTime = DateTime.Now;
 #endif
-                var response = await restClient.ExecuteAsync(request);
-                ThrottleApi(response);
+                HttpResponseMessage response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+                ThrottleApi2(response);
 #if DEBUG
                 System.Diagnostics.Debug.WriteLine($"End API Call, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
                 startTime = DateTime.Now;
 #endif
-
                 if (!response.IsSuccessStatusCode)
                 {
                     if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
@@ -244,28 +284,19 @@ namespace AzureDevOps
                         return string.Empty;
                     }
 
-                    throw new HttpRequestException($"API Request failed: {response.StatusCode} {response.ErrorMessage}");
+                    throw new HttpRequestException($"API Request failed: {response.StatusCode} {response.ReasonPhrase}");
                 }
 
                 if (unzipContent)
                 {
-                    var tempFile = Path.GetTempFileName();
-
-                    using (var file = File.OpenWrite(tempFile))
-                    {
-                        await file.WriteAsync(response.RawBytes, 0, response.RawBytes == null ? 0 : response.RawBytes.Length);
-                        file.Close();
-                    }
-
-                    ZipFile.ExtractToDirectory(tempFile, CheckoutDirectory, true);
-                    File.Delete(tempFile);
+                    GetZipContent(response.Content.ReadAsStream());
 #if DEBUG
                     System.Diagnostics.Debug.WriteLine($"Unzip, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
 #endif
                     return string.Empty;
                 }
 
-                return response.Content ?? string.Empty;
+                return await response.Content.ReadAsStringAsync();
             }
             finally
             {
@@ -273,36 +304,31 @@ namespace AzureDevOps
             }
         }
 
-        private static RestClient GetClient(string url)
+        private static HttpClient GetClient2(string url)
         {
             var uri = new Uri(url);
             var baseUrl = uri.GetLeftPart(UriPartial.Authority);
 
-            if (clients.ContainsKey(baseUrl))
+            if (httpClients.TryGetValue(baseUrl, out HttpClient? value))
             {
-                return clients[baseUrl];
-            }
-            else
-            {
-                var options = new RestClientOptions(baseUrl)
+                if (value != null)
                 {
-                    MaxTimeout = 3600000 // 1 hour
-                };
-
-                var client = new RestClient(options);
-                clients[baseUrl] = client;
-                return client;
+                    return value;
+                }
             }
+
+            var client = new HttpClient()
+            {
+                BaseAddress = new Uri(baseUrl),
+                Timeout = new TimeSpan(1, 0, 0),     // one hour
+            };
+
+
+            httpClients[baseUrl] = client;
+            return client;
         }
 
-        private static Uri GetRelativeUri(string url)
-        {
-            var uri = new Uri(url);
-            var baseUri = new Uri(uri.GetLeftPart(UriPartial.Authority));
-            return baseUri.MakeRelativeUri(uri);
-        }
-
-        private static void ThrottleApi(RestResponse response)
+        private static void ThrottleApi2(HttpResponseMessage response)
         {
             var headers = response.Headers;
             if (headers == null)
@@ -312,7 +338,7 @@ namespace AzureDevOps
 
             foreach (var header in headers)
             {
-                var headerName = header.Name?.ToLower();
+                var headerName = header.Key?.ToLower();
                 if (headerName == null)
                 {
                     continue;
@@ -320,7 +346,7 @@ namespace AzureDevOps
 
                 var headerValue = header.Value?.ToString();
 #if DEBUG
-                if ( headerName.StartsWith("x-ratelimit") || headerName.Equals("retry-after"))
+                if (headerName.StartsWith("x-ratelimit") || headerName.Equals("retry-after"))
                 {
                     System.Diagnostics.Debug.WriteLine($"Azure API Throttling: {headerName} = {headerValue ?? "<null>"}");
                 }
@@ -361,6 +387,11 @@ namespace AzureDevOps
                         break;
                 }
             }
+        }
+
+        private void GetZipContent(Stream zipStream)
+        {
+            ZipFile.ExtractToDirectory(zipStream, CheckoutDirectory, true);
         }
 
         #endregion

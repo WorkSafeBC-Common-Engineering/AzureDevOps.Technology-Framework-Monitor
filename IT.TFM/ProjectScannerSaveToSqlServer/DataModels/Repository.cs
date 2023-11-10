@@ -9,6 +9,7 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         public Repository()
         {
             Files = new HashSet<File>();
+            Pipelines = new HashSet<Pipeline>();
         }
 
         public int Id { get; set; }
@@ -50,6 +51,9 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<File> Files { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Pipeline> Pipelines { get; set; }
 
         public virtual Project Project { get; set; }
     }

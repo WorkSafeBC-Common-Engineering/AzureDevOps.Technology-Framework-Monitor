@@ -227,6 +227,41 @@ namespace ProjectScannerSaveToSqlServer
             _ = context.SaveChangesAsync().Result;
         }
 
+        void IStorageWriter.SavePipeline(ProjData.Pipeline pipeline)
+        {
+            var dbRepo = context.Repositories
+                                .SingleOrDefault(r => r.RepositoryId.Equals(pipeline.RepositoryId, StringComparison.InvariantCultureIgnoreCase))
+                                ?? throw new InvalidOperationException("No matching Repository defined");
+
+            var dbPipeline = context.Pipelines
+                                    .SingleOrDefault(p => p.PipelineId == pipeline.Id);
+
+            if (dbPipeline == null)
+            {
+                dbPipeline = new Pipeline
+                {
+                    Repository = dbRepo,
+                    PipelineId = pipeline.Id,
+                    RepositoryId = dbRepo.Id
+                };
+
+                context.Pipelines.Add(dbPipeline);
+            }
+
+            dbPipeline.Name = pipeline.Name;
+            dbPipeline.Folder = pipeline.Folder;
+            dbPipeline.Revision = pipeline.Revision;
+            dbPipeline.Url = pipeline.Url;
+            dbPipeline.Type = pipeline.Type;
+            dbPipeline.PipelineType = pipeline.PipelineType;
+            dbPipeline.QueueStatus = pipeline.QueueStatus;
+            dbPipeline.Quality = pipeline.Quality;
+            dbPipeline.CreatedBy = pipeline.CreatedBy;
+            dbPipeline.CreatedDate = pipeline.CreatedDate;
+
+            _ = context.SaveChangesAsync().Result;
+        }
+
         void IStorageWriter.DeleteFile(ProjData.FileItem file, Guid repoId)
         {
             var id = repoId.ToString("D").ToLower();

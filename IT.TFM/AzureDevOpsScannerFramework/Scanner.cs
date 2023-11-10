@@ -124,6 +124,55 @@ namespace AzureDevOpsScannerFramework
             return repoList.AsEnumerable();
         }
 
+        async Task<IEnumerable<Pipeline>> IScanner.Pipelines(Guid projectId)
+        {
+            var pipelineList = new List<Pipeline>();
+            api.Project = projectId.ToString();
+            var azDoPipelines = await api.GetPipelinesAsync();
+
+            foreach (var pipeline in azDoPipelines.Value)
+            {
+                var p = new Pipeline
+                {
+                    Id = pipeline.Id ?? 0,
+                    Name = pipeline.Name,
+                    Folder = pipeline.Folder,
+                    Revision = pipeline.Revision ?? 0,
+                    Url = pipeline.Url,
+                    Type = pipeline.Configuration.Type,
+                };
+
+                switch(pipeline.Configuration.Type)
+                {
+                    case "designerJson":
+                        p.PipelineType = pipeline.Configuration.DesignerJson.Type;
+                        p.Quality = pipeline.Configuration.DesignerJson.Quality;
+                        p.QueueStatus = pipeline.Configuration.DesignerJson.QueueStatus;
+                        p.CreatedBy = pipeline.Configuration.DesignerJson.AuthoredBy.DisplayName;
+                        p.CreatedDate = pipeline.Configuration.DesignerJson.CreatedDate;
+                        p.RepositoryName = pipeline.Configuration.DesignerJson.Repository.Name;
+                        p.RepositoryId = pipeline.Configuration.DesignerJson.Repository.Id;
+                        break;
+
+                    case "designerHyphenJson":
+                        break;
+
+                    case "justInTime":
+                        break;
+
+                    case "unknown":
+                        break;
+
+                    case "yaml":
+                        break;
+                }
+
+                pipelineList.Add(p);
+            }
+
+            return pipelineList.AsEnumerable();
+        }
+
         async Task<IEnumerable<FileItem>> IScanner.Files(Guid projectId, Repository repository)
         {
             if (repository.DefaultBranch == null)
