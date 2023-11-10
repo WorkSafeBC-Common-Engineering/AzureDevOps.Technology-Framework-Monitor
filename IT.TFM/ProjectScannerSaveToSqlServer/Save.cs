@@ -142,7 +142,7 @@ namespace ProjectScannerSaveToSqlServer
                 nameTokens = repository.Name.Split('.');
             }
 
-            if (nameTokens?.Length > 1 && nameTokens[0].ToUpper() != "ZZZ")
+            if (nameTokens?.Length > 1 && !nameTokens[0].Equals("ZZZ", StringComparison.CurrentCultureIgnoreCase))
             {
                 dbRepo.Portfolio = nameTokens[0];
                 

@@ -33,7 +33,7 @@ namespace ContentFilter
 
         bool IFilter.IsMatch(string data)
         {
-            return data.ToLower().Contains(filterValue);
+            return data.Contains(filterValue, StringComparison.CurrentCultureIgnoreCase);
         }
 
         #endregion

@@ -40,7 +40,7 @@ namespace VisualStudioFileParser
         {
             foreach (var line in content)
             {
-                if (line.ToLower().Contains(UrlHttps) || line.ToLower().Contains(UrlHttp))
+                if (line.Contains(UrlHttps, StringComparison.CurrentCultureIgnoreCase) || line.Contains(UrlHttp, StringComparison.CurrentCultureIgnoreCase))
                 {
                     var url = GetUrl(line);
                     if (IgnoreThisUrl(url))

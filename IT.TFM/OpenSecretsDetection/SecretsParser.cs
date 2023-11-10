@@ -145,7 +145,7 @@ namespace OpenSecretsDetection
 
                 foreach (var secret in connectionSecrets)
                 {
-                    if (value.ToLower().Contains(secret))
+                    if (value.Contains(secret, StringComparison.CurrentCultureIgnoreCase))
                     {
                         connectionNames.Add(nameValue);
                         break;
@@ -232,7 +232,7 @@ namespace OpenSecretsDetection
                 var apiKeyValue = apiKey == null ? string.Empty : apiKey.Value;
                 var hasKeyValue = apiKeyValue.Trim().Length > 0;
 
-                if (useKeyValue.ToLower() == "no" || (hasKeyValue && !IsKeyVaultToken(apiKeyValue)))
+                if (useKeyValue.Equals("no", StringComparison.CurrentCultureIgnoreCase) || (hasKeyValue && !IsKeyVaultToken(apiKeyValue)))
                 {
                     secretsList.Add($"[ ApiKey: {apiName}, hasKey: {hasKeyValue} ]");
                 }
@@ -260,7 +260,7 @@ namespace OpenSecretsDetection
                 var valueNode = node.Attributes[appSettingValueAttribute];
                 var settingsValue = valueNode == null ? string.Empty : valueNode.Value.Trim();
 
-                if (settingsName.ToLower().Contains(searchTerm) && settingsValue.Length > 0 && !IsKeyVaultToken(settingsValue))
+                if (settingsName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) && settingsValue.Length > 0 && !IsKeyVaultToken(settingsValue))
                 {
                     list.Add($"Name: {settingsName}");
                 }
