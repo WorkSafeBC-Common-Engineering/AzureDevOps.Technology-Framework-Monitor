@@ -307,7 +307,10 @@ namespace AzureDevOpsScannerFramework
         private void UseFileFilter()
         {
             var useFilterValue = ConfigurationManager.AppSettings["useFileFiltering"];
-            bool.TryParse(useFilterValue, out useFileFilter);
+            if (!bool.TryParse(useFilterValue, out useFileFilter))
+            {
+                useFileFilter = false;
+            }
         }
 
         #endregion
