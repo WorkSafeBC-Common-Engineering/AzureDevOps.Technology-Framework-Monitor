@@ -73,7 +73,7 @@ namespace AzureDevOps
 
         void IRestApi.Initialize(string organizationUrl)
         {
-            var url = organizationUrl.EndsWith("/")
+            var url = organizationUrl.EndsWith('/')
                 ? organizationUrl.Substring(0, organizationUrl.Length - 1)
                 : organizationUrl;
 

@@ -230,7 +230,7 @@ namespace AzureDevOpsScannerFramework
             string[] content;
             bool hasProperties = false;
 
-            var dir = file.Path.StartsWith("/") ? file.Path.Substring(1) : file.Path;
+            var dir = file.Path.StartsWith('/') ? file.Path[1..] : file.Path;
             var filePath = Path.Combine(api.CheckoutDirectory, dir);
 
             //file.SHA1 = azureFile.CommitId;

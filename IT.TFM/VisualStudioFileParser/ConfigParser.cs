@@ -79,7 +79,7 @@ namespace VisualStudioFileParser
                 startPos = line.IndexOf(UrlHttp, StringComparison.InvariantCultureIgnoreCase);
             }
 
-            int endPos = line.IndexOf("\"", startPos + 1);
+            int endPos = line.IndexOf('"', startPos + 1);
             
             return endPos < 0
                 ? line.Substring(startPos + 1)
