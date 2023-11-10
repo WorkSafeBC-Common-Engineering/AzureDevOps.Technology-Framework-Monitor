@@ -39,7 +39,7 @@ namespace NpmFileParser
                 var cleanDependency = dependencyString.Replace("\"", string.Empty)
                                                       .Replace(@"://", "-");
                 var fields = cleanDependency.Split(new char[] { ':' });
-                if (fields.Count() != 2)
+                if (fields.Length != 2)
                 {
                     dependency = dependency.Next;
                     continue;

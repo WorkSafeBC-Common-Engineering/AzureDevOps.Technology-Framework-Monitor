@@ -109,7 +109,7 @@ namespace ProjectScanner
             var configuration = scanners[name];
             var fields = configuration.Split(fieldSeparator, StringSplitOptions.None);
 
-            if (fields.Count() < maxConfigurationFields)
+            if (fields.Length < maxConfigurationFields)
             {
                 throw new ApplicationException($"Configuration data for {name} scanner is missing: {configuration}");
             }

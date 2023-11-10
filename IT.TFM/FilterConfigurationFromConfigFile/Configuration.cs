@@ -26,7 +26,7 @@ namespace FilterConfigurationFromConfigFile
         {
             var dataValues = ConfigurationFileData.ConfigurationSettings.LoadConfigurationValues(configurationFile, configurationSection);
 
-            var data = new List<FilterData>(dataValues.Count());
+            var data = new List<FilterData>(dataValues.Length);
 
             foreach (var item in dataValues)
             {
