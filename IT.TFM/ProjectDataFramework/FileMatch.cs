@@ -32,7 +32,7 @@ namespace ProjectData
                     {
                         MatchType = MatchType.EndsWith,
                         MatchOn = ".sln",
-                        Exceptions = new string[] { }
+                        Exceptions = Array.Empty<string>()
             };
 
                 case FileItemType.VB6Project:
@@ -40,7 +40,7 @@ namespace ProjectData
                     {
                         MatchType = MatchType.EndsWith,
                         MatchOn = ".vbp",
-                        Exceptions = new string[] { }
+                        Exceptions = Array.Empty<string>()
                     };
 
                 case FileItemType.CSProject:
@@ -48,7 +48,7 @@ namespace ProjectData
                     {
                         MatchType = MatchType.EndsWith,
                         MatchOn = ".csproj",
-                        Exceptions = new string[] { }
+                        Exceptions = Array.Empty<string>()
                     };
 
                 case FileItemType.VBProject:
@@ -56,7 +56,7 @@ namespace ProjectData
                     {
                         MatchType = MatchType.EndsWith,
                         MatchOn = ".vbproj",
-                        Exceptions = new string[] { }
+                        Exceptions = Array.Empty<string>()
                     };
 
                 case FileItemType.SqlProject:
@@ -64,7 +64,7 @@ namespace ProjectData
                     {
                         MatchType = MatchType.EndsWith,
                         MatchOn = ".sqlproj",
-                        Exceptions = new string[] { }
+                        Exceptions = Array.Empty<string>()
                     };
 
                 case FileItemType.VSConfig:
@@ -80,7 +80,7 @@ namespace ProjectData
                     {
                         MatchType = MatchType.Exact,
                         MatchOn = "packages.config",
-                        Exceptions = new string[] { }
+                        Exceptions = Array.Empty<string>()
                     };
 
                 case FileItemType.NpmPackage:
@@ -88,7 +88,7 @@ namespace ProjectData
                     {
                         MatchType = MatchType.Exact,
                         MatchOn = "package.json",
-                        Exceptions = new string[] { }
+                        Exceptions = Array.Empty<string>()
                     };
 
                 default:
