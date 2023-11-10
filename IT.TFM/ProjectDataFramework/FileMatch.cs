@@ -82,7 +82,7 @@ namespace ProjectData
 
     public static class StringExtension
     {
-        private static readonly Dictionary<FileItemType, FileMatch> fileMatches = new Dictionary<FileItemType, FileMatch>
+        private static readonly Dictionary<FileItemType, FileMatch> fileMatches = new()
         {
             {FileItemType.VSSolution, FileMatch.MatchOnFile(FileItemType.VSSolution) },
             {FileItemType.VB6Project, FileMatch.MatchOnFile(FileItemType.VB6Project) },

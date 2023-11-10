@@ -20,7 +20,7 @@ namespace ProjectData
 
         private static readonly IUnityContainer _container;
 
-        private readonly List<IFilter> filters = new List<IFilter>();
+        private readonly List<IFilter> filters = new();
 
         #endregion
 

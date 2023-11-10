@@ -18,10 +18,10 @@ namespace ProjectScanner
 
         private const int maxConfigurationFields = 2;
 
-        private static readonly object initLock = new object();
+        private static readonly object initLock = new();
         private static Dictionary<string, string> scanners;
 
-        private static readonly ReaderWriterLockSlim cacheLock = new ReaderWriterLockSlim();
+        private static readonly ReaderWriterLockSlim cacheLock = new();
         private static bool isInitialized = false;
 
 

@@ -10,7 +10,7 @@ namespace ProjectData
     {
         #region Private members
 
-        private readonly List<Project> projects = new List<Project>();
+        private readonly List<Project> projects = new();
 
         #endregion
 
