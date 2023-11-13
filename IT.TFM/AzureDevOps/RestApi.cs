@@ -97,7 +97,7 @@ namespace AzureDevOps
 
         async Task<AzDoProjectList> IRestApi.GetProjectsAsync()
         {
-            var content = await CallApiAsync2(GetUrl(getProjectsUrl));
+            var content = await CallApiAsync(GetUrl(getProjectsUrl));
 
             var projects = JsonConvert.DeserializeObject<AzDoProjectList>(content);
             return projects ?? new AzDoProjectList();
@@ -105,7 +105,7 @@ namespace AzureDevOps
 
         async Task<AzDoRepositoryList> IRestApi.GetRepositoriesAsync()
         {
-            var content = await CallApiAsync2(GetUrl(getRepositoriesUrl));
+            var content = await CallApiAsync(GetUrl(getRepositoriesUrl));
             var repositories = JsonConvert.DeserializeObject<AzDoRepositoryList>(content);
 
             if (repositories == null || repositories.Value == null)
@@ -116,7 +116,7 @@ namespace AzureDevOps
             foreach (var repo in repositories.Value)
             {
                 Repository = repo.Id;
-                var commitContent = await CallApiAsync2(GetUrl(getRepositoryCommitUrl));
+                var commitContent = await CallApiAsync(GetUrl(getRepositoryCommitUrl));
                 if (commitContent == string.Empty)
                 {
                     repo.LastCommitId = string.Empty;
@@ -142,7 +142,7 @@ namespace AzureDevOps
 
         async Task<AzDoFileList> IRestApi.GetFilesAsync()
         {
-            var content = await CallApiAsync2(GetUrl(getFilesUrl));
+            var content = await CallApiAsync(GetUrl(getFilesUrl));
 
             if (content == string.Empty)
             {
@@ -155,12 +155,12 @@ namespace AzureDevOps
 
         async Task<string> IRestApi.DownloadRepositoryAsync()
         {
-            return await CallApiAsync2(GetUrl(downloadRepositoryUrl), mediaType: "application/zip", unzipContent: true);
+            return await CallApiAsync(GetUrl(downloadRepositoryUrl), mediaType: "application/zip", unzipContent: true);
         }
 
         async Task<AzDoPipelineList> IRestApi.GetPipelinesAsync()
         {
-            var content = await CallApiAsync2(GetUrl(getPipelinesUrl));
+            var content = await CallApiAsync(GetUrl(getPipelinesUrl));
 
             if (content == string.Empty)
             {
@@ -180,7 +180,7 @@ namespace AzureDevOps
                     continue;
                 }
 
-                var pipelineContent = await CallApiAsync2(pipeline.Url);
+                var pipelineContent = await CallApiAsync(pipeline.Url);
                 if (pipelineContent == string.Empty)
                 {
                     continue;
@@ -260,7 +260,7 @@ namespace AzureDevOps
             return $"Basic {Convert.ToBase64String(Encoding.ASCII.GetBytes($":{Token}"))}";
         }
 
-        private async Task<string> CallApiAsync2(string url, string mediaType = "application/json", bool unzipContent = false)
+        private async Task<string> CallApiAsync(string url, string mediaType = "application/json", bool unzipContent = false)
         {
             try
             {
@@ -271,7 +271,7 @@ namespace AzureDevOps
                     Directory.Delete(CheckoutDirectory, true);
                 }
 
-                HttpClient httpClient = GetClient2(url);
+                HttpClient httpClient = GetClient(url);
 
                 using var request = new HttpRequestMessage(HttpMethod.Get, url);
                 request.Headers.Add("Authorization", AuthHeader());
@@ -281,7 +281,7 @@ namespace AzureDevOps
                 var startTime = DateTime.Now;
 #endif
                 HttpResponseMessage response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
-                ThrottleApi2(response);
+                ThrottleApi(response);
 #if DEBUG
                 System.Diagnostics.Debug.WriteLine($"End API Call, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
                 startTime = DateTime.Now;
@@ -314,7 +314,7 @@ namespace AzureDevOps
             }
         }
 
-        private static HttpClient GetClient2(string url)
+        private static HttpClient GetClient(string url)
         {
             var uri = new Uri(url);
             var baseUrl = uri.GetLeftPart(UriPartial.Authority);
@@ -338,7 +338,7 @@ namespace AzureDevOps
             return client;
         }
 
-        private static void ThrottleApi2(HttpResponseMessage response)
+        private static void ThrottleApi(HttpResponseMessage response)
         {
             var headers = response.Headers;
             if (headers == null)
