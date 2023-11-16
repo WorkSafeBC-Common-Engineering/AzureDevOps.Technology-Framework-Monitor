@@ -66,25 +66,19 @@ namespace EndOfLifeConfigFile
             return eolList;
         }
 
-        private DateTime? GetDate(ComponentTypeEnum componentType, string version)
+        private static DateTime? GetDate(ComponentTypeEnum componentType, string version)
         {
-            switch (componentType)
+            return componentType switch
             {
-                case ComponentTypeEnum.DotNet:
-                    return GetDate(eolDotNetList, version);
-
-                case ComponentTypeEnum.Component:
-                    return GetDate(eolComponentList, version);
-            }
-
-            return null;
+                ComponentTypeEnum.DotNet => GetDate(eolDotNetList, version),
+                ComponentTypeEnum.Component => GetDate(eolComponentList, version),
+                _ => null,
+            };
         }
 
-        private DateTime? GetDate(Dictionary<string, DateTime> dictionary, string key)
+        private static DateTime? GetDate(Dictionary<string, DateTime> dictionary, string key)
         {
-            return dictionary.ContainsKey(key)
-                ? dictionary[key]
-                : new DateTime?();
+            return dictionary.TryGetValue(key, out DateTime value) ? value : new DateTime?();
         }
 
         #endregion

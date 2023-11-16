@@ -24,7 +24,7 @@ namespace AzureDevOpsScannerFramework
 
         private string azureDevOpsOrganizationUrl;
 
-        private readonly List<string> propertyFields = new();
+        private readonly List<string> propertyFields = [];
 
         private string organizationName;
 
@@ -62,7 +62,7 @@ namespace AzureDevOpsScannerFramework
                 api.PagingSkip = projectOffset;
                 var azDoProjects = await api.GetProjectsAsync();
 
-                if (azDoProjects.Value.Any())
+                if (azDoProjects.Value.Length != 0)
                 {
                     if (azDoProjects.Count < projectCount)
                     {
@@ -124,6 +124,55 @@ namespace AzureDevOpsScannerFramework
             return repoList.AsEnumerable();
         }
 
+        async Task<IEnumerable<Pipeline>> IScanner.Pipelines(Guid projectId)
+        {
+            var pipelineList = new List<Pipeline>();
+            api.Project = projectId.ToString();
+            var azDoPipelines = await api.GetPipelinesAsync();
+
+            foreach (var pipeline in azDoPipelines.Value)
+            {
+                var p = new Pipeline
+                {
+                    Id = pipeline.Id ?? 0,
+                    Name = pipeline.Name,
+                    Folder = pipeline.Folder,
+                    Revision = pipeline.Revision ?? 0,
+                    Url = pipeline.Url,
+                    Type = pipeline.Configuration.Type,
+                };
+
+                switch(pipeline.Configuration.Type)
+                {
+                    case "designerJson":
+                        p.PipelineType = pipeline.Configuration.DesignerJson.Type;
+                        p.Quality = pipeline.Configuration.DesignerJson.Quality;
+                        p.QueueStatus = pipeline.Configuration.DesignerJson.QueueStatus;
+                        p.CreatedBy = pipeline.Configuration.DesignerJson.AuthoredBy.DisplayName;
+                        p.CreatedDate = pipeline.Configuration.DesignerJson.CreatedDate;
+                        p.RepositoryName = pipeline.Configuration.DesignerJson.Repository.Name;
+                        p.RepositoryId = pipeline.Configuration.DesignerJson.Repository.Id;
+                        break;
+
+                    case "designerHyphenJson":
+                        break;
+
+                    case "justInTime":
+                        break;
+
+                    case "unknown":
+                        break;
+
+                    case "yaml":
+                        break;
+                }
+
+                pipelineList.Add(p);
+            }
+
+            return pipelineList.AsEnumerable();
+        }
+
         async Task<IEnumerable<FileItem>> IScanner.Files(Guid projectId, Repository repository)
         {
             if (repository.DefaultBranch == null)
@@ -181,7 +230,7 @@ namespace AzureDevOpsScannerFramework
             string[] content;
             bool hasProperties = false;
 
-            var dir = file.Path.StartsWith("/") ? file.Path.Substring(1) : file.Path;
+            var dir = file.Path.StartsWith('/') ? file.Path[1..] : file.Path;
             var filePath = Path.Combine(api.CheckoutDirectory, dir);
 
             //file.SHA1 = azureFile.CommitId;
@@ -201,7 +250,7 @@ namespace AzureDevOpsScannerFramework
                 }
 
                 AddPropertyFields(file);
-                hasProperties = file.Properties.Any() || file.References.Any() || file.UrlReferences.Any() || file.PackageReferences.Any();
+                hasProperties = file.Properties.Count != 0 || file.References.Count != 0 || file.UrlReferences.Count != 0 || file.PackageReferences.Count != 0;
 
             }
             catch (Exception ex)
@@ -233,7 +282,7 @@ namespace AzureDevOpsScannerFramework
             azureDevOpsOrganizationUrl = configuration;
         }
 
-        private void AddFileProperties(FileItem file, string[] content)
+        private static void AddFileProperties(FileItem file, string[] content)
         {
             try
             {
@@ -258,7 +307,10 @@ namespace AzureDevOpsScannerFramework
         private void UseFileFilter()
         {
             var useFilterValue = ConfigurationManager.AppSettings["useFileFiltering"];
-            bool.TryParse(useFilterValue, out useFileFilter);
+            if (!bool.TryParse(useFilterValue, out useFileFilter))
+            {
+                useFileFilter = false;
+            }
         }
 
         #endregion

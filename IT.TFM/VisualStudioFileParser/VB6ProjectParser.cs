@@ -24,8 +24,8 @@ namespace VisualStudioFileParser
                 var position = line.IndexOf('=');
                 if (position > 0)
                 {
-                    var key = line.Substring(0, position);
-                    var value = StripQuotes(line.Substring(position + 1));
+                    var key = line[..position];
+                    var value = StripQuotes(line[(position + 1)..]);
 
                     switch (key.ToLower())
                     {
@@ -63,14 +63,14 @@ namespace VisualStudioFileParser
 
         private static string StripQuotes(string text)
         {
-            if (text.StartsWith("'") || text.StartsWith("\""))
+            if (text.StartsWith('\'') || text.StartsWith('"'))
             {
-                text = text.Substring(1);
+                text = text[1..];
             }
 
-            if (text.EndsWith("'") || text.EndsWith("\""))
+            if (text.EndsWith('\'') || text.EndsWith('"'))
             {
-                text = text.Substring(0, text.Length - 1);
+                text = text[..^1];
             }
 
             return text;

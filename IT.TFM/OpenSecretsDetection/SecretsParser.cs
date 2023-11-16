@@ -19,14 +19,12 @@ namespace OpenSecretsDetection
         private const string connectionsPath = @"/configuration/connectionStrings/add";
 
 
-        private const string startConnectionStrings = "<connectionStrings>";
-        private const string endConnectionStrings = "</connectionStrings>";
         private const string connectionStringAttribute = "connectionString";
         private const string connectionName = "name";
         private readonly string[] connectionSecrets =
-                                    {
+                                    [
                                         "password"
-                                    };
+                                    ];
 
         #endregion
 
@@ -145,22 +143,22 @@ namespace OpenSecretsDetection
 
                 foreach (var secret in connectionSecrets)
                 {
-                    if (value.ToLower().Contains(secret))
+                    if (value.Contains(secret, StringComparison.CurrentCultureIgnoreCase))
                     {
                         connectionNames.Add(nameValue);
                         break;
                     }
                 }
 
-                if (connectionNames.Any())
+                if (connectionNames.Count != 0)
                 {
-                    var allConnections = string.Join(", ", connectionNames.ToArray());
+                    var allConnections = string.Join(", ", [.. connectionNames]);
                     file.AddProperty(dbSecretProperty, allConnections);
                 }
             }
         }
 
-        private void ScanForApiKeySecrets(FileItem file, string[] content)
+        private static void ScanForApiKeySecrets(FileItem file, string[] content)
         {
             if (file.FileType != FileItemType.VSConfig)
             {
@@ -173,14 +171,14 @@ namespace OpenSecretsDetection
             GetApiKeySecrets(xmlDoc, apiKeyPath, secretsList);
             GetApiKeySecrets(xmlDoc, es2KeyPath, secretsList);
 
-            if (secretsList.Any())
+            if (secretsList.Count != 0)
             {
-                var allSecrets = string.Join(", ", secretsList.ToArray());
+                var allSecrets = string.Join(", ", [.. secretsList]);
                 file.AddProperty(apiKeySecretProperty, allSecrets);
             }
         }
 
-        private void ScanForOAuthSecrets(FileItem file, string[] content)
+        private static void ScanForOAuthSecrets(FileItem file, string[] content)
         {
             if (file.FileType != FileItemType.VSConfig)
             {
@@ -191,14 +189,14 @@ namespace OpenSecretsDetection
             var xmlDoc = GetXml(content);
             SearchAppSettings(xmlDoc, oauthSearchOn, oAuthList);
 
-            if (oAuthList.Any())
+            if (oAuthList.Count != 0)
             {
-                var allOAuth = string.Join(", ", oAuthList.ToArray());
+                var allOAuth = string.Join(", ", [.. oAuthList]);
                 file.AddProperty(oauthSecretProperty, allOAuth);
             }
         }
 
-        private XmlDocument GetXml(string[] content)
+        private static XmlDocument GetXml(string[] content)
         {
             var data = string.Concat(content);
             var xml = new XmlDocument();
@@ -207,7 +205,7 @@ namespace OpenSecretsDetection
             return xml;
         }
 
-        private void GetApiKeySecrets(XmlDocument xmlDoc, string nodePath, List<string> secretsList)
+        private static void GetApiKeySecrets(XmlDocument xmlDoc, string nodePath, List<string> secretsList)
         {
             var nodes = xmlDoc.SelectNodes(nodePath);
             if (nodes.Count == 0)
@@ -232,14 +230,14 @@ namespace OpenSecretsDetection
                 var apiKeyValue = apiKey == null ? string.Empty : apiKey.Value;
                 var hasKeyValue = apiKeyValue.Trim().Length > 0;
 
-                if (useKeyValue.ToLower() == "no" || (hasKeyValue && !IsKeyVaultToken(apiKeyValue)))
+                if (useKeyValue.Equals("no", StringComparison.CurrentCultureIgnoreCase) || (hasKeyValue && !IsKeyVaultToken(apiKeyValue)))
                 {
                     secretsList.Add($"[ ApiKey: {apiName}, hasKey: {hasKeyValue} ]");
                 }
             }
         }
 
-        private void SearchAppSettings(XmlDocument xmlDoc, string searchTerm, List<string> list)
+        private static void SearchAppSettings(XmlDocument xmlDoc, string searchTerm, List<string> list)
         {
             var settings = xmlDoc.SelectSingleNode(appSettingsPath);
             if (settings == null)
@@ -260,7 +258,7 @@ namespace OpenSecretsDetection
                 var valueNode = node.Attributes[appSettingValueAttribute];
                 var settingsValue = valueNode == null ? string.Empty : valueNode.Value.Trim();
 
-                if (settingsName.ToLower().Contains(searchTerm) && settingsValue.Length > 0 && !IsKeyVaultToken(settingsValue))
+                if (settingsName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) && settingsValue.Length > 0 && !IsKeyVaultToken(settingsValue))
                 {
                     list.Add($"Name: {settingsName}");
                 }
@@ -276,7 +274,7 @@ namespace OpenSecretsDetection
         //    return line.Substring(startPos, endPost - startPos);
         //}
 
-        private bool IsKeyVaultToken(string value)
+        private static bool IsKeyVaultToken(string value)
         {
             var trimmedValue = value.Trim();
             return trimmedValue.StartsWith(KeyVaultTokenPrefix) && trimmedValue.EndsWith(KeyVaultTokenPostfix);

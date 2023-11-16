@@ -12,7 +12,7 @@ namespace ContentFilter
     {
         #region Private Members
 
-        private readonly char[] fieldSeparator = { '|' };
+        private readonly char[] fieldSeparator = ['|'];
 
         private string columnName;
         private string filterValue;
@@ -33,7 +33,7 @@ namespace ContentFilter
 
         bool IFilter.IsMatch(string data)
         {
-            return data.ToLower().Contains(filterValue);
+            return data.Contains(filterValue, StringComparison.CurrentCultureIgnoreCase);
         }
 
         #endregion

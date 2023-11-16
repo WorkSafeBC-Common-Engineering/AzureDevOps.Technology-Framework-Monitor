@@ -6,32 +6,24 @@ using System.Linq;
 
 namespace ProjectData
 {
-    public class Organization
+    public class Organization(ProjectSource source, string name, string url)
     {
         #region Private members
 
-        private readonly List<Project> projects = new List<Project>();
+        private readonly List<Project> projects = [];
 
         #endregion
-
         #region Constructors
-
-        public Organization(ProjectSource source, string name, string url)
-        {
-            Source = source;
-            Name = name;
-            Url = url;
-        }
 
         #endregion
 
         #region Public Properties
 
-        public ProjectSource Source { get; private set; }
+        public ProjectSource Source { get; private set; } = source;
 
-        public string Name { get; private set; }
+        public string Name { get; private set; } = name;
 
-        public string Url { get; private set; }
+        public string Url { get; private set; } = url;
 
         public IEnumerable<Project> Projects
         {

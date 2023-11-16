@@ -36,5 +36,7 @@ namespace AzureDevOps
         Task<AzDoFileList> GetFilesAsync();
 
         Task<string> DownloadRepositoryAsync();
+
+        Task<AzDoPipelineList> GetPipelinesAsync();
     }
 }

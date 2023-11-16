@@ -8,14 +8,14 @@ namespace AzureDevOps.Models
 {
     internal class AzDoCommit
     {
-        public string CommitId { get; set; }
+        public string CommitId { get; set; } = string.Empty;
     }
 
     internal class AzDoCommitList
     {
         public int Count { get; set; }
 
-        public AzDoCommit[] Value { get; set; } = Array.Empty<AzDoCommit>();
+        public AzDoCommit[] Value { get; set; } = [];
     }
 
 
