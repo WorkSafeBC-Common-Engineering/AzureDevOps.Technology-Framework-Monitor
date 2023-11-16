@@ -41,7 +41,7 @@ namespace AzureDevOps
 
         private const string getPipelinesUrl = "https://{baseUrl}/{organization}/{project}/_apis/pipelines?{apiVersion}";
 
-        private static readonly Dictionary<string, HttpClient> httpClients = new();
+        private static readonly Dictionary<string, HttpClient> httpClients = [];
 
         private static readonly Semaphore waitOnApiCall = new(1, 1);
 
@@ -69,7 +69,7 @@ namespace AzureDevOps
 
         public int PagingSkip { get; set; }
 
-        private static readonly char[] separator = new char[] { '/' };
+        private static readonly char[] separator = ['/'];
 
         void IRestApi.Initialize(string organizationUrl)
         {

@@ -20,7 +20,7 @@ namespace ProjectData
 
         private static readonly IUnityContainer _container;
 
-        private readonly List<IFilter> filters = new();
+        private readonly List<IFilter> filters = [];
 
         #endregion
 
@@ -65,7 +65,7 @@ namespace ProjectData
                 results.Add(filter.IsMatch(fields));
             }
 
-            return results.ToArray();
+            return [.. results];
         }
 
         #endregion

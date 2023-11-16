@@ -31,49 +31,49 @@ namespace ProjectData
                 {
                     MatchType = MatchType.EndsWith,
                     MatchOn = ".sln",
-                    Exceptions = Array.Empty<string>()
+                    Exceptions = []
                 },
                 FileItemType.VB6Project => new FileMatch
                 {
                     MatchType = MatchType.EndsWith,
                     MatchOn = ".vbp",
-                    Exceptions = Array.Empty<string>()
+                    Exceptions = []
                 },
                 FileItemType.CSProject => new FileMatch
                 {
                     MatchType = MatchType.EndsWith,
                     MatchOn = ".csproj",
-                    Exceptions = Array.Empty<string>()
+                    Exceptions = []
                 },
                 FileItemType.VBProject => new FileMatch
                 {
                     MatchType = MatchType.EndsWith,
                     MatchOn = ".vbproj",
-                    Exceptions = Array.Empty<string>()
+                    Exceptions = []
                 },
                 FileItemType.SqlProject => new FileMatch
                 {
                     MatchType = MatchType.EndsWith,
                     MatchOn = ".sqlproj",
-                    Exceptions = Array.Empty<string>()
+                    Exceptions = []
                 },
                 FileItemType.VSConfig => new FileMatch
                 {
                     MatchType = MatchType.EndsWith,
                     MatchOn = ".config",
-                    Exceptions = new string[] { "packages.config" }
+                    Exceptions = ["packages.config"]
                 },
                 FileItemType.NuGetPkgConfig => new FileMatch
                 {
                     MatchType = MatchType.Exact,
                     MatchOn = "packages.config",
-                    Exceptions = Array.Empty<string>()
+                    Exceptions = []
                 },
                 FileItemType.NpmPackage => new FileMatch
                 {
                     MatchType = MatchType.Exact,
                     MatchOn = "package.json",
-                    Exceptions = Array.Empty<string>()
+                    Exceptions = []
                 },
                 _ => throw new ArgumentException("Invalid parameter - value does not exist", nameof(fileType)),
             };

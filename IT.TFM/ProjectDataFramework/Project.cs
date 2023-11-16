@@ -8,7 +8,7 @@ namespace ProjectData
     {
         #region Private Members
 
-        private readonly List<Repository> repositories = new();
+        private readonly List<Repository> repositories = [];
 
         #endregion
 

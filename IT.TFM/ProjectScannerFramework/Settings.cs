@@ -12,7 +12,7 @@ namespace ProjectScanner
         #region Private Members
 
         private const string separator = "||";
-        private static readonly string[] fieldSeparator = { separator };
+        private static readonly string[] fieldSeparator = [separator];
 
         private const string scannerKey = "Scanner";
 
@@ -73,7 +73,7 @@ namespace ProjectScanner
                 if (!IsInitialized)
                 {
                     var appSettings = ConfigurationManager.AppSettings;
-                    scanners = new Dictionary<string, string>();
+                    scanners = [];
 
                     var allKeys = appSettings.AllKeys.Where(k => k.StartsWith(scannerKey));
                     foreach (var key in allKeys)

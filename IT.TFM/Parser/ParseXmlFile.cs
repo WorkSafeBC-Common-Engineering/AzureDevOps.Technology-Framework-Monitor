@@ -12,7 +12,7 @@ namespace Parser
         private const string configurationFile = "Parser.dll.config";
         private const string sectionIgnoreFileRefs = "FileReferences-Ignore";
 
-        private static readonly string[] fileRefPunctuation = { " ", ",", "." };
+        private static readonly string[] fileRefPunctuation = [" ", ",", "."];
         private static readonly string[] ignoreFileRefs;
 
         #endregion
@@ -57,7 +57,7 @@ namespace Parser
         protected const string propertyAzureFunction = @"AzureFunction";
 
         protected XmlNamespaceManager mgr;
-        private static readonly char[] separator = new char[] { '/' };
+        private static readonly char[] separator = ['/'];
 
         #endregion
 

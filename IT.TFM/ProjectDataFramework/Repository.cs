@@ -8,7 +8,7 @@ namespace ProjectData
     {
         #region Private Members
 
-        private readonly List<FileItem> files = new();
+        private readonly List<FileItem> files = [];
 
         #endregion
 

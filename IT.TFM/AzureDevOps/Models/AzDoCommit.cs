@@ -15,7 +15,7 @@ namespace AzureDevOps.Models
     {
         public int Count { get; set; }
 
-        public AzDoCommit[] Value { get; set; } = Array.Empty<AzDoCommit>();
+        public AzDoCommit[] Value { get; set; } = [];
     }
 
 

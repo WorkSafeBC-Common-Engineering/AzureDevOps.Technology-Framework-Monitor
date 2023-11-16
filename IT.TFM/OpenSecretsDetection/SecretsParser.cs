@@ -22,9 +22,9 @@ namespace OpenSecretsDetection
         private const string connectionStringAttribute = "connectionString";
         private const string connectionName = "name";
         private readonly string[] connectionSecrets =
-                                    {
+                                    [
                                         "password"
-                                    };
+                                    ];
 
         #endregion
 
@@ -152,7 +152,7 @@ namespace OpenSecretsDetection
 
                 if (connectionNames.Count != 0)
                 {
-                    var allConnections = string.Join(", ", connectionNames.ToArray());
+                    var allConnections = string.Join(", ", [.. connectionNames]);
                     file.AddProperty(dbSecretProperty, allConnections);
                 }
             }
@@ -173,7 +173,7 @@ namespace OpenSecretsDetection
 
             if (secretsList.Count != 0)
             {
-                var allSecrets = string.Join(", ", secretsList.ToArray());
+                var allSecrets = string.Join(", ", [.. secretsList]);
                 file.AddProperty(apiKeySecretProperty, allSecrets);
             }
         }
@@ -191,7 +191,7 @@ namespace OpenSecretsDetection
 
             if (oAuthList.Count != 0)
             {
-                var allOAuth = string.Join(", ", oAuthList.ToArray());
+                var allOAuth = string.Join(", ", [.. oAuthList]);
                 file.AddProperty(oauthSecretProperty, allOAuth);
             }
         }

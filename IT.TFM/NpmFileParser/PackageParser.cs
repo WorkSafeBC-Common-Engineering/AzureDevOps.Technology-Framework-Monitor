@@ -16,7 +16,7 @@ namespace NpmFileParser
         private const string jsonJoinChar = " ";
         private const string dependenciesProperty = "dependencies";
         private const string npmPackageType = "NPM";
-        private static readonly char[] separator = new char[] { ':' };
+        private static readonly char[] separator = [':'];
 
         #endregion
 

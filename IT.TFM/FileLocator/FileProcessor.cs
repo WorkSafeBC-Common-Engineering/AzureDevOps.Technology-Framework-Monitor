@@ -48,7 +48,7 @@ namespace RepoScan.FileLocator
                     orgName = repoItem.OrgName;
                     scanner = ScannerFactory.GetScanner(orgName);
 
-                    List<Guid> pList = new();
+                    List<Guid> pList = [];
                     await foreach (var p in scanner.Projects())
                     {
                         pList.Add(p.Id);

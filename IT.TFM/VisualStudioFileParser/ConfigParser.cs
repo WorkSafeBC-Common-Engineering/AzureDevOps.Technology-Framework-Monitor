@@ -93,7 +93,7 @@ namespace VisualStudioFileParser
 
         private static IEnumerable<string> GetPaths(string[] content, string url)
         {
-            List<string> paths = new();
+            List<string> paths = [];
             var stack = new Stack<string>();
 
             var settings = new XmlReaderSettings

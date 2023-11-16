@@ -24,7 +24,7 @@ namespace AzureDevOpsScannerFramework
 
         private string azureDevOpsOrganizationUrl;
 
-        private readonly List<string> propertyFields = new();
+        private readonly List<string> propertyFields = [];
 
         private string organizationName;
 

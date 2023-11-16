@@ -33,6 +33,6 @@ namespace AzureDevOps.Models
     {
         public int Count { get; set; }
 
-        public AzDoRepository[] Value { get; set; } = Array.Empty<AzDoRepository>();
+        public AzDoRepository[] Value { get; set; } = [];
     }
 }

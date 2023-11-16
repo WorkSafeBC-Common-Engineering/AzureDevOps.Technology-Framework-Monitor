@@ -12,7 +12,7 @@ namespace ContentFilter
     {
         #region Private Members
 
-        private readonly char[] fieldSeparator = { '|' };
+        private readonly char[] fieldSeparator = ['|'];
 
         private string columnName;
         private string filterValue;

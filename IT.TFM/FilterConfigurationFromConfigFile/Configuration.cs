@@ -13,7 +13,7 @@ namespace FilterConfigurationFromConfigFile
     {
         #region Private Members
 
-        private readonly char[] filterTypeSeparator = { ':' };
+        private readonly char[] filterTypeSeparator = [':'];
 
         private const string configurationFile = "FilterConfigurationFromConfigFile.dll.config";
         private const string configurationSection = "FilterConfiguration";
@@ -34,7 +34,7 @@ namespace FilterConfigurationFromConfigFile
                 data.Add(new FilterData { FilterType = fields[0], Data = fields[1] });
             }
 
-            return data.ToArray();
+            return [.. data];
         }
 
         #endregion
