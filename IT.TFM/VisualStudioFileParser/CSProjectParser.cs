@@ -40,7 +40,7 @@ namespace VisualStudioFileParser
             WriteIfExistsProperty(rootNode, xmliOSApp, file, propertyIsiOS, "Yes");
 
             WriteVSProjectReferences(rootNode, xmlReferences, file);
-            WriteVSProjectReferences(rootNode, xmlPkgReference, file);
+            WriteVSProjectPackageReference(rootNode, xmlPkgReference, file);
         }
 
         #endregion

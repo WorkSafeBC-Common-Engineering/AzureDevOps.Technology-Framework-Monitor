@@ -41,6 +41,7 @@ namespace Parser
         protected const string xmlAttrToolsVer = @"ToolsVersion";
         protected const string xmlAttrSdk = @"Sdk";
         protected const string xmlAttrInclude = @"Include";
+        protected const string xmlAttrPkgVersion = @"Version";
 
         protected const string propertyError = "Error";
         protected const string propertyToolsVersion = "ToolsVersion";
@@ -125,6 +126,20 @@ namespace Parser
                 if (ValidReference(attribute))
                 {
                     file.AddReference(attribute);
+                }
+            }
+        }
+
+        protected void WriteVSProjectPackageReference(XmlElement rootNode, string xPath, FileItem file)
+        {
+            var nodeList = AllNodes(rootNode, xPath);
+            foreach (XmlNode node in nodeList)
+            {
+                var attribute = node.Attributes[xmlAttrInclude]?.Value;
+                if (ValidReference(attribute))
+                {
+                    var versionAttribute = node.Attributes[xmlAttrPkgVersion]?.Value;
+                    file.AddPackageReference("Project", attribute, versionAttribute, null, null);
                 }
             }
         }
