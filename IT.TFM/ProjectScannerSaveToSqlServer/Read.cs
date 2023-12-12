@@ -16,7 +16,6 @@ namespace ProjectScannerSaveToSqlServer
         #region Private Members
 
         private Organization organization = null;
-        private Project project = null;
 
         #endregion
 
@@ -312,84 +311,6 @@ namespace ProjectScannerSaveToSqlServer
             organizationId = dbOrganization == null ? 0 : dbOrganization.Id;
 
             return dbOrganization;
-        }
-
-        private FileItem GetFile(DataModels.File dbFile)
-        {
-            var fileType = (FileItemType)Enum.Parse(typeof(FileItemType), dbFile.FileType.Value);
-
-            var file = new FileItem
-            {
-                Id = dbFile.FileId,
-                FileType = fileType,
-                Path = dbFile.Path,
-                Url = dbFile.Url,
-            };
-
-            foreach (var pkgRef in dbFile.FileReferences
-                                         .Where(r => r.FileReferenceTypeId == RefTypePkg)
-                                         .Select(r => new PackageReference
-                                         {
-                                            Id = r.Name,
-                                            PackageType = r.PackageType,
-                                            Version = r.Version,
-                                            VersionComparator =  r.VersionComparator,
-                                            FrameworkVersion = r.FrameworkVersion
-                                         }))
-            {
-                file.PackageReferences.Add(pkgRef);
-            }
-
-            foreach (var fileRef in dbFile.FileReferences
-                                          .Where(r => r.FileReferenceTypeId == RefTypeFile)
-                                          .Select(r => r.Name))
-            {
-                file.References.Add(fileRef);
-            }
-
-            foreach (var urlRef in dbFile.FileReferences
-                                         .Where(r => r.FileReferenceTypeId == RefTypeUrl)
-                                         .Select(r => new UrlReference
-                                         {
-                                             Path = r.Path,
-                                             Url = r.Name
-                                         }))
-            {
-                file.UrlReferences.Add(urlRef);
-            }
-
-            foreach (var property in dbFile.FileProperties
-                                       .Where(r => r.PropertyTypeId == PropertyTypeProperty)
-                                       .Select (r => new KeyValuePair<string, string>(r.Name, r.Value)))
-            {
-                file.Properties.Add(property.Key, property.Value);
-            }
-
-            foreach (var item in dbFile.FileProperties
-                                       .Where(r => r.PropertyTypeId == PropertyTypeProperty)
-                                       .Select(r => new KeyValuePair<string, string>(r.Name, r.Value)))
-            {
-                file.FilteredItems.Add(item.Key, item.Value);
-            }
-
-            return file;
-        }
-
-        private IEnumerable<Project> GetProjects()
-        {
-            foreach (var p in organization.Projects)
-            {
-                project = p;
-                yield return p;
-            }
-        }
-
-        private IEnumerable<Repository> GetRepositories()
-        {
-            foreach (var r in project.Repositories)
-            {
-                yield return r;
-            }
         }
 
         #endregion

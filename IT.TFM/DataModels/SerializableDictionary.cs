@@ -14,7 +14,6 @@ namespace RepoScan.DataModels
     {
         #region Constants
 
-        private const string DictionaryNodeName = "Dictionary";
         private const string ItemNodeName = "Item";
         private const string KeyNodeName = "Key";
         private const string ValueNodeName = "Value";
@@ -150,10 +149,7 @@ namespace RepoScan.DataModels
         {
             get
             {
-                if (valueSerializer == null)
-                {
-                    valueSerializer = new XmlSerializer(typeof(TVal));
-                }
+                valueSerializer ??= new XmlSerializer(typeof(TVal));
                 return valueSerializer;
             }
         }
@@ -162,10 +158,7 @@ namespace RepoScan.DataModels
         {
             get
             {
-                if (keySerializer == null)
-                {
-                    keySerializer = new XmlSerializer(typeof(TKey));
-                }
+                keySerializer ??= new XmlSerializer(typeof(TKey));
                 return keySerializer;
             }
         }

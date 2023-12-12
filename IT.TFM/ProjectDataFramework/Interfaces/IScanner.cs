@@ -18,6 +18,8 @@ namespace ProjectData.Interfaces
 
         Task LoadFiles(Guid projectId, Guid repositoryId);
 
+        Task<IEnumerable<Pipeline>> Pipelines(Guid projectId);
+
         void DeleteFiles();
 
         FileItem FileDetails(Guid projectId, Guid repositoryId, FileItem file);

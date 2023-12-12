@@ -5,10 +5,10 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
     public partial class Repository
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Repository()
         {
             Files = new HashSet<File>();
+            Pipelines = new HashSet<Pipeline>();
         }
 
         public int Id { get; set; }
@@ -48,8 +48,9 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         [StringLength(50)]
         public string LastCommitId { get; set; }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<File> Files { get; set; }
+
+        public virtual ICollection<Pipeline> Pipelines { get; set; }
 
         public virtual Project Project { get; set; }
     }

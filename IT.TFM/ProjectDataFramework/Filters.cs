@@ -17,11 +17,10 @@ namespace ProjectData
         private const string configurationSection = "unity";
         private const string dependencyInjectionContainer = "FilterContainer";
         private const string contentFilter = "Content";
-        private const string fileFilter = "FileContent";
 
         private static readonly IUnityContainer _container;
 
-        private readonly List<IFilter> filters = new List<IFilter>();
+        private readonly List<IFilter> filters = [];
 
         #endregion
 
@@ -66,14 +65,14 @@ namespace ProjectData
                 results.Add(filter.IsMatch(fields));
             }
 
-            return results.ToArray();
+            return [.. results];
         }
 
         #endregion
 
         #region Private Methods
 
-        private IFilter GetFilterInstance(FilterData data)
+        private static IFilter GetFilterInstance(FilterData data)
         {
             var filter = _container.Resolve<IFilter>(data.FilterType);
             filter.Initialize(data.Data);

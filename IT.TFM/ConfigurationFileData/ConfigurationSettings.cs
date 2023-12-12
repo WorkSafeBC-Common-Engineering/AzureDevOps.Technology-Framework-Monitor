@@ -46,7 +46,7 @@ namespace ConfigurationFileData
                 values.Add(configData.Get(key));
             }
 
-            return values.ToArray();
+            return [.. values];
         }
 
         private static Dictionary<string, string> GetSectionDictionary(string sectionName, Configuration configuration)

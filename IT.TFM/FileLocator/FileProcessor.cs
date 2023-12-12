@@ -14,7 +14,7 @@ namespace RepoScan.FileLocator
 {
     public class FileProcessor
     {
-        public async Task GetFiles(int totalThreads)
+        public static async Task GetFiles(int totalThreads)
         {
             Settings.Initialize();
 
@@ -48,7 +48,7 @@ namespace RepoScan.FileLocator
                     orgName = repoItem.OrgName;
                     scanner = ScannerFactory.GetScanner(orgName);
 
-                    List<Guid> pList = new();
+                    List<Guid> pList = [];
                     await foreach (var p in scanner.Projects())
                     {
                         pList.Add(p.Id);

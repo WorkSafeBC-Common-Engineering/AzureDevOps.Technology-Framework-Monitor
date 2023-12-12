@@ -64,7 +64,7 @@ namespace NuGetFileParser
 
         #region Private Methods
 
-        private void InvalidNuGetPackages(FileItem file)
+        private static void InvalidNuGetPackages(FileItem file)
         {
             file.AddProperty(propertyError, $"Invalid NuGet packages file - <packages> must be root node");
         }

@@ -80,6 +80,7 @@
     <Build Include="dbo\Views\FilePropertiesPivot.sql" />
     <Build Include="dbo\Views\FullScan.sql" />
     <Build Include="dbo\Tables\dotNetEndOfLife.sql" />
+    <Build Include="dbo\Tables\Pipelines.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\PopulateDotNetEOL.sql" />

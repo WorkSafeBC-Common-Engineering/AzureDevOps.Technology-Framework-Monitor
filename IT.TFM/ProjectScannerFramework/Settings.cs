@@ -12,16 +12,16 @@ namespace ProjectScanner
         #region Private Members
 
         private const string separator = "||";
-        private static readonly string[] fieldSeparator = { separator };
+        private static readonly string[] fieldSeparator = [separator];
 
         private const string scannerKey = "Scanner";
 
         private const int maxConfigurationFields = 2;
 
-        private static readonly object initLock = new object();
+        private static readonly object initLock = new();
         private static Dictionary<string, string> scanners;
 
-        private static readonly ReaderWriterLockSlim cacheLock = new ReaderWriterLockSlim();
+        private static readonly ReaderWriterLockSlim cacheLock = new();
         private static bool isInitialized = false;
 
 
@@ -104,12 +104,9 @@ namespace ProjectScanner
             var fields = configuration.Split(fieldSeparator, StringSplitOptions.None);
             var enumName = Enum.GetNames(typeof(ProjectSource)).SingleOrDefault(e => e.Equals(fields[0], StringComparison.InvariantCultureIgnoreCase));
 
-            if (enumName == null)
-            {
-                throw new ArgumentException($"Invalid Scanner type for configuration {name} : {configuration}");
-            }
-
-            return (ProjectSource)Enum.Parse(typeof(ProjectSource), enumName);
+            return enumName == null
+                ? throw new ArgumentException($"Invalid Scanner type for configuration {name} : {configuration}")
+                : (ProjectSource)Enum.Parse(typeof(ProjectSource), enumName);
         }
 
         public static string GetConfigurationData(string name)
@@ -119,7 +116,7 @@ namespace ProjectScanner
             var configuration = scanners[name];
             var fields = configuration.Split(fieldSeparator, StringSplitOptions.None);
 
-            if (fields.Count() < maxConfigurationFields)
+            if (fields.Length < maxConfigurationFields)
             {
                 throw new ApplicationException($"Configuration data for {name} scanner is missing: {configuration}");
             }

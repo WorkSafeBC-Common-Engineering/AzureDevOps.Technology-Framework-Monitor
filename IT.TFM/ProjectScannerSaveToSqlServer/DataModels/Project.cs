@@ -8,7 +8,6 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
     public partial class Project
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Project()
         {
             Repositories = new HashSet<Repository>();
@@ -49,7 +48,6 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
         public virtual Organization Organization { get; set; }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Repository> Repositories { get; set; }
     }
 }

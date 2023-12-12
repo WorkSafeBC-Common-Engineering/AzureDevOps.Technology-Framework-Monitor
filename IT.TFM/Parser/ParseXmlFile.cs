@@ -14,7 +14,7 @@ namespace Parser
         private const string configurationFile = "Parser.dll.config";
         private const string sectionIgnoreFileRefs = "FileReferences-Ignore";
 
-        private static readonly string[] fileRefPunctuation = { " ", ",", "." };
+        private static readonly string[] fileRefPunctuation = [" ", ",", "."];
         private static readonly string[] ignoreFileRefs;
 
         protected Dictionary<string, string> buildProperties;
@@ -62,6 +62,7 @@ namespace Parser
         protected const string propertyAzureFunction = @"AzureFunction";
 
         protected XmlNamespaceManager mgr;
+        private static readonly char[] separator = ['/'];
 
         #endregion
 
@@ -89,7 +90,7 @@ namespace Parser
             return xml;
         }
 
-        protected void InvalidVSProject(FileItem file)
+        protected static void InvalidVSProject(FileItem file)
         {
             file.AddProperty(propertyError, $"Invalid project file - <Project> must be root node");
         }
@@ -177,14 +178,14 @@ namespace Parser
 
         }
 
-        protected string NamespacePath(string path)
+        protected static string NamespacePath(string path)
         {
-            var fields = path.Split(new char[] { '/' });
+            var fields = path.Split(separator);
             var newFields = fields.Select(f => "msbld:" + f);
             return string.Join("/", newFields);
         }
 
-        protected bool ValidReference(string reference)
+        protected static bool ValidReference(string reference)
         {
             if (reference == null)
             {

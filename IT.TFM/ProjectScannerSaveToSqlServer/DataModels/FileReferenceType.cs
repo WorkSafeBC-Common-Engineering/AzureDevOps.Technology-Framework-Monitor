@@ -8,7 +8,6 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
     public partial class FileReferenceType
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public FileReferenceType()
         {
             FileReferences = new HashSet<FileReference>();
@@ -21,7 +20,6 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         [StringLength(10)]
         public string Value { get; set; }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<FileReference> FileReferences { get; set; }
     }
 }

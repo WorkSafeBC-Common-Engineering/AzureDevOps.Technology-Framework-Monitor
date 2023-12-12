@@ -129,20 +129,14 @@ namespace RepoScan.Storage.SqlServer
 
         private IStorageWriter GetWriter()
         {
-            if (sqlWriter == null)
-            {
-                sqlWriter = DataStorage.StorageFactory.GetStorageWriter();
-            }
+            sqlWriter ??= DataStorage.StorageFactory.GetStorageWriter();
 
             return sqlWriter;
         }
 
         private IStorageReader GetReader()
         {
-            if (sqlReader == null)
-            {
-                sqlReader = DataStorage.StorageFactory.GetStorageReader();
-            }
+            sqlReader ??= DataStorage.StorageFactory.GetStorageReader();
 
             return sqlReader;
         }

@@ -21,6 +21,6 @@ namespace AzureDevOps.Models
     {
         public int Count { get; set; }
 
-        public AzDoFile[] Value { get; set; } = Array.Empty<AzDoFile>();
+        public AzDoFile[] Value { get; set; } = [];
     }
 }

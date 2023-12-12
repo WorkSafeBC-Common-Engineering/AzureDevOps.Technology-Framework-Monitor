@@ -19,15 +19,15 @@ namespace ProjectData
 
         public int StorageId { get; set; }
 
-        public Dictionary<string, string> Properties { get; } = new Dictionary<string, string>();
+        public Dictionary<string, string> Properties { get; } = [];
 
-        public List<string> References { get; } = new List<string>();
+        public List<string> References { get; } = [];
 
-        public List<UrlReference> UrlReferences { get; } = new List<UrlReference>();
+        public List<UrlReference> UrlReferences { get; } = [];
 
-        public List<PackageReference> PackageReferences { get; } = new List<PackageReference>();
+        public List<PackageReference> PackageReferences { get; } = [];
 
-        public Dictionary<string, string> FilteredItems { get; } = new Dictionary<string, string>();
+        public Dictionary<string, string> FilteredItems { get; } = [];
 
         public Guid RepositoryId { get; set; } = Guid.Empty;
 

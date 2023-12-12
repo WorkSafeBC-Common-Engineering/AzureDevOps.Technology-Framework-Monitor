@@ -142,7 +142,7 @@ namespace ProjectScannerSaveToSqlServer
                 nameTokens = repository.Name.Split('.');
             }
 
-            if (nameTokens?.Length > 1 && nameTokens[0].ToUpper() != "ZZZ")
+            if (nameTokens?.Length > 1 && !nameTokens[0].Equals("ZZZ", StringComparison.CurrentCultureIgnoreCase))
             {
                 dbRepo.Portfolio = nameTokens[0];
                 
@@ -223,6 +223,41 @@ namespace ProjectScannerSaveToSqlServer
                 SaveUrlReferences(dbFile, file.UrlReferences);
                 SavePkgReferences(dbFile, file.PackageReferences);
             }
+
+            _ = context.SaveChangesAsync().Result;
+        }
+
+        void IStorageWriter.SavePipeline(ProjData.Pipeline pipeline)
+        {
+            var dbRepo = context.Repositories
+                                .SingleOrDefault(r => r.RepositoryId.Equals(pipeline.RepositoryId, StringComparison.InvariantCultureIgnoreCase))
+                                ?? throw new InvalidOperationException("No matching Repository defined");
+
+            var dbPipeline = context.Pipelines
+                                    .SingleOrDefault(p => p.PipelineId == pipeline.Id);
+
+            if (dbPipeline == null)
+            {
+                dbPipeline = new Pipeline
+                {
+                    Repository = dbRepo,
+                    PipelineId = pipeline.Id,
+                    RepositoryId = dbRepo.Id
+                };
+
+                context.Pipelines.Add(dbPipeline);
+            }
+
+            dbPipeline.Name = pipeline.Name;
+            dbPipeline.Folder = pipeline.Folder;
+            dbPipeline.Revision = pipeline.Revision;
+            dbPipeline.Url = pipeline.Url;
+            dbPipeline.Type = pipeline.Type;
+            dbPipeline.PipelineType = pipeline.PipelineType;
+            dbPipeline.QueueStatus = pipeline.QueueStatus;
+            dbPipeline.Quality = pipeline.Quality;
+            dbPipeline.CreatedBy = pipeline.CreatedBy;
+            dbPipeline.CreatedDate = pipeline.CreatedDate;
 
             _ = context.SaveChangesAsync().Result;
         }
@@ -462,243 +497,6 @@ namespace ProjectScannerSaveToSqlServer
                         VersionComparator = reference.VersionComparator,
                         FrameworkVersion = reference.FrameworkVersion
                     });
-                }
-            }
-        }
-
-        private void SaveFileProperty(File file, KeyValuePair<string, string> property)
-        {
-            var dbProperty = file.FileProperties
-                                 .SingleOrDefault(fp => fp.PropertyTypeId == PropertyTypeProperty
-                                                     && fp.Name.Equals(property.Key, StringComparison.InvariantCultureIgnoreCase));
-
-            if (dbProperty == null)
-            {
-                dbProperty = new FileProperty
-                {
-                    FileId = file.Id,
-                    Name = property.Key,
-                    Value = property.Value,
-                    PropertyTypeId = PropertyTypeProperty
-                };
-
-                context.FileProperties.Add(dbProperty);
-            }
-
-            dbProperty.Value = property.Value;
-        }
-
-        private void SaveFileReference(File file, string reference)
-        {
-            var dbFileRef = file.FileReferences
-                                .SingleOrDefault(fr => fr.FileReferenceTypeId == RefTypeFile
-                                                    && fr.Name.Equals(reference, StringComparison.InvariantCultureIgnoreCase));
-
-            if (dbFileRef == null)
-            {
-                var refType = context.FileReferenceTypes.Single(r => r.Id == RefTypeFile);
-
-                context.FileReferences.Add(new FileReference
-                {
-                    FileId = file.Id,
-                    FileReferenceType = refType,
-                    Name = reference
-                });
-            }
-        }
-
-        private void SaveUrlReference(File file, ProjData.UrlReference reference)
-        {
-            var dbUrlRef = file.FileReferences
-                                 .SingleOrDefault(ur => ur.FileReferenceTypeId == RefTypeUrl
-                                                     && ur.Name.Equals(reference.Url, StringComparison.InvariantCultureIgnoreCase)
-                                                     && ur.Path.Equals(reference.Path, StringComparison.InvariantCultureIgnoreCase));
-
-            if (dbUrlRef == null)
-            {
-                var refType = context.FileReferenceTypes.Single(r => r.Id == RefTypeUrl);
-
-                context.FileReferences.Add(new FileReference
-                {
-                    FileId = file.Id,
-                    FileReferenceType = refType,
-                    Name = reference.Url,
-                    Path = reference.Path
-                });
-            }
-        }
-
-        private void SavePackageReference(File file, ProjData.PackageReference reference)
-        {
-            var dbPkgRef = file.FileReferences
-                                 .SingleOrDefault(pr => pr.FileReferenceTypeId == RefTypePkg
-                                                     && pr.PackageType.Equals(reference.PackageType, StringComparison.InvariantCultureIgnoreCase)
-                                                     && pr.Name.Equals(reference.Id, StringComparison.InvariantCultureIgnoreCase));
-
-            if (dbPkgRef == null)
-            {
-                var refType = context.FileReferenceTypes.Single(r => r.Id == RefTypePkg);
-
-                dbPkgRef = new FileReference
-                {
-                    FileId = file.Id,
-                    FileReferenceType = refType,
-                    PackageType = reference.PackageType,
-                    Name = reference.Id
-                };
-
-                context.FileReferences.Add(dbPkgRef);
-            }
-
-            dbPkgRef.Version = reference.Version;
-            dbPkgRef.FrameworkVersion = reference.FrameworkVersion;
-        }
-
-        private void SaveFilteredItem(File file, KeyValuePair<string, string> item)
-        {
-            var dbItem = file.FileProperties
-                             .SingleOrDefault(fi => fi.PropertyTypeId == PropertyTypeFilteredItem
-                                                 && fi.Name.Equals(item.Key, StringComparison.InvariantCultureIgnoreCase));
-
-            if (dbItem == null)
-            {
-                dbItem = new FileProperty
-                {
-                    FileId = file.Id,
-                    Name = item.Key,
-                    PropertyTypeId = PropertyTypeFilteredItem
-                };
-
-                context.FileProperties.Add(dbItem);
-            }
-
-            dbItem.Value = item.Value;
-        }
-
-        private void CleanupFileProperties(ProjData.FileItem file, int dbFileId)
-        {
-            var dbFile = context.Files.SingleOrDefault(f => f.Id == dbFileId);
-            if (dbFile == null)
-            {
-                return;
-            }
-
-            foreach (var property in dbFile.FileProperties)
-            {
-                if(!file.Properties.Any(p => p.Key.Equals(property.Name, StringComparison.InvariantCultureIgnoreCase)))
-                {
-                    context.FileProperties.Remove(property);
-                }
-            }
-        }
-
-        private void CleanupFileReferences(ProjData.FileItem file, int dbFileId)
-        {
-            var dbFile = context.Files.SingleOrDefault(f => f.Id == dbFileId);
-            if (dbFile == null)
-            {
-                return;
-            }
-
-            foreach (var reference in dbFile.FileReferences)
-            {
-                bool found = true;
-
-                switch (reference.FileReferenceTypeId)
-                {
-                    case RefTypeFile:
-                        found = file.References.Any(r => r.Equals(reference.Name, StringComparison.InvariantCultureIgnoreCase));
-                        break;
-
-                    case RefTypeUrl:
-                        found = file.UrlReferences.Any(ur => ur.Url.Equals(reference.Name, StringComparison.InvariantCultureIgnoreCase)
-                                                          && ur.Path.Equals(reference.Path, StringComparison.InvariantCultureIgnoreCase));
-                        break;
-
-                    case RefTypePkg:
-                        found = file.PackageReferences.Any(pr => pr.PackageType == reference.PackageType
-                                                              && pr.Id == reference.Name);
-                        break;
-
-                    default:
-                        continue;
-                }
-
-                if (!found)
-                {
-                    context.FileReferences.Remove(reference);
-                }
-            }
-        }
-
-        private void CleanupRepositoryFiles(ProjData.Repository repo, int dbRepoId)
-        {
-            var dbRepo = context.Repositories.SingleOrDefault(r => r.Id == dbRepoId);
-            if (dbRepo == null)
-            {
-                return;
-            }
-
-            foreach (var file in dbRepo.Files)
-            {
-                if(!repo.Files.Any(f => f.Id.Equals(file.FileId, StringComparison.InvariantCultureIgnoreCase)))
-                {
-                    context.FileProperties.RemoveRange(file.FileProperties);
-                    context.FileReferences.RemoveRange(file.FileReferences);
-                    context.Files.Remove(file);
-                }
-            }
-        }
-
-        private void CleanupProjectRepositories(ProjData.Project project, int dbProjectId)
-        {
-            var dbProject = context.Projects.SingleOrDefault(p => p.Id == dbProjectId);
-            if (dbProject == null)
-            {
-                return;
-            }
-
-            foreach (var repo in dbProject.Repositories)
-            {
-                if (!project.Repositories.Any(r => r.Id.ToString().Equals(repo.RepositoryId, StringComparison.InvariantCultureIgnoreCase)))
-                {
-                    foreach (var file in repo.Files)
-                    {
-                        context.FileProperties.RemoveRange(file.FileProperties);
-                        context.FileReferences.RemoveRange(file.FileReferences);
-                    }
-
-                    context.Files.RemoveRange(repo.Files);
-                    context.Repositories.Remove(repo);
-                }
-            }
-        }
-
-        private void CleanupOrganizationProjects(ProjData.Organization org, int dbOrgId)
-        {
-            var dbOrganization = context.Organizations.SingleOrDefault(o => o.Id == dbOrgId);
-            if (dbOrganization == null)
-            {
-                return;
-            }
-
-            foreach (var project in dbOrganization.Projects)
-            {
-                if (!org.Projects.Any(p => p.Id.ToString().Equals(project.ProjectId, StringComparison.InvariantCultureIgnoreCase)))
-                {
-                    foreach (var repo in project.Repositories)
-                    {
-                        foreach (var file in repo.Files)
-                        {
-                            context.FileProperties.RemoveRange(file.FileProperties);
-                            context.FileReferences.RemoveRange(file.FileReferences);
-                        }
-
-                        context.Files.RemoveRange(repo.Files);
-                        context.Repositories.Remove(repo);
-                    }
-
-                    context.Projects.Remove(project);
                 }
             }
         }

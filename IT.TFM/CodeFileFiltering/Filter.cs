@@ -72,7 +72,7 @@ namespace FileFiltering
             {
                 foreach (var line in content)
                 {
-                    if (line.ToLower().Contains(match))
+                    if (line.Contains(match, StringComparison.CurrentCultureIgnoreCase))
                     {
                         file.AddReference($"FileFilter: {match}");
                         return;

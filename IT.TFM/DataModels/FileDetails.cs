@@ -32,9 +32,9 @@ namespace RepoScan.DataModels
 
         public List<PackageReference> PackageReferences { get; set; }
 
-        public SerializableDictionary<string, string> Properties { get; set; } = new SerializableDictionary<string, string>();
+        public SerializableDictionary<string, string> Properties { get; set; } = [];
 
-        public SerializableDictionary<string, string> FilteredItems { get; set; } = new SerializableDictionary<string, string>();
+        public SerializableDictionary<string, string> FilteredItems { get; set; } = [];
 
         #endregion
     }

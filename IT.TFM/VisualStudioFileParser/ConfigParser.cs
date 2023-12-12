@@ -45,7 +45,7 @@ namespace VisualStudioFileParser
         {
             foreach (var line in content)
             {
-                if (line.ToLower().Contains(UrlHttps) || line.ToLower().Contains(UrlHttp))
+                if (line.Contains(UrlHttps, StringComparison.CurrentCultureIgnoreCase) || line.Contains(UrlHttp, StringComparison.CurrentCultureIgnoreCase))
                 {
                     var url = GetUrl(line);
                     if (IgnoreThisUrl(url))
@@ -76,7 +76,7 @@ namespace VisualStudioFileParser
 
         #region Private Methods
 
-        private string GetUrl(string line)
+        private static string GetUrl(string line)
         {
             int startPos = line.IndexOf(UrlHttps, StringComparison.InvariantCultureIgnoreCase);
             if (startPos < 0)
@@ -84,21 +84,21 @@ namespace VisualStudioFileParser
                 startPos = line.IndexOf(UrlHttp, StringComparison.InvariantCultureIgnoreCase);
             }
 
-            int endPos = line.IndexOf("\"", startPos + 1);
+            int endPos = line.IndexOf('"', startPos + 1);
             
             return endPos < 0
-                ? line.Substring(startPos + 1)
+                ? line[(startPos + 1)..]
                 : line.Substring(startPos + 1, endPos - startPos - 1);
         }
 
-        private bool IgnoreThisUrl(string url)
+        private static bool IgnoreThisUrl(string url)
         {
             return ignoreUrls.Any(u => url.StartsWith(u, StringComparison.InvariantCultureIgnoreCase));
         }
 
-        private IEnumerable<string> GetPaths(string[] content, string url)
+        private static IEnumerable<string> GetPaths(string[] content, string url)
         {
-            List<string> paths = new List<string>();
+            List<string> paths = [];
             var stack = new Stack<string>();
 
             var settings = new XmlReaderSettings
@@ -112,43 +112,41 @@ namespace VisualStudioFileParser
             var xmlText = string.Concat(content);
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(xmlText)))
             {
-                using (XmlReader reader = XmlReader.Create(stream, settings))
+                using XmlReader reader = XmlReader.Create(stream, settings);
+                while (reader.Read())
                 {
-                    while (reader.Read())
+                    if (reader.NodeType == XmlNodeType.EndElement)
                     {
-                        if (reader.NodeType == XmlNodeType.EndElement)
+                        stack.Pop();
+                        continue;
+                    }
+
+                    if (reader.NodeType == XmlNodeType.Element)
+                    {
+                        stack.Push(reader.LocalName);
+
+                        if (reader.HasAttributes)
+                        {
+                            while (reader.MoveToNextAttribute())
+                            {
+                                if (reader.Value.Equals(url, StringComparison.InvariantCultureIgnoreCase))
+                                {
+                                    paths.Add(GetPath(stack, reader.LocalName));
+                                }
+                            }
+
+                            reader.MoveToElement();
+                        }
+
+                        if (reader.IsEmptyElement)
                         {
                             stack.Pop();
                             continue;
                         }
 
-                        if (reader.NodeType == XmlNodeType.Element)
+                        if (reader.HasValue && reader.Value.Contains(url))
                         {
-                            stack.Push(reader.LocalName);
-
-                            if (reader.HasAttributes)
-                            {
-                                while (reader.MoveToNextAttribute())
-                                {
-                                    if (reader.Value.Equals(url, StringComparison.InvariantCultureIgnoreCase))
-                                    {
-                                        paths.Add(GetPath(stack, reader.LocalName));
-                                    }
-                                }
-
-                                reader.MoveToElement();
-                            }
-
-                            if (reader.IsEmptyElement)
-                            {
-                                stack.Pop();
-                                continue;
-                            }
-
-                            if (reader.HasValue && reader.Value.Contains(url))
-                            {
-                                paths.Add(GetPath(stack, string.Empty));
-                            }
+                            paths.Add(GetPath(stack, string.Empty));
                         }
                     }
                 }
@@ -157,7 +155,7 @@ namespace VisualStudioFileParser
             return paths.AsEnumerable();
         }
 
-        private string GetPath(Stack<string> stack, string attribute)
+        private static string GetPath(Stack<string> stack, string attribute)
         {
             var path = string.Join("/", stack.Reverse());
             if (!string.IsNullOrEmpty(attribute))
