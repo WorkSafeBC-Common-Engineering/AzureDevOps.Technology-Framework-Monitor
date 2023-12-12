@@ -20,6 +20,11 @@ namespace VisualStudioFileParser
 
         #region IFileParser Implementation
 
+        void IFileParser.Initialize(object data)
+        {
+            // no op
+        }
+
         void IFileParser.Parse(FileItem file, string[] content)
         {
             int index = 0;

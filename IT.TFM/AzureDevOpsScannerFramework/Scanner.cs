@@ -32,6 +32,8 @@ namespace AzureDevOpsScannerFramework
 
         private static readonly AzureDevOps.IRestApi api = new AzureDevOps.RestApi();
 
+        private Dictionary<string, string> buildProperties = new();
+
         #endregion
 
         #region IScanner Implementation
@@ -166,6 +168,7 @@ namespace AzureDevOpsScannerFramework
             api.Project = projectId.ToString();
             api.Repository = repositoryId.ToString();
             await api.DownloadRepositoryAsync();
+            LoadDirectoryBuildProperties();
         }
 
         void IScanner.DeleteFiles()
@@ -237,7 +240,7 @@ namespace AzureDevOpsScannerFramework
         {
             try
             {
-                Parser.ParseFile.GetProperties(file, content);
+                Parser.ParseFile.GetProperties(file, content, buildProperties);
             }
             catch (Exception ex)
             {
@@ -259,6 +262,38 @@ namespace AzureDevOpsScannerFramework
         {
             var useFilterValue = ConfigurationManager.AppSettings["useFileFiltering"];
             bool.TryParse(useFilterValue, out useFileFilter);
+        }
+
+        private void LoadDirectoryBuildProperties()
+        {
+            buildProperties.Clear();
+
+            Directory.EnumerateFiles(api.CheckoutDirectory, "Directory.Build.props", SearchOption.AllDirectories)
+                .ForEach(f =>
+                {
+                    var xmlDocument = new System.Xml.XmlDocument();
+                    xmlDocument.Load(f);
+
+                    var propertyGroups = xmlDocument.GetElementsByTagName("PropertyGroup");
+                    for (int i = 0; i < propertyGroups.Count; i++)
+                    {
+                        var propertyGroup = propertyGroups[i];
+                        for (int j = 0; j < propertyGroup.ChildNodes.Count; j++)
+                        {
+                            var property = propertyGroup.ChildNodes[j];
+                            if (property.NodeType == System.Xml.XmlNodeType.Element)
+                            {
+                                var key = property.Name;
+                                var value = property.InnerText;
+
+                                if (!buildProperties.ContainsKey(key))
+                                {
+                                    buildProperties.Add(key, value);
+                                }
+                            }
+                        }
+                    }
+                });
         }
 
         #endregion

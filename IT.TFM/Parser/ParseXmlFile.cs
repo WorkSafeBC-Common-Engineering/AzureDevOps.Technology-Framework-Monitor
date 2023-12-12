@@ -1,5 +1,7 @@
 ﻿using ConfigurationFileData;
 using ProjectData;
+
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 
@@ -14,6 +16,8 @@ namespace Parser
 
         private static readonly string[] fileRefPunctuation = { " ", ",", "." };
         private static readonly string[] ignoreFileRefs;
+
+        protected Dictionary<string, string> buildProperties;
 
         #endregion
 
@@ -139,6 +143,20 @@ namespace Parser
                 if (ValidReference(attribute))
                 {
                     var versionAttribute = node.Attributes[xmlAttrPkgVersion]?.Value;
+                    if (versionAttribute.StartsWith("$"))
+                    {
+                        versionAttribute = versionAttribute.Replace("$(", string.Empty).Replace(")", string.Empty);
+                        // find the entry from the Directory.Build.props file - if not found then leave this blank.
+                        if (buildProperties != null && buildProperties.TryGetValue(versionAttribute, out string value))
+                        {
+                            versionAttribute = value;
+                        }
+                        else
+                        {
+                            versionAttribute = string.Empty;
+                        }
+                    }
+
                     file.AddPackageReference("Project", attribute, versionAttribute, null, null);
                 }
             }
