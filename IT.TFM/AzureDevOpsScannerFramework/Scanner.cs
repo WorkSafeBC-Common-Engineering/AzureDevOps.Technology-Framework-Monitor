@@ -32,7 +32,7 @@ namespace AzureDevOpsScannerFramework
 
         private static readonly AzureDevOps.IRestApi api = new AzureDevOps.RestApi();
 
-        private Dictionary<string, string> buildProperties = new();
+        private static readonly Dictionary<string, string> buildProperties = [];
 
         #endregion
 
