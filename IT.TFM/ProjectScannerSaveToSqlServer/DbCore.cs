@@ -39,7 +39,7 @@ namespace ProjectScannerSaveToSqlServer
 
         protected void Initialize(string configuration)
         {
-            connection = $"name={configuration}";
+            connection = configuration;
             context = GetConnection();
         }
 

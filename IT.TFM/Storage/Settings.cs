@@ -21,7 +21,16 @@ namespace Storage
         {
             var appSettings = ConfigurationManager.AppSettings;
             Storage = appSettings[storageKey];
-            Configuration = appSettings[configurationKey];
+
+            var dbConfiguration = Environment.GetEnvironmentVariable("TFM_DbConnection");
+            if (dbConfiguration == null)
+            {
+                Configuration = $"name={appSettings[configurationKey]}";
+            }
+            else
+            {
+                Configuration = dbConfiguration;
+            }
         }
 
         #endregion
