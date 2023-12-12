@@ -1,12 +1,18 @@
 ﻿using Parser.Interfaces;
 using ProjectData;
 using System;
+using System.Collections.Generic;
 
 namespace VisualStudioFileParser
 {
     class CSProjectParser : Parser.ParseXmlFile, IFileParser
     {
         #region IFileParser Implementation
+
+        void IFileParser.Initialize(object data)
+        {
+            buildProperties = data as Dictionary<string, string>;
+        }
 
         void IFileParser.Parse(FileItem file, string[] content)
         {
@@ -40,7 +46,7 @@ namespace VisualStudioFileParser
             WriteIfExistsProperty(rootNode, xmliOSApp, file, propertyIsiOS, "Yes");
 
             WriteVSProjectReferences(rootNode, xmlReferences, file);
-            WriteVSProjectReferences(rootNode, xmlPkgReference, file);
+            WriteVSProjectPackageReference(rootNode, xmlPkgReference, file);
         }
 
         #endregion

@@ -1,5 +1,7 @@
 ﻿using ConfigurationFileData;
 using ProjectData;
+
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 
@@ -14,6 +16,8 @@ namespace Parser
 
         private static readonly string[] fileRefPunctuation = [" ", ",", "."];
         private static readonly string[] ignoreFileRefs;
+
+        protected Dictionary<string, string> buildProperties;
 
         #endregion
 
@@ -41,6 +45,7 @@ namespace Parser
         protected const string xmlAttrToolsVer = @"ToolsVersion";
         protected const string xmlAttrSdk = @"Sdk";
         protected const string xmlAttrInclude = @"Include";
+        protected const string xmlAttrPkgVersion = @"Version";
 
         protected const string propertyError = "Error";
         protected const string propertyToolsVersion = "ToolsVersion";
@@ -126,6 +131,34 @@ namespace Parser
                 if (ValidReference(attribute))
                 {
                     file.AddReference(attribute);
+                }
+            }
+        }
+
+        protected void WriteVSProjectPackageReference(XmlElement rootNode, string xPath, FileItem file)
+        {
+            var nodeList = AllNodes(rootNode, xPath);
+            foreach (XmlNode node in nodeList)
+            {
+                var attribute = node.Attributes[xmlAttrInclude]?.Value;
+                if (ValidReference(attribute))
+                {
+                    var versionAttribute = node.Attributes[xmlAttrPkgVersion]?.Value;
+                    if (versionAttribute.StartsWith("$"))
+                    {
+                        versionAttribute = versionAttribute.Replace("$(", string.Empty).Replace(")", string.Empty);
+                        // find the entry from the Directory.Build.props file - if not found then leave this blank.
+                        if (buildProperties != null && buildProperties.TryGetValue(versionAttribute, out string value))
+                        {
+                            versionAttribute = value;
+                        }
+                        else
+                        {
+                            versionAttribute = string.Empty;
+                        }
+                    }
+
+                    file.AddPackageReference("Project", attribute, versionAttribute, null, null);
                 }
             }
         }

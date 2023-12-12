@@ -72,13 +72,23 @@ namespace ProjectScanner
             {
                 if (!IsInitialized)
                 {
-                    var appSettings = ConfigurationManager.AppSettings;
-                    scanners = [];
+                    var envScanner = Environment.GetEnvironmentVariable("TFM_ScannerName");
+                    var envScannerValue = Environment.GetEnvironmentVariable("TFM_ScannerValue");
+                    scanners = new Dictionary<string, string>();
 
-                    var allKeys = appSettings.AllKeys.Where(k => k.StartsWith(scannerKey));
-                    foreach (var key in allKeys)
+                    if (envScanner == null || envScannerValue == null)
                     {
-                        scanners.Add(key[(key.IndexOf(separator) + separator.Length)..], appSettings[key]);
+                        var appSettings = ConfigurationManager.AppSettings;
+
+                        var allKeys = appSettings.AllKeys.Where(k => k.StartsWith(scannerKey));
+                        foreach (var key in allKeys)
+                        {
+                            scanners.Add(key[(key.IndexOf(separator) + separator.Length)..], appSettings[key]);
+                        }
+                    }
+                    else
+                    {
+                        scanners.Add(envScanner, envScannerValue);
                     }
 
                     IsInitialized = true;

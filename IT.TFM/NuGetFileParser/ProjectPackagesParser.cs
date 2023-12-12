@@ -27,6 +27,11 @@ namespace NuGetFileParser
 
         #region IFileParser Implentation
 
+        void IFileParser.Initialize(object data)
+        {
+            // no op
+        }
+
         void IFileParser.Parse(FileItem file, string[] content)
         {
             var xmlDoc = GetAsXml(content);
