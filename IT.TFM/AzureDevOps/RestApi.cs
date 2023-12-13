@@ -92,7 +92,7 @@ namespace AzureDevOps
                 CheckoutDirectory = Path.Combine(Environment.CurrentDirectory, Organization);
             }
 
-            Token = Environment.GetEnvironmentVariable("TFM_AdToken") ?? string.Empty;
+            Token = ConfidentialSettings.Values.Token;
         }
 
         async Task<AzDoProjectList> IRestApi.GetProjectsAsync()

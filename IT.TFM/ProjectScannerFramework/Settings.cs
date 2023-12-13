@@ -72,11 +72,11 @@ namespace ProjectScanner
             {
                 if (!IsInitialized)
                 {
-                    var envScanner = Environment.GetEnvironmentVariable("TFM_ScannerName");
-                    var envScannerValue = Environment.GetEnvironmentVariable("TFM_ScannerValue");
-                    scanners = new Dictionary<string, string>();
+                    var envScanner = ConfidentialSettings.Values.Organization;
+                    var envScannerValue = ConfidentialSettings.Values.OrganizationUrl;
+                    scanners = [];
 
-                    if (envScanner == null || envScannerValue == null)
+                    if (string.IsNullOrEmpty(envScanner) || string.IsNullOrEmpty(envScannerValue))
                     {
                         var appSettings = ConfigurationManager.AppSettings;
 
