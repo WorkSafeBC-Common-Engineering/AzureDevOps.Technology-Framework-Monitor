@@ -4,13 +4,13 @@
     {
         #region Private Members
 
-        private const string envToken = "TFM_AdToken";
+        private const string envToken = "azdo-pat";
 
-        private const string envOrg = "TFM_ScannerName";
+        private const string envOrg = "azdo-org-name";
 
-        private const string envUrl = "TFM_ScannerValue";
+        private const string envUrl = "azdo-org-url";
 
-        private const string envDbConnection = "TFM_DbConnection";
+        private const string envDbConnection = "sql-connectionstring";
 
         #endregion
 
