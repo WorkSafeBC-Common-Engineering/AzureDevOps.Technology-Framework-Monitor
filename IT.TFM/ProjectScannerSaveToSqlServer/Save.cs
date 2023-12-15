@@ -469,8 +469,10 @@ namespace ProjectScannerSaveToSqlServer
             // Next update any of the existing database properties that are in the list
             foreach (var dbRef in dbReferences)
             {
-                var reference = references.SingleOrDefault(r => r.PackageType.Equals(dbRef.PackageType, StringComparison.InvariantCultureIgnoreCase)
-                                                             && r.Id.Equals(dbRef.Name, StringComparison.InvariantCultureIgnoreCase));
+                var reference = references.Where(r => r.PackageType.Equals(dbRef.PackageType, StringComparison.InvariantCultureIgnoreCase)
+                                                   && r.Id.Equals(dbRef.Name, StringComparison.InvariantCultureIgnoreCase))
+                                          .OrderBy(r => r.Version).Last();
+
                 if (reference != null)
                 {
                     dbRef.Version = reference.Version;
@@ -482,8 +484,8 @@ namespace ProjectScannerSaveToSqlServer
             // Finally add any new properties from the list that are not in the database for this file
             foreach (var reference in references)
             {
-                var dbReference = dbReferences.SingleOrDefault(r => r.PackageType.Equals(reference.PackageType, StringComparison.InvariantCultureIgnoreCase)
-                                                                 && r.Name.Equals(reference.Id, StringComparison.InvariantCultureIgnoreCase));
+                var dbReference = dbReferences.FirstOrDefault(r => r.PackageType.Equals(reference.PackageType, StringComparison.InvariantCultureIgnoreCase)
+                                                                && r.Name.Equals(reference.Id, StringComparison.InvariantCultureIgnoreCase));
 
                 if (dbReference == null)
                 {
