@@ -22,8 +22,8 @@ namespace Storage
             var appSettings = ConfigurationManager.AppSettings;
             Storage = appSettings[storageKey];
 
-            var dbConfiguration = Environment.GetEnvironmentVariable("TFM_DbConnection");
-            if (dbConfiguration == null)
+            var dbConfiguration = ConfidentialSettings.Values.DbConnection;
+            if (string.IsNullOrEmpty(dbConfiguration))
             {
                 Configuration = $"name={appSettings[configurationKey]}";
             }

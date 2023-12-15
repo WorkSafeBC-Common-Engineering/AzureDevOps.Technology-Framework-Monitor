@@ -3,7 +3,10 @@ using ProjectData;
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Xml;
+
+using Unity.Builder;
 
 namespace Parser
 {
@@ -141,10 +144,32 @@ namespace Parser
             foreach (XmlNode node in nodeList)
             {
                 var attribute = node.Attributes[xmlAttrInclude]?.Value;
+                string versionAttribute = string.Empty;
+
                 if (ValidReference(attribute))
                 {
-                    var versionAttribute = node.Attributes[xmlAttrPkgVersion]?.Value;
-                    if (versionAttribute.StartsWith("$"))
+                    foreach (XmlAttribute attributeValue in node.Attributes)
+                    {                         
+                        if (attributeValue.Name.Equals(xmlAttrPkgVersion, System.StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            versionAttribute = node.Attributes[xmlAttrPkgVersion]?.Value;
+                            break;
+                        }
+                    }
+
+                    if (string.IsNullOrEmpty(versionAttribute))
+                    {
+                        versionAttribute = string.Empty;
+                        foreach (XmlNode childNode in node.ChildNodes)
+                        {
+                            if (childNode.Name.Equals("Version", System.StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                versionAttribute = childNode.InnerText;
+                                break;
+                            }
+                        }
+                    }
+                    else if (versionAttribute.StartsWith("$"))
                     {
                         versionAttribute = versionAttribute.Replace("$(", string.Empty).Replace(")", string.Empty);
                         // find the entry from the Directory.Build.props file - if not found then leave this blank.
