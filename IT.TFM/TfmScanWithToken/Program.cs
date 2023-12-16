@@ -16,8 +16,8 @@ namespace TfmScanWithToken
             await FileScanAsync(threadCount);
             await FileDetailsAsync(threadCount, forceDetails);
 #if DEBUG
-            Console.WriteLine("Press any key to exit.");
-            Console.ReadKey();
+            //Console.WriteLine("Press any key to exit.");
+            //Console.ReadKey();
 #endif
         }
 
