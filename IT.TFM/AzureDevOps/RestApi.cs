@@ -92,6 +92,8 @@ namespace AzureDevOps
                 CheckoutDirectory = Path.Combine(Environment.CurrentDirectory, Organization);
             }
 
+            Console.WriteLine($"=> Checkout Directory = {CheckoutDirectory}");
+
             Token = ConfidentialSettings.Values.Token;
         }
 
