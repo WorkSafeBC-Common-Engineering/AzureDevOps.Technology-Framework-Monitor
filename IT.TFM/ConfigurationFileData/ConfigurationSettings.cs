@@ -18,6 +18,21 @@ namespace ConfigurationFileData
             var configuration = GetConfiguration(file);
 
             Console.WriteLine($"=> LoadConfigurationValues: configuration loaded = {configuration != null}");
+            if ( configuration != null )
+            {
+                Console.WriteLine($"=> LoadConfigurationValues: configuration has file = {configuration.HasFile}");
+                Console.WriteLine($"=> LoadConfigurationValues: configuration file path = {configuration.FilePath}");
+                Console.WriteLine($"=> LoadConfigurationValues: configuration file exists = {File.Exists(configuration.FilePath)}");
+                Console.WriteLine($"=> LoadConfigurationValues: configuration file path = {configuration.FilePath}");
+
+                var index = 0;
+                foreach (string key in configuration.Sections.Keys)
+                {
+                    Console.WriteLine($"\t=> LoadConfigurationValues: configuration section [{index}] - key = {key}:");
+                    Console.WriteLine($"\t=> LoadConfigurationValues: configuration file path = {configuration.FilePath}");
+                    var value = configuration.Sections[key];
+                }
+            }
 
             return GetSectionValues(section, configuration);
         }
