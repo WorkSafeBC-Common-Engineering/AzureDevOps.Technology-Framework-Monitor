@@ -25,12 +25,12 @@ namespace ConfigurationFileData
                 Console.WriteLine($"=> LoadConfigurationValues: configuration file exists = {File.Exists(configuration.FilePath)}");
                 Console.WriteLine($"=> LoadConfigurationValues: configuration file path = {configuration.FilePath}");
 
-                var index = 0;
                 foreach (string key in configuration.Sections.Keys)
                 {
-                    Console.WriteLine($"\t=> LoadConfigurationValues: configuration section [{index}] - key = {key}:");
-                    Console.WriteLine($"\t=> LoadConfigurationValues: configuration file path = {configuration.FilePath}");
+                    Console.WriteLine($"\t=> LoadConfigurationValues: configuration section key = {key}:");
+
                     var value = configuration.Sections[key];
+                    Console.WriteLine($"\t=> LoadConfigurationValues: configuration section type = {value.GetType()}:");
                 }
             }
 
