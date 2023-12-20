@@ -12,12 +12,12 @@ namespace TfmScanWithToken
             var threadCount = GetTotalThreads();
             var forceDetails = GetForceDetails();
 
-            //await RepoScanAsync();
-            //await FileScanAsync(threadCount, forceDetails);
+            await RepoScanAsync();
+            await FileScanAsync(threadCount, forceDetails);
             await FileDetailsAsync(threadCount, forceDetails);
 #if DEBUG
-            //Console.WriteLine("Press any key to exit.");
-            //Console.ReadKey();
+            Console.WriteLine("Press any key to exit.");
+            Console.ReadKey();
 #endif
         }
 

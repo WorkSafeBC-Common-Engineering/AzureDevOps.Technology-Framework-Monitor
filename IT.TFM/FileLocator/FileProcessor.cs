@@ -40,7 +40,9 @@ namespace RepoScan.FileLocator
                 // Skip any repos that have been flagged as deleted or No Scan
                 if (repoItem.ProjectNoScan || repoItem.ProjectIsDeleted || repoItem.RepositoryNoScan || repoItem.IsDeleted)
                 {
+#if DEBUG
                     Console.WriteLine($"=> File Scan GetFiles(): Skipping repo {repoItem.RepositoryName} - ProjectNoScan = {repoItem.ProjectNoScan}, ProjectIsDeleted = {repoItem.ProjectIsDeleted}, RepositoryNoScan = {repoItem.RepositoryNoScan}, IsDeleted = {repoItem.IsDeleted}");
+#endif
                     continue;
                 }
 
@@ -55,8 +57,9 @@ namespace RepoScan.FileLocator
                         pList.Add(p.Id);
                     }
                     projectList = pList.ToArray();
-
+#if DEBUG
                     Console.WriteLine($"=> File Scan, GetFiles(): Get Project IDs returned {projectList.Count()} items");
+#endif
                 }
 
                 // Check whether the project or repo still exists - it might have been moved or deleted.
@@ -64,9 +67,9 @@ namespace RepoScan.FileLocator
                 {
                     repoItem.ProjectIsDeleted = true;
                     repoWriter.Write(repoItem, false);
-
+#if DEBUG
                     Console.WriteLine($"=> File Scan GetFiles(): Project {repoItem.ProjectName} was deleted");
-
+#endif
                     continue;
                 }
 
@@ -80,8 +83,9 @@ namespace RepoScan.FileLocator
 
                     repoList = await scanner.Repositories(project);
                     lastProject = repoItem.ProjectId;
-
-                    Console.WriteLine($"File Scan GetFiles(): Project {repoItem.ProjectName} returned {repoList.Count()} repositories");
+#if DEBUG
+                    Console.WriteLine($"=> File Scan GetFiles(): Project {repoItem.ProjectName} returned {repoList.Count()} repositories");
+#endif
                 }
 
                 bool repoExists = false;
@@ -108,15 +112,17 @@ namespace RepoScan.FileLocator
                     // flag repo as deleted.
                     repoItem.IsDeleted = true;
                     repoWriter.Write(repoItem, false);
-
+#if DEBUG
                     Console.WriteLine($"=> File Scan GetFiles(): repository {repoItem.RepositoryName} was deleted");
-
+#endif
                     continue;
                 }
 
                 if (repoUnchanged && !forceDetails)
                 {
+#if DEBUG
                     Console.WriteLine($"=> File Scan GetFiles(): repository {repoItem.RepositoryName} is unchanged");
+#endif
                     continue;
                 }
 
@@ -134,9 +140,9 @@ namespace RepoScan.FileLocator
                     //{
                     //    return;
                     //}
-
+#if DEBUG
                     Console.WriteLine($"=> File Scan GetFiles(): Getting File: Repository = {repoItem.RepositoryName}, File Path = {file.Path}");
-
+#endif
 
                     if (file.FileType != FileItemType.NoMatch || FileFiltering.Filter.CanFilterFile(file))
                     {
@@ -154,9 +160,9 @@ namespace RepoScan.FileLocator
                         // Then each thread could have this created ahead of time without
                         // the cost of creating a fresh DB connection every time.
                         IWriteFileItem writer = StorageFactory.GetFileItemWriter();
-
+#if DEBUG
                         Console.WriteLine($"=> File Scan GetFiles(): sending file to writer - ${file.Path}");
-
+#endif
                         writer.Write(fileItem, false, true);
                     }
                 });
