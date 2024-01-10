@@ -65,7 +65,9 @@ namespace Parser
         protected const string propertyAzureFunction = @"AzureFunction";
 
         protected XmlNamespaceManager mgr;
-        private static readonly char[] separator = ['/'];
+        private static readonly char[] namespaceSeparator = ['/'];
+        private static readonly char[] pkgSeparator = [','];
+        private static readonly char[] attributeValueSeparator = ['='];
 
         #endregion
 
@@ -130,9 +132,27 @@ namespace Parser
             var nodeList = AllNodes(rootNode, xPath);
             foreach (XmlNode node in nodeList)
             {
+
                 var attribute = node.Attributes[xmlAttrInclude]?.Value;
                 if (ValidReference(attribute))
                 {
+                    var pkgFields = attribute.Split(pkgSeparator, System.StringSplitOptions.RemoveEmptyEntries | System.StringSplitOptions.TrimEntries);
+
+                    var pkgName = pkgFields.First();
+
+                    var versionAttribute = pkgFields.FirstOrDefault(f => f.StartsWith(xmlAttrPkgVersion));
+                    if (versionAttribute != null)
+                    {
+                        var versionFields = versionAttribute.Split(attributeValueSeparator, System.StringSplitOptions.TrimEntries);
+                        var versionValue = versionFields.Length == 2 ? versionFields[1] : null;
+
+                        if (versionValue != null)
+                        {
+                            file.AddPackageReference("Project", pkgName, versionValue, null, null);
+                            continue;
+                        }
+                    }
+
                     file.AddReference(attribute);
                 }
             }
@@ -205,7 +225,7 @@ namespace Parser
 
         protected static string NamespacePath(string path)
         {
-            var fields = path.Split(separator);
+            var fields = path.Split(namespaceSeparator);
             var newFields = fields.Select(f => "msbld:" + f);
             return string.Join("/", newFields);
         }

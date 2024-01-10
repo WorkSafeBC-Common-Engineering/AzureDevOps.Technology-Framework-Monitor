@@ -73,7 +73,9 @@ namespace RepoScan.FileLocator
                 var deleteList = new ConcurrentBag<DataModels.FileDetails>();
                 Parallel.ForEach(fileItems, options, (fileItem) =>
                 {
-                    System.Diagnostics.Debug.WriteLine($"*** Thread Start: {Environment.CurrentManagedThreadId}");
+#if DEBUG
+                    Console.WriteLine($"*** Thread Start: {Environment.CurrentManagedThreadId}");
+#endif
 
                     //TODO: Create a pool of writer items (one per totalThread) to create the necessary DB connections ahead of time.
                     IWriteFileDetails writer = StorageFactory.GetFileDetailsWriter();
@@ -94,13 +96,16 @@ namespace RepoScan.FileLocator
                         }; 
 
                         deleteList.Add(fileDetails );
-
-                        System.Diagnostics.Debug.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId}");
+#if DEBUG
+                        Console.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId}");
+#endif
                         return;
                     }
                     if (azDoFile.CommitId == fileItem.CommitId && !forceDetails)
                     {
-                        System.Diagnostics.Debug.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId}");
+#if DEBUG
+                        Console.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId}");
+#endif
                         return;
                     }
 
@@ -133,8 +138,9 @@ namespace RepoScan.FileLocator
 
                         writer.Write(fileDetails, forceDetails);
                     }
-
-                    System.Diagnostics.Debug.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId}");
+#if DEBUG
+                    Console.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId}");
+#endif
                 });
 
                 if (!deleteList.IsEmpty)

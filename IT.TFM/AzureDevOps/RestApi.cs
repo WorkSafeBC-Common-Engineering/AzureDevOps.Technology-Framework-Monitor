@@ -91,7 +91,9 @@ namespace AzureDevOps
                 Organization = fields[1];
                 CheckoutDirectory = Path.Combine(Environment.CurrentDirectory, Organization);
             }
-
+#if DEBUG
+            Console.WriteLine($"=> Checkout Directory = {CheckoutDirectory}");
+#endif
             Token = ConfidentialSettings.Values.Token;
         }
 
@@ -277,13 +279,13 @@ namespace AzureDevOps
                 request.Headers.Add("Authorization", AuthHeader());
                 request.Headers.Add("Accept", mediaType);
 #if DEBUG
-                System.Diagnostics.Debug.WriteLine($"API Call: {url}");
+                Console.WriteLine($"API Call: {url}");
                 var startTime = DateTime.Now;
 #endif
                 HttpResponseMessage response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
                 ThrottleApi(response);
 #if DEBUG
-                System.Diagnostics.Debug.WriteLine($"End API Call, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
+                Console.WriteLine($"End API Call, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
                 startTime = DateTime.Now;
 #endif
                 if (!response.IsSuccessStatusCode)
@@ -301,7 +303,7 @@ namespace AzureDevOps
                 {
                     GetZipContent(response.Content.ReadAsStream());
 #if DEBUG
-                    System.Diagnostics.Debug.WriteLine($"Unzip, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
+                    Console.WriteLine($"Unzip, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
 #endif
                     return string.Empty;
                 }
@@ -358,7 +360,7 @@ namespace AzureDevOps
 #if DEBUG
                 if (headerName.StartsWith("x-ratelimit") || headerName.Equals("retry-after"))
                 {
-                    System.Diagnostics.Debug.WriteLine($"Azure API Throttling: {headerName} = {headerValue ?? "<null>"}");
+                    Console.WriteLine($"Azure API Throttling: {headerName} = {headerValue ?? "<null>"}");
                 }
 #endif
                 if (headerValue == null)

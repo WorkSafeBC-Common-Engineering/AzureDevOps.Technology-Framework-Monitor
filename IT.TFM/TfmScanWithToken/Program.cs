@@ -13,7 +13,7 @@ namespace TfmScanWithToken
             var forceDetails = GetForceDetails();
 
             await RepoScanAsync();
-            await FileScanAsync(threadCount);
+            await FileScanAsync(threadCount, forceDetails);
             await FileDetailsAsync(threadCount, forceDetails);
 #if DEBUG
             Console.WriteLine("Press any key to exit.");
@@ -31,11 +31,11 @@ namespace TfmScanWithToken
             Console.WriteLine($"Repo Scan complete at: {DateTime.Now.ToLongTimeString()}");
         }
 
-        private static async Task FileScanAsync(int threadCount)
+        private static async Task FileScanAsync(int threadCount, bool forceDetails)
         {
             Console.WriteLine($"Starting File Scan at: {DateTime.Now.ToLongTimeString()}");
 
-            await RepoFileScan.FileProcessor.GetFiles(threadCount);
+            await RepoFileScan.FileProcessor.GetFiles(threadCount, forceDetails);
 
             Console.WriteLine($"File Scan complete at: {DateTime.Now.ToLongTimeString()}");
         }
