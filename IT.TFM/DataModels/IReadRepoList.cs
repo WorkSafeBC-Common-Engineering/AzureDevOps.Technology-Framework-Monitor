@@ -8,6 +8,6 @@ namespace RepoScan.DataModels
 {
     public interface IReadRepoList
     {
-        IEnumerable<RepositoryItem> Read();
+        IEnumerable<RepositoryItem> Read(string projectId, string repositoryId);
     }
 }

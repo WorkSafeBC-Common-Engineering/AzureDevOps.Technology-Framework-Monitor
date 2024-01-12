@@ -14,7 +14,7 @@ namespace RepoScan.FileLocator
 {
     public class FileProcessor
     {
-        public static async Task GetFiles(int totalThreads, bool forceDetails)
+        public static async Task GetFiles(int totalThreads, bool forceDetails, string projectId, string repositoryId)
         {
             Settings.Initialize();
 
@@ -35,7 +35,7 @@ namespace RepoScan.FileLocator
             var lastProject = Guid.Empty;
             IEnumerable<Repository> repoList = null;
 
-            foreach (var repoItem in reader.Read())
+            foreach (var repoItem in reader.Read(projectId, repositoryId))
             {
                 // Skip any repos that have been flagged as deleted or No Scan
                 if (repoItem.ProjectNoScan || repoItem.ProjectIsDeleted || repoItem.RepositoryNoScan || repoItem.IsDeleted)

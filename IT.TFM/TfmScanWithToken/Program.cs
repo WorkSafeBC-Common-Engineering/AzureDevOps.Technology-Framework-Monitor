@@ -16,8 +16,8 @@ namespace TfmScanWithToken
             var repositoryId = GetRepositoryId(args);
 
             await RepoScanAsync(projectId, repositoryId);
-            await FileScanAsync(threadCount, forceDetails);
-            await FileDetailsAsync(threadCount, forceDetails);
+            await FileScanAsync(threadCount, forceDetails, projectId, repositoryId);
+            await FileDetailsAsync(threadCount, forceDetails, projectId, repositoryId);
 #if DEBUG
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey();
@@ -34,16 +34,16 @@ namespace TfmScanWithToken
             Console.WriteLine($"Repo Scan complete at: {DateTime.Now.ToLongTimeString()}");
         }
 
-        private static async Task FileScanAsync(int threadCount, bool forceDetails)
+        private static async Task FileScanAsync(int threadCount, bool forceDetails, string projectId, string repositoryId)
         {
             Console.WriteLine($"Starting File Scan at: {DateTime.Now.ToLongTimeString()}");
 
-            await RepoFileScan.FileProcessor.GetFiles(threadCount, forceDetails);
+            await RepoFileScan.FileProcessor.GetFiles(threadCount, forceDetails, projectId, repositoryId);
 
             Console.WriteLine($"File Scan complete at: {DateTime.Now.ToLongTimeString()}");
         }
 
-        private static async Task FileDetailsAsync(int threadCount, bool forceDetails)
+        private static async Task FileDetailsAsync(int threadCount, bool forceDetails, string projectId, string repositoryId)
         {
             Console.WriteLine($"Starting File Details Scan at: {DateTime.Now.ToLongTimeString()}");
 

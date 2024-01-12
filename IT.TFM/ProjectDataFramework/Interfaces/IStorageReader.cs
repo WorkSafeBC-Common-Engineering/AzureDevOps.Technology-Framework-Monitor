@@ -14,7 +14,7 @@ namespace ProjectData.Interfaces
 
         Organization GetOrganization();
 
-        Project GetProject();
+        Project GetProjectAndRepositories(string projectId, string repositoryId);
 
         Repository GetRepository();
 

@@ -27,7 +27,7 @@ namespace RepoScan.FileLocator
             };
 
             IReadRepoList repoReader = StorageFactory.GetRepoListReader();
-            foreach (var repoItem in repoReader.Read())
+            foreach (var repoItem in repoReader.Read(string.Empty, string.Empty))
             {
                 // Skip any repos that have been flagged as deleted or No Scan
                 if (repoItem.ProjectNoScan || repoItem.ProjectIsDeleted || repoItem.RepositoryNoScan || repoItem.IsDeleted)

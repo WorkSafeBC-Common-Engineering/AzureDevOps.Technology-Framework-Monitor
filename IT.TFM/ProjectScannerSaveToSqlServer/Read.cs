@@ -1,13 +1,10 @@
 ﻿using ProjectData;
 using ProjectData.Interfaces;
+
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Data.Entity.Core.Common.CommandTrees;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProjectScannerSaveToSqlServer
 {
@@ -87,9 +84,78 @@ namespace ProjectScannerSaveToSqlServer
             return organization;
         }
 
-        Project IStorageReader.GetProject()
+        Project IStorageReader.GetProjectAndRepositories(string projectId, string repositoryId)
         {
-            throw new NotImplementedException();
+            var dbProject = context.Projects
+                                   .SingleOrDefaultAsync(p => p.ProjectId.Equals(projectId, StringComparison.InvariantCultureIgnoreCase)
+                                                           && !p.Deleted)
+                                   .Result;
+
+            var project = new Project
+            {
+                Name = dbProject.Name,
+                Id = new Guid(dbProject.ProjectId),
+                Abbreviation = dbProject.Abbreviation,
+                Description = dbProject.Description,
+                LastUpdate = dbProject.LastUpdate ?? DateTime.MinValue,
+                Revision = dbProject.Revision,
+                State = dbProject.State,
+                Url = dbProject.Url,
+                Visibility = dbProject.Visibility,
+                Deleted = dbProject.Deleted,
+                NoScan = dbProject.NoScan
+            };
+
+            if (repositoryId == string.Empty)
+            {
+                foreach (var repo in dbProject.Repositories)
+                {
+                    var repository = new Repository
+                    {
+                        Id = new Guid(repo.RepositoryId),
+                        DefaultBranch = repo.DefaultBranch,
+                        IsFork = repo.IsFork,
+                        Name = repo.Name,
+                        RemoteUrl = repo.RemoteUrl,
+                        Size = repo.Size,
+                        FileCount = repo.Files.Count,
+                        Url = repo.Url,
+                        WebUrl = repo.WebUrl,
+                        Deleted = repo.Deleted,
+                        LastCommitId = repo.LastCommitId,
+                        NoScan = repo.NoScan
+                    };
+
+                    project.AddRepository(repository);
+                }
+            }
+            else
+            {
+                var repository = context.Repositories.SingleOrDefaultAsync(r => r.RepositoryId.Equals(repositoryId, StringComparison.InvariantCultureIgnoreCase)
+                                                                             && !r.Deleted)
+                                        .Result;
+                
+                if (repository != null)
+                {
+                    var repo = new Repository
+                    {
+                        DefaultBranch = repository.DefaultBranch,
+                        Id = new Guid(repository.RepositoryId),
+                        IsFork = repository.IsFork,
+                        Name = repository.Name,
+                        RemoteUrl = repository.RemoteUrl,
+                        Size = repository.Size,
+                        Url = repository.Url,
+                        WebUrl = repository.WebUrl,
+                        Deleted = repository.Deleted,
+                        LastCommitId = repository.LastCommitId
+                    };
+
+                    project.AddRepository(repo);
+                }
+            }
+
+            return project;
         }
 
         Repository IStorageReader.GetRepository()
