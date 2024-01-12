@@ -36,7 +36,7 @@ namespace RepoScan.Storage.SqlServer
 
             while (org != null && projectList != null && projectList.Any())
             {
-                foreach (var project in org.Projects)
+                foreach (var project in projectList)
                 {
                     if (!project.Repositories.Any())
                     {

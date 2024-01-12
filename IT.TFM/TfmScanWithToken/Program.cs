@@ -47,7 +47,7 @@ namespace TfmScanWithToken
         {
             Console.WriteLine($"Starting File Details Scan at: {DateTime.Now.ToLongTimeString()}");
 
-            await RepoFileScan.FileDetails.GetDetailsAsync(threadCount, forceDetails);
+            await RepoFileScan.FileDetails.GetDetailsAsync(threadCount, forceDetails, projectId, repositoryId);
 
             Console.WriteLine($"File Details Scan complete at: {DateTime.Now.ToLongTimeString()}");
         }
