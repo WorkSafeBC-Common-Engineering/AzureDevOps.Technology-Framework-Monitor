@@ -29,7 +29,11 @@ namespace AzureDevOps
 
         void Initialize(string organizationUrl);
 
+        Task<AzDoProject?> GetProjectAsync(string projectId);
+
         Task<AzDoProjectList> GetProjectsAsync();
+
+        Task<AzDoRepository?> GetRepositoryAsync(string repositoryId);
 
         Task<AzDoRepositoryList> GetRepositoriesAsync();
 

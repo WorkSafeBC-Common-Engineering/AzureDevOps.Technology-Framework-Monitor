@@ -52,7 +52,7 @@ namespace RepoScan.FileLocator
                     scanner = ScannerFactory.GetScanner(orgName);
 
                     List<Guid> pList = [];
-                    await foreach (var p in scanner.Projects())
+                    await foreach (var p in scanner.Projects(string.Empty))
                     {
                         pList.Add(p.Id);
                     }
@@ -81,7 +81,7 @@ namespace RepoScan.FileLocator
                         Name = repoItem.ProjectName
                     };
 
-                    repoList = await scanner.Repositories(project);
+                    repoList = await scanner.Repositories(project, string.Empty);
                     lastProject = repoItem.ProjectId;
 #if DEBUG
                     Console.WriteLine($"=> File Scan GetFiles(): Project {repoItem.ProjectName} returned {repoList.Count()} repositories");
