@@ -28,7 +28,7 @@ namespace ProjectScannerSaveToSqlServer
             get { return true; }
         }
 
-        Organization IStorageReader.GetOrganization()
+        Organization IStorageReader.GetOrganization(string projectId, string repositoryId)
         {
             var dbOrganization = GetOrganization();
 
@@ -40,12 +40,44 @@ namespace ProjectScannerSaveToSqlServer
             ProjectSource source = (ProjectSource)Enum.Parse(typeof(ProjectSource), dbOrganization.ScannerType.Value);
             organization = new Organization(source, dbOrganization.Name, dbOrganization.Uri);
 
-            foreach(var dbProject in dbOrganization.Projects)
+            Project project;
+
+            if (projectId == string.Empty)
             {
-                var dataProject = new Project
+                foreach (var dataProject in dbOrganization.Projects)
                 {
-                    Id = new Guid(dbProject.ProjectId),
+                    project = new Project
+                    {
+                        Id = new Guid(dataProject.ProjectId),
+                        Name = dataProject.Name,
+                        Abbreviation = dataProject.Abbreviation,
+                        Description = dataProject.Description,
+                        LastUpdate = dataProject.LastUpdate ?? DateTime.MinValue,
+                        Revision = dataProject.Revision,
+                        State = dataProject.State,
+                        Url = dataProject.Url,
+                        Visibility = dataProject.Visibility,
+                        Deleted = dataProject.Deleted,
+                        NoScan = dataProject.NoScan
+                    };
+
+                    GetRepositoriesForProject(dataProject, project);
+
+                    organization.AddProject(project);
+                }
+            }
+
+            else
+            {
+                var dbProject = context.Projects
+                                       .SingleOrDefaultAsync(p => p.ProjectId.Equals(projectId, StringComparison.InvariantCultureIgnoreCase)
+                                                               && !p.Deleted)
+                                       .Result;
+
+                project = new Project
+                {
                     Name = dbProject.Name,
+                    Id = new Guid(dbProject.ProjectId),
                     Abbreviation = dbProject.Abbreviation,
                     Description = dbProject.Description,
                     LastUpdate = dbProject.LastUpdate ?? DateTime.MinValue,
@@ -57,105 +89,42 @@ namespace ProjectScannerSaveToSqlServer
                     NoScan = dbProject.NoScan
                 };
 
-                foreach (var repo in dbProject.Repositories)
+                if (repositoryId != string.Empty)
                 {
-                    var repository = new Repository
-                    {
-                        Id = new Guid(repo.RepositoryId),
-                        DefaultBranch = repo.DefaultBranch,
-                        IsFork = repo.IsFork,
-                        Name = repo.Name,
-                        RemoteUrl = repo.RemoteUrl,
-                        Size = repo.Size,
-                        FileCount = repo.Files.Count,
-                        Url = repo.Url,
-                        WebUrl = repo.WebUrl,
-                        Deleted = repo.Deleted,
-                        LastCommitId = repo.LastCommitId,
-                        NoScan = repo.NoScan                        
-                    };
+                    var repository = context.Repositories.SingleOrDefaultAsync(r => r.RepositoryId.Equals(repositoryId, StringComparison.InvariantCultureIgnoreCase)
+                                                                                 && !r.Deleted)
+                                            .Result;
 
-                    dataProject.AddRepository(repository);
+                    if (repository != null)
+                    {
+                        var repo = new Repository
+                        {
+                            DefaultBranch = repository.DefaultBranch,
+                            Id = new Guid(repository.RepositoryId),
+                            IsFork = repository.IsFork,
+                            Name = repository.Name,
+                            RemoteUrl = repository.RemoteUrl,
+                            Size = repository.Size,
+                            Url = repository.Url,
+                            WebUrl = repository.WebUrl,
+                            Deleted = repository.Deleted,
+                            LastCommitId = repository.LastCommitId,
+                            NoScan = repository.NoScan
+                        };
+
+                        project.AddRepository(repo);
+                    }
                 }
 
-                organization.AddProject(dataProject);
+                else
+                {
+                    GetRepositoriesForProject(dbProject, project);
+                }
+
+                organization.AddProject(project);
             }
 
             return organization;
-        }
-
-        Project IStorageReader.GetProjectAndRepositories(string projectId, string repositoryId)
-        {
-            var dbProject = context.Projects
-                                   .SingleOrDefaultAsync(p => p.ProjectId.Equals(projectId, StringComparison.InvariantCultureIgnoreCase)
-                                                           && !p.Deleted)
-                                   .Result;
-
-            var project = new Project
-            {
-                Name = dbProject.Name,
-                Id = new Guid(dbProject.ProjectId),
-                Abbreviation = dbProject.Abbreviation,
-                Description = dbProject.Description,
-                LastUpdate = dbProject.LastUpdate ?? DateTime.MinValue,
-                Revision = dbProject.Revision,
-                State = dbProject.State,
-                Url = dbProject.Url,
-                Visibility = dbProject.Visibility,
-                Deleted = dbProject.Deleted,
-                NoScan = dbProject.NoScan
-            };
-
-            if (repositoryId == string.Empty)
-            {
-                foreach (var repo in dbProject.Repositories)
-                {
-                    var repository = new Repository
-                    {
-                        Id = new Guid(repo.RepositoryId),
-                        DefaultBranch = repo.DefaultBranch,
-                        IsFork = repo.IsFork,
-                        Name = repo.Name,
-                        RemoteUrl = repo.RemoteUrl,
-                        Size = repo.Size,
-                        FileCount = repo.Files.Count,
-                        Url = repo.Url,
-                        WebUrl = repo.WebUrl,
-                        Deleted = repo.Deleted,
-                        LastCommitId = repo.LastCommitId,
-                        NoScan = repo.NoScan
-                    };
-
-                    project.AddRepository(repository);
-                }
-            }
-            else
-            {
-                var repository = context.Repositories.SingleOrDefaultAsync(r => r.RepositoryId.Equals(repositoryId, StringComparison.InvariantCultureIgnoreCase)
-                                                                             && !r.Deleted)
-                                        .Result;
-                
-                if (repository != null)
-                {
-                    var repo = new Repository
-                    {
-                        DefaultBranch = repository.DefaultBranch,
-                        Id = new Guid(repository.RepositoryId),
-                        IsFork = repository.IsFork,
-                        Name = repository.Name,
-                        RemoteUrl = repository.RemoteUrl,
-                        Size = repository.Size,
-                        Url = repository.Url,
-                        WebUrl = repository.WebUrl,
-                        Deleted = repository.Deleted,
-                        LastCommitId = repository.LastCommitId
-                    };
-
-                    project.AddRepository(repo);
-                }
-            }
-
-            return project;
         }
 
         Repository IStorageReader.GetRepository()
@@ -188,7 +157,8 @@ namespace ProjectScannerSaveToSqlServer
                     WebUrl = repo.WebUrl,
                     OrgName = repo.Project.Organization.Name,
                     Deleted = repo.Deleted,
-                    LastCommitId = repo.LastCommitId
+                    LastCommitId = repo.LastCommitId,
+                    NoScan = repo.NoScan
                 };
             }
 
@@ -376,6 +346,30 @@ namespace ProjectScannerSaveToSqlServer
             organizationId = dbOrganization == null ? 0 : dbOrganization.Id;
 
             return dbOrganization;
+        }
+
+        private static void GetRepositoriesForProject(DataModels.Project dataProject, Project project)
+        {
+            foreach (var repo in dataProject.Repositories)
+            {
+                var repository = new Repository
+                {
+                    Id = new Guid(repo.RepositoryId),
+                    DefaultBranch = repo.DefaultBranch,
+                    IsFork = repo.IsFork,
+                    Name = repo.Name,
+                    RemoteUrl = repo.RemoteUrl,
+                    Size = repo.Size,
+                    FileCount = repo.Files.Count,
+                    Url = repo.Url,
+                    WebUrl = repo.WebUrl,
+                    Deleted = repo.Deleted,
+                    LastCommitId = repo.LastCommitId,
+                    NoScan = repo.NoScan
+                };
+
+                project.AddRepository(repository);
+            }
         }
 
         #endregion

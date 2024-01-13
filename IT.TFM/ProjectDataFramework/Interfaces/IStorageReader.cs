@@ -12,9 +12,7 @@ namespace ProjectData.Interfaces
 
         bool IsDatabase { get; }
 
-        Organization GetOrganization();
-
-        Project GetProjectAndRepositories(string projectId, string repositoryId);
+        Organization GetOrganization(string projectId, string repositoryId);
 
         Repository GetRepository();
 

@@ -23,20 +23,16 @@ namespace RepoScan.Storage.SqlServer
         IEnumerable<RepositoryItem> IReadRepoList.Read(string projectId, string repositoryId)
         {
             var reader = GetReader();
-            var org = reader.GetOrganization();
+            var org = reader.GetOrganization(projectId, repositoryId);
 
             if (org == null)
             {
                 yield break;
             }
 
-            var projectList = projectId == string.Empty
-                ? org.Projects
-                : new Project[] { reader.GetProjectAndRepositories(projectId, repositoryId) };
-
-            while (org != null && projectList != null && projectList.Any())
+            while (org != null && org.Projects != null && org.Projects.Any())
             {
-                foreach (var project in projectList)
+                foreach (var project in org.Projects)
                 {
                     if (!project.Repositories.Any())
                     {
@@ -81,7 +77,7 @@ namespace RepoScan.Storage.SqlServer
                     }
                 }
 
-                org = reader.GetOrganization();
+                org = reader.GetOrganization(projectId, repositoryId);
             }
         }
 

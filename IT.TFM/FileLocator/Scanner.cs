@@ -74,12 +74,12 @@ namespace RepoScan.FileLocator
                         repoOnly = true;
                     }
 
-                    var pipelines = await scanner.Pipelines(project.Id);
-                    var pipelineWriter = StorageFactory.GetPipelineWriter();
-                    foreach (var pipeline in pipelines)
-                    {
-                        pipelineWriter.Write(pipeline);
-                    }
+                    //var pipelines = await scanner.Pipelines(project.Id);
+                    //var pipelineWriter = StorageFactory.GetPipelineWriter();
+                    //foreach (var pipeline in pipelines)
+                    //{
+                    //    pipelineWriter.Write(pipeline);
+                    //}
                 }
             }
         }
