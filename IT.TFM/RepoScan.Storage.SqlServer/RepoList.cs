@@ -20,10 +20,15 @@ namespace RepoScan.Storage.SqlServer
 
         #region IReadRepoList Implementation
 
-        IEnumerable<RepositoryItem> IReadRepoList.Read()
+        IEnumerable<RepositoryItem> IReadRepoList.Read(string projectId, string repositoryId)
         {
             var reader = GetReader();
-            var org = reader.GetOrganization();
+            var org = reader.GetOrganization(projectId, repositoryId);
+
+            if (org == null)
+            {
+                yield break;
+            }
 
             while (org != null && org.Projects != null && org.Projects.Any())
             {
@@ -72,7 +77,7 @@ namespace RepoScan.Storage.SqlServer
                     }
                 }
 
-                org = reader.GetOrganization();
+                org = reader.GetOrganization(projectId, repositoryId);
             }
         }
 

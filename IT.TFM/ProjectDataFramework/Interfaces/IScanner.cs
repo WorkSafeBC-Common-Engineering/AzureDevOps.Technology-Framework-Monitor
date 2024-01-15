@@ -10,9 +10,9 @@ namespace ProjectData.Interfaces
 
         Organization GetOrganization();
 
-        IAsyncEnumerable<Project> Projects();
+        IAsyncEnumerable<Project> Projects(string projectId);
 
-        Task<IEnumerable<Repository>> Repositories(Project project);
+        Task<IEnumerable<Repository>> Repositories(Project project, string repositoryId);
 
         Task<IEnumerable<FileItem>> Files(Guid projectId, Repository repository);
 

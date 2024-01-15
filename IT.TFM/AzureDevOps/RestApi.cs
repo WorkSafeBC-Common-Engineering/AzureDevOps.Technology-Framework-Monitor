@@ -29,7 +29,11 @@ namespace AzureDevOps
 
         private const string apiVersion = "api-version=7.0";
 
+        private const string getProjectUrl = "https://{baseUrl}/{organization}/_apis/projects/{project}?{apiVersion}";
+
         private const string getProjectsUrl = "https://{baseUrl}/{organization}_apis/projects?$top={$top}&$skip={$skip}&{apiVersion}";
+
+        private const string getRepositoryUrl = "https://{baseUrl}/{organization}/{project}/_apis/git/repositories/{repository}?{apiVersion}";
 
         private const string getRepositoriesUrl = "https://{baseUrl}/{organization}{project}/_apis/git/repositories?{apiVersion}";
 
@@ -97,12 +101,30 @@ namespace AzureDevOps
             Token = ConfidentialSettings.Values.Token;
         }
 
+        async Task<AzDoProject?> IRestApi.GetProjectAsync(string projectId)
+        {
+            Project = projectId;
+            var content = await CallApiAsync(GetUrl(getProjectUrl));
+
+            var project = JsonConvert.DeserializeObject<AzDoProject>(content);
+            return project;
+        }
+
         async Task<AzDoProjectList> IRestApi.GetProjectsAsync()
         {
             var content = await CallApiAsync(GetUrl(getProjectsUrl));
 
             var projects = JsonConvert.DeserializeObject<AzDoProjectList>(content);
             return projects ?? new AzDoProjectList();
+        }
+
+        async Task<AzDoRepository?> IRestApi.GetRepositoryAsync(string repositoryId)
+        {
+            Repository = repositoryId;
+            var content = await CallApiAsync(GetUrl(getRepositoryUrl));
+
+            var repository = JsonConvert.DeserializeObject<AzDoRepository>(content);
+            return repository; ;
         }
 
         async Task<AzDoRepositoryList> IRestApi.GetRepositoriesAsync()

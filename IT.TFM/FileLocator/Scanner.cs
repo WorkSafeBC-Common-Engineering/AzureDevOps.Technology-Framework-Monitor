@@ -20,7 +20,7 @@ namespace RepoScan.FileLocator
 
         #region Public Methods
 
-        public async Task ScanAsync()
+        public async Task ScanAsync(string projectId, string repositoryId)
         {
             IWriteRepoList writer = StorageFactory.GetRepoListWriter();
 
@@ -31,11 +31,12 @@ namespace RepoScan.FileLocator
                 var scanner = ScannerFactory.GetScanner(name);
 
                 var organization = scanner.GetOrganization();
-                await foreach (var project in scanner.Projects())
+
+                await foreach (var project in scanner.Projects(projectId))
                 {
                     bool repoOnly = false;
 
-                    var repos = await scanner.Repositories(project);
+                    var repos = await scanner.Repositories(project, repositoryId);
 
                     foreach (var repo in repos)
                     {
@@ -73,12 +74,12 @@ namespace RepoScan.FileLocator
                         repoOnly = true;
                     }
 
-                    var pipelines = await scanner.Pipelines(project.Id);
-                    var pipelineWriter = StorageFactory.GetPipelineWriter();
-                    foreach (var pipeline in pipelines)
-                    {
-                        pipelineWriter.Write(pipeline);
-                    }
+                    //var pipelines = await scanner.Pipelines(project.Id);
+                    //var pipelineWriter = StorageFactory.GetPipelineWriter();
+                    //foreach (var pipeline in pipelines)
+                    //{
+                    //    pipelineWriter.Write(pipeline);
+                    //}
                 }
             }
         }

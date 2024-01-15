@@ -6,6 +6,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using AzureDevOps.Models;
+
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.VisualStudio.Services.Client;
@@ -53,57 +55,89 @@ namespace AzureDevOpsScannerFramework
             return new Organization(ProjectSource.AzureDevOps, organizationName, azureDevOpsOrganizationUrl);
         }
 
-        async IAsyncEnumerable<Project> IScanner.Projects()
+        async IAsyncEnumerable<Project> IScanner.Projects(string projectId)
         {
-            int projectOffset = 0;
-            api.PagingTop = projectCount;
-            bool getMore = true;
-
-            while (getMore)
+            if (projectId != string.Empty)
             {
-                api.PagingSkip = projectOffset;
-                var azDoProjects = await api.GetProjectsAsync();
+                var project = await api.GetProjectAsync(projectId);
 
-                if (azDoProjects.Value.Length != 0)
+                yield return new Project
                 {
-                    if (azDoProjects.Count < projectCount)
+                    Name = project.Name,
+                    Id = new Guid(project.Id),
+                    Abbreviation = project.Abbreviation,
+                    Description = project.Description,
+                    LastUpdate = DateTime.Parse(project.LastUpdateTime),
+                    Revision = long.Parse(project.Revision),
+                    State = project.ProjectState,
+                    Url = project.Url,
+                    Visibility = project.Visibility
+                };
+            }
+
+            else
+            {
+                int projectOffset = 0;
+                api.PagingTop = projectCount;
+                bool getMore = true;
+
+                while (getMore)
+                {
+                    api.PagingSkip = projectOffset;
+                    var azDoProjects = await api.GetProjectsAsync();
+
+                    if (azDoProjects.Value.Length != 0)
+                    {
+                        if (azDoProjects.Count < projectCount)
+                        {
+                            getMore = false;
+                        }
+
+                        foreach (var p in azDoProjects.Value)
+                        {
+                            var project = new Project
+                            {
+                                Name = p.Name,
+                                Id = new Guid(p.Id),
+                                Abbreviation = p.Abbreviation,
+                                Description = p.Description,
+                                LastUpdate = DateTime.Parse(p.LastUpdateTime),
+                                Revision = long.Parse(p.Revision),
+                                State = p.ProjectState,
+                                Url = p.Url,
+                                Visibility = p.Visibility
+                            };
+
+                            yield return project;
+                        }
+
+                        projectOffset += projectCount;
+                    }
+                    else
                     {
                         getMore = false;
                     }
-
-                    foreach (var p in azDoProjects.Value)
-                    {
-                        var project = new Project
-                        {
-                            Name = p.Name,
-                            Id = new Guid(p.Id),
-                            Abbreviation = p.Abbreviation,
-                            Description = p.Description,
-                            LastUpdate = DateTime.Parse(p.LastUpdateTime),
-                            Revision = long.Parse(p.Revision),
-                            State = p.ProjectState,
-                            Url = p.Url,
-                            Visibility = p.Visibility
-                        };
-
-                        yield return project;
-                    }
-
-                    projectOffset += projectCount;
-                }
-                else
-                {
-                    getMore = false;
                 }
             }
         }
 
-        async Task<IEnumerable<Repository>> IScanner.Repositories(Project project)
+        async Task<IEnumerable<Repository>> IScanner.Repositories(Project project, string repositoryId)
         {
             var repoList = new List<Repository>();
 
             api.Project = project.Id.ToString();
-            var azDoRepos = await api.GetRepositoriesAsync();
+
+            AzDoRepositoryList azDoRepos;
+
+            if (repositoryId != string.Empty)
+            {
+                var repository = await api.GetRepositoryAsync(repositoryId);
+                azDoRepos = new AzDoRepositoryList { Count = 1, Value = [repository] };
+            }
+            else
+            {
+                azDoRepos = await api.GetRepositoriesAsync();
+            }
 
             foreach (var r in azDoRepos.Value)
             {
@@ -316,7 +350,7 @@ namespace AzureDevOpsScannerFramework
             }
         }
 
-        private void LoadDirectoryBuildProperties()
+        private static void LoadDirectoryBuildProperties()
         {
             buildProperties.Clear();
 
@@ -338,14 +372,16 @@ namespace AzureDevOpsScannerFramework
                                 var key = property.Name;
                                 var value = property.InnerText;
 
-                                if (!buildProperties.ContainsKey(key))
-                                {
-                                    buildProperties.Add(key, value);
-                                }
+                                buildProperties.TryAdd(key, value);
                             }
                         }
                     }
                 });
+        }
+
+        private static void GetProject(string projectId)
+        {
+
         }
 
         #endregion
