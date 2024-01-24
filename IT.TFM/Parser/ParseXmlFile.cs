@@ -1,12 +1,8 @@
-﻿using ConfigurationFileData;
-using ProjectData;
+﻿using ProjectData;
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Xml;
-
-using Unity.Builder;
 
 namespace Parser
 {
@@ -26,7 +22,7 @@ namespace Parser
 
         static ParseXmlFile()
         {
-            ignoreFileRefs = ConfigurationSettings.LoadConfigurationValues(configurationFile, sectionIgnoreFileRefs);
+            ignoreFileRefs = ConfigurationFileData.ConfigurationSettings.LoadConfigurationValues(configurationFile, sectionIgnoreFileRefs);
         }
 
         #region Protected Members
@@ -44,6 +40,7 @@ namespace Parser
         protected const string xmliOSApp = "ItemGroup/Reference[@Include=\"Xamarin.iOS\"]";
         protected const string xmlReferences = @"ItemGroup/Reference";
         protected const string xmlPkgReference = @"ItemGroup/PackageReference";
+        protected const string xmlHintPath = @"HintPath";
 
         protected const string xmlAttrToolsVer = @"ToolsVersion";
         protected const string xmlAttrSdk = @"Sdk";
@@ -64,10 +61,14 @@ namespace Parser
         protected const string propertyIsiOS = @"iOSApp";
         protected const string propertyAzureFunction = @"AzureFunction";
 
+        private const string PackageProjectType = "Project";
+
         protected XmlNamespaceManager mgr;
         private static readonly char[] namespaceSeparator = ['/'];
         private static readonly char[] pkgSeparator = [','];
         private static readonly char[] attributeValueSeparator = ['='];
+        private static readonly char[] pathSeparator = ['\\', '/'];
+        private static readonly char[] hintPathVersionSeparator = ['.'];
 
         #endregion
 
@@ -148,8 +149,18 @@ namespace Parser
 
                         if (versionValue != null)
                         {
-                            file.AddPackageReference("Project", pkgName, versionValue, null, null);
+                            file.AddPackageReference(PackageProjectType, pkgName, versionValue, null, null);
                             continue;
+                        }
+                    }
+
+                    else
+                    {
+                        // One last chance - can we get the version number based on the Hint Path (if there is one)
+                        var version = GetHintPathVersion(node);
+                        if (version != null)
+                        {
+                            file.AddPackageReference(PackageProjectType, pkgName, version, null, null);
                         }
                     }
 
@@ -203,7 +214,7 @@ namespace Parser
                         }
                     }
 
-                    file.AddPackageReference("Project", attribute, versionAttribute, null, null);
+                    file.AddPackageReference(PackageProjectType, attribute, versionAttribute, null, null);
                 }
             }
         }
@@ -257,6 +268,64 @@ namespace Parser
 
             return true;
         }
+
+        /// <summary>
+        /// Using the Hint Path, try and parse out a version number.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns>Null if no version found, else returns the version # as string.</returns>
+        protected static string GetHintPathVersion(XmlNode node)
+        {
+            var childNodes = node.ChildNodes;
+            foreach (XmlNode childNode in childNodes)
+            {
+                if (!childNode.LocalName.Equals(xmlHintPath, System.StringComparison.InvariantCultureIgnoreCase))
+                {
+                    continue;
+                }
+
+                var path = childNode.InnerText;
+                System.Diagnostics.Debug.WriteLine($"\t>>> Using HintPath: {path}");
+
+                var fields = path.Split(pathSeparator, System.StringSplitOptions.RemoveEmptyEntries | System.StringSplitOptions.TrimEntries);
+
+                foreach (var field in fields)
+                {
+                    if (field == "." || field == ".." || field == "packages")
+                    {
+                        continue;
+                    }
+                    
+                    return ExtractVersionFromHintPathSegment(field);
+                }                
+            }
+
+            return null;
+        }
+
+        private static string ExtractVersionFromHintPathSegment(string segment)
+        {
+            string version = null;
+
+            System.Diagnostics.Debug.WriteLine($"\t>>> Getting Package Version from HintPath segment: {segment}");
+
+            var fields = segment.Split(hintPathVersionSeparator, System.StringSplitOptions.RemoveEmptyEntries | System.StringSplitOptions.TrimEntries);
+
+            for (var index = 0; index < fields.Length; index++)
+            {
+                var field = fields[index];
+                if (int.TryParse(field, out _))
+                {
+                    // Start of version number, just add this and the remaining fields as the version.
+                    version = string.Join(hintPathVersionSeparator[0], fields[index..]);
+                    break;
+                }
+            }
+
+            System.Diagnostics.Debug.WriteLine($"\t>>> Getting Package Version from HintPath, version = {version}");
+            return version;
+        }
+
         #endregion
     }
 }

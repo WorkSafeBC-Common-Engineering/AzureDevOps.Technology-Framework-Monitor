@@ -2,6 +2,7 @@
 
 using Newtonsoft.Json;
 
+using System.Diagnostics;
 using System.IO.Compression;
 using System.Text;
 
@@ -10,6 +11,8 @@ namespace AzureDevOps
     public class RestApi : IRestApi, IDisposable
     {
         #region Private Members
+
+        private const int maxRetries = 3;
 
         private const string fieldBaseUrl = "{baseUrl}";
 
@@ -297,14 +300,39 @@ namespace AzureDevOps
 
                 HttpClient httpClient = GetClient(url);
 
-                using var request = new HttpRequestMessage(HttpMethod.Get, url);
-                request.Headers.Add("Authorization", AuthHeader());
-                request.Headers.Add("Accept", mediaType);
 #if DEBUG
                 Console.WriteLine($"API Call: {url}");
                 var startTime = DateTime.Now;
 #endif
-                HttpResponseMessage response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+                HttpResponseMessage response = null;
+
+                int retries = maxRetries;
+                while (true)
+                {
+                    try
+                    {
+                        using var request = new HttpRequestMessage(HttpMethod.Get, url);
+                        request.Headers.Add("Authorization", AuthHeader());
+                        request.Headers.Add("Accept", mediaType);
+
+                        response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        var msg = $"\t *** Exception occured with this URL: {url}\n{ex}";
+                        Console.WriteLine(msg);
+                        Debug.WriteLine(msg);
+
+                        if (retries-- <= 0)
+                        {
+                            throw;
+                        }
+
+                        Thread.Sleep(5000 * (maxRetries - retries));
+                    }
+                }
+
                 ThrottleApi(response);
 #if DEBUG
                 Console.WriteLine($"End API Call, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
