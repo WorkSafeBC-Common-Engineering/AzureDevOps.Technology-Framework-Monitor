@@ -2,6 +2,7 @@
 using ProjectData;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace VisualStudioFileParser
 {
@@ -47,7 +48,41 @@ namespace VisualStudioFileParser
 
             WriteVSProjectReferences(rootNode, xmlReferences, file);
             WriteVSProjectPackageReference(rootNode, xmlPkgReference, file);
+
+            CleanupReferences(file);
         }
+
+        #endregion
+
+        #region Private Methods
+
+        // For the File References, we may have duplicates - some from NuGet package.configs, some from different areas of a Project file
+        // We want to look at each set of these, and determine if there are duplicates. If so, we will clean up these references before saving.
+
+        private static void CleanupReferences(FileItem file)
+        {
+            var packageReferences = file.PackageReferences
+                                        .Where(r => r.PackageType == "Project")
+                                        .OrderBy(r => r.Id)
+                                        .ThenBy(r => r.Version)
+                                        .ToArray();
+
+            var referenceCount = packageReferences.Length;
+            for (int index = 0; index < referenceCount; index++)
+            {
+                var reference = packageReferences[index];
+
+                var fileReferences = file.References
+                                        .Where(r => r.Equals(reference.Id, StringComparison.InvariantCultureIgnoreCase))
+                                        .ToArray();
+
+                foreach (var item in fileReferences)
+                {
+                    file.References.Remove(item);
+                }
+            }
+        }
+
 
         #endregion
     }
