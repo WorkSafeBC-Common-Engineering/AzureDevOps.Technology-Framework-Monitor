@@ -99,12 +99,13 @@ namespace ProjectScannerSaveToSqlServer
                     {
                         var repo = new Repository
                         {
-                            DefaultBranch = repository.DefaultBranch,
                             Id = new Guid(repository.RepositoryId),
+                            DefaultBranch = repository.DefaultBranch,
                             IsFork = repository.IsFork,
                             Name = repository.Name,
                             RemoteUrl = repository.RemoteUrl,
                             Size = repository.Size,
+                            FileCount = repository.Files.Count,
                             Url = repository.Url,
                             WebUrl = repository.WebUrl,
                             Deleted = repository.Deleted,
