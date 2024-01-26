@@ -4,6 +4,5 @@
     [EOL] DATE NULL, 
     [ExtendedEOL] DATE NULL, 
     [Display] NVARCHAR(50) NOT NULL, 
-    [IsTargetVersion] BIT NOT NULL DEFAULT 0, 
-    [IsSupportedVersion] BIT NOT NULL DEFAULT 0
+    [IsTargetVersion] BIT NOT NULL DEFAULT 0
 )

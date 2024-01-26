@@ -29,8 +29,9 @@ SELECT		'AzureDevOps' AS ScanSource,
 			CASE WHEN EOL.EOL <= DATEADD(MONTH, 6, GETDATE()) THEN 'YES' ELSE '' END AS [Package EOL - 6 Months],
 			CASE WHEN EOL.EOL <= DATEADD(MONTH, 9, GETDATE()) THEN 'YES' ELSE '' END AS [Package EOL - 9 Months],
 			CASE WHEN EOL.EOL <= DATEADD(MONTH, 12, GETDATE()) THEN 'YES' ELSE '' END AS [Package EOL - 12 Months],
-			EOL.IsSupportedVersion,
-			EOL.IsTargetVersion,
+			CASE WHEN EOL IS NULL THEN 1
+                 WHEN DATEDIFF(day, EOL, GETDATE()) > 0 THEN 0 ELSE 1 END AS [Is Supported Version],
+			EOL.IsTargetVersion AS [Is Target Version],
 
 			FR.[Name] AS [File Reference],
 			FU.[Name] AS [URL Reference],
