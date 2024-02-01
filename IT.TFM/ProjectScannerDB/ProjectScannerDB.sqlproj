@@ -64,6 +64,7 @@
     <Folder Include="dbo\FullTextCatalogs" />
     <Folder Include="dbo\Views" />
     <Folder Include="PostDeployment" />
+    <Folder Include="dbo\StoredProcedures" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\ScannerTypes.sql" />
@@ -82,6 +83,7 @@
     <Build Include="dbo\Tables\dotNetEndOfLife.sql" />
     <Build Include="dbo\Tables\Pipelines.sql" />
     <Build Include="dbo\Tables\Reports.sql" />
+    <Build Include="dbo\StoredProcedures\UpdateReports.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\PopulateDotNetEOL.sql" />

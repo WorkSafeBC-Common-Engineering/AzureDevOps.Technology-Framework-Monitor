@@ -2,7 +2,6 @@
 (
     [Timestamp] DATE NOT NULL,
     [Organization] NVARCHAR(50) NOT NULL, 
-    [OrganizationId] INT NOT NULL,
     [Project] NVARCHAR(50) NOT NULL,
     [ProjectId] INT NOT NULL,
     [ProjectDescription] NVARCHAR(MAX) NOT NULL,
