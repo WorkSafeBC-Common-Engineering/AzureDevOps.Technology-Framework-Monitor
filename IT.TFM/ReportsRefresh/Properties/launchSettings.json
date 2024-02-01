@@ -1,0 +1,27 @@
+{
+  "profiles": {
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
+    },
+    "ReportsRefresh - no parameters": {
+      "commandName": "Project"
+    },
+    "ReportsRefresh - Clean, no days": {
+      "commandName": "Project",
+      "commandLineArgs": "c "
+    },
+    "ReportsRefresh - Update": {
+      "commandName": "Project",
+      "commandLineArgs": "u"
+    },
+    "ReportsRefresh - Clean, 30 days": {
+      "commandName": "Project",
+      "commandLineArgs": "c 30"
+    },
+    "ReportsRefresh - Clean, invalid days": {
+      "commandName": "Project",
+      "commandLineArgs": "c blah"
+    }
+  }
+}
