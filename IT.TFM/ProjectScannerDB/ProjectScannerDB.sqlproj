@@ -84,6 +84,7 @@
     <Build Include="dbo\Tables\Pipelines.sql" />
     <Build Include="dbo\Tables\Reports.sql" />
     <Build Include="dbo\StoredProcedures\UpdateReports.sql" />
+    <Build Include="dbo\StoredProcedures\CleanupReports.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\PopulateDotNetEOL.sql" />
