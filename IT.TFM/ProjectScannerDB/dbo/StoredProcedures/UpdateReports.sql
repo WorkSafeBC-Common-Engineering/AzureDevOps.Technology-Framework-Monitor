@@ -1,7 +1,18 @@
 ﻿CREATE PROCEDURE [dbo].[UpdateReports]
 AS
 	DECLARE @timestamp DATE = GETDATE()
+	DECLARE @lastTimestamp DATE
 
+	SELECT @lastTimestamp = MAX(Timestamp) FROM Reports
+
+	IF (@lastTimestamp = @timestamp)
+	BEGIN
+		-- we have already ran once today, so we want to just refresh this days data
+		-- So remove the current data for this date first to avoid any duplication
+
+		DELETE	FROM Reports
+		WHERE	Timestamp = @lastTimestamp
+	END
 
 	INSERT INTO dbo.Reports (Timestamp, Organization, Project, ProjectId, ProjectDescription, ProjectUrl,
 							 Repository, RepositoryId, RepositoryDefaultBranch, RepositoryUrl,
