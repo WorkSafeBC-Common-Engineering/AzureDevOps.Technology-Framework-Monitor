@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using System.Data.SqlClient;
 
 const int sqlExecuteTimeout = 600;  // 600 seconds = 10 minutes

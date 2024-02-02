@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[UpdateReports]
+CREATE PROCEDURE [dbo].[UpdateReports]
 AS
 	DECLARE @timestamp DATE = GETDATE()
 	DECLARE @lastTimestamp DATE
