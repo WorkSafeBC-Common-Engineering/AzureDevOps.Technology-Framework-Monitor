@@ -1,5 +1,10 @@
-﻿using System.Data;
+using System.Data;
 using System.Data.SqlClient;
+
+const int sqlExecuteTimeout = 600;  // 600 seconds = 10 minutes
+const string sqlUpdate = "dbo.UpdateReports";
+const string sqlCleanup = "dbo.CleanupReports";
+const string sqlDaysParameter = "@days";
 
 if (args.Length == 0)
 {
@@ -28,10 +33,10 @@ switch (args[0])
 void Update(string connectionString)
 {
     using SqlConnection connection = new(connectionString);
-    var command = new SqlCommand("dbo.UpdateReports", connection)
+    var command = new SqlCommand(sqlUpdate, connection)
     {
         CommandType = CommandType.StoredProcedure,
-        CommandTimeout = 60
+        CommandTimeout = sqlExecuteTimeout
     };
 
     command.Connection.Open();
@@ -41,12 +46,12 @@ void Update(string connectionString)
 void Cleanup(string connectionString, int days)
 {
     using SqlConnection connection = new(connectionString);
-    var command = new SqlCommand("dbo.CleanupReports", connection)
+    var command = new SqlCommand(sqlCleanup, connection)
     {
         CommandType = CommandType.StoredProcedure,
-        CommandTimeout = 60
+        CommandTimeout = sqlExecuteTimeout
     };
-    var daysParameter = command.Parameters.Add("@days", SqlDbType.Int);
+    var daysParameter = command.Parameters.Add(sqlDaysParameter, SqlDbType.Int);
     daysParameter.Value = days;
 
     command.Connection.Open();
