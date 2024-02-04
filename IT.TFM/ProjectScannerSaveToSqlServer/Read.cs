@@ -277,7 +277,8 @@ namespace ProjectScannerSaveToSqlServer
                                               Version = fr.Version,
                                               VersionComparator = fr.VersionComparator,
                                               FrameworkVersion = fr.FrameworkVersion
-                                          });
+                                          })
+                                          .ToArray();
 
                 fileItem.PackageReferences.AddRange(pkgRefs);
 
@@ -285,7 +286,8 @@ namespace ProjectScannerSaveToSqlServer
                 var refs = context.FileReferences
                                        .Where(fr => fr.FileId == mainFile.Id
                                                  && fr.FileReferenceTypeId == RefTypeFile)
-                                       .Select(fr => fr.Name);
+                                       .Select(fr => fr.Name)
+                                       .ToArray();
 
                 fileItem.References.AddRange(refs);
 
@@ -297,7 +299,8 @@ namespace ProjectScannerSaveToSqlServer
                                           {
                                               Url = fr.Name,
                                               Path = fr.Path
-                                          });
+                                          })
+                                          .ToArray();
 
                 fileItem.UrlReferences.AddRange(urlRefs);
 
@@ -305,7 +308,8 @@ namespace ProjectScannerSaveToSqlServer
                 var properties = context.FileProperties
                                              .Where(fp => fp.FileId == mainFile.Id
                                                        && fp.FilePropertyType.Id == PropertyTypeProperty)
-                                             .Select(fp => new { Key = fp.Name, fp.Value });
+                                             .Select(fp => new { Key = fp.Name, fp.Value })
+                                             .ToArray();
 
                 foreach (var property in properties)
                 {
@@ -316,7 +320,8 @@ namespace ProjectScannerSaveToSqlServer
                 var filterItems = context.FileProperties
                                               .Where(fp => fp.FileId == mainFile.Id
                                                         && fp.PropertyTypeId == PropertyTypeFilteredItem)
-                                              .Select(fp => new { Key = fp.Name, fp.Value });
+                                              .Select(fp => new { Key = fp.Name, fp.Value })
+                                              .ToArray();
 
                 foreach (var filterItem in filterItems)
                 {
