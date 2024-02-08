@@ -65,7 +65,7 @@ namespace RepoScan.FileLocator
                     continue;
                 }
 
-                var fileItems = reader.Read(repoItem.RepositoryId.ToString());
+                var fileItems = reader.Read(repoItem.RepositoryId.ToString());                
                 var fileList = await scanner.Files(repoItem.ProjectId, 
                                                    new ProjectData.Repository { Id = repoItem.RepositoryId,
                                                                                 DefaultBranch = repoItem.RepositoryDefaultBranch });
