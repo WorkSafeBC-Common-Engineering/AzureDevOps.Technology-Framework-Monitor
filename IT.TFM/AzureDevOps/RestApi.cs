@@ -213,17 +213,30 @@ namespace AzureDevOps
                     continue;
                 }
 
-                var pipelineDetails = JsonConvert.DeserializeObject<AzDoPipeline>(pipelineContent);
+                AzDoPipelineDetails? pipelineDetails = null;
+
+                try
+                {
+                    pipelineDetails = JsonConvert.DeserializeObject<AzDoPipelineDetails>(pipelineContent);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                    throw;
+                }
+
+
                 if (pipelineDetails == null)
                 {
                     continue;
                 }
 
-                pipeline.Configuration = pipelineDetails.Configuration;
+                Debug.WriteLine($"Pipeline Type: {pipelineDetails.configuration.type}");
+                pipeline.Details = pipelineDetails;
             }
 
 
-            return pipelines ?? new AzDoPipelineList();
+            return pipelines;
         }
 
         #endregion

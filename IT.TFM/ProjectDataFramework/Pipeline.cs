@@ -6,8 +6,6 @@ namespace ProjectData
     {
         public int Id { get; set; } = 0;
 
-        public string RepositoryName { get; set; } = string.Empty;
-
         public string RepositoryId { get; set; } = string.Empty;
 
         public string Name { get; set; } = string.Empty;
@@ -22,12 +20,6 @@ namespace ProjectData
 
         public string PipelineType { get; set; } = string.Empty;
 
-        public string QueueStatus { get; set; } = string.Empty;
-
-        public string Quality { get; set; } = string.Empty;
-
-        public string CreatedBy { get; set; }
-        
-        public DateTime CreatedDate { get; set; }
+        public string Path {  get; set; } = string.Empty;
     }
 }

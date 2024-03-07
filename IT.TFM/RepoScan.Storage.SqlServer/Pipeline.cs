@@ -26,7 +26,7 @@ namespace RepoScan.Storage.SqlServer
         {
             var writer = GetWriter();
 
-            //writer.SavePipeline(pipeline);
+            writer.SavePipeline(pipeline);
         }
 
         #endregion

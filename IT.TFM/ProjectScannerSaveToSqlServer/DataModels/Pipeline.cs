@@ -15,7 +15,7 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
         public int PipelineId { get; set; }
 
-        public int RepositoryId { get; set; }
+        public int? RepositoryId { get; set; }
 
         [Required]
         public string Name { get; set; } = string.Empty;
@@ -32,24 +32,10 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         [StringLength(20)]
         public string Type { get; set; } = string.Empty;
 
-        [Required]
         [StringLength(20)]
         public string PipelineType { get; set; } = string.Empty;
 
-        [Required]
-        [StringLength(20)]
-        public string QueueStatus { get; set; } = string.Empty;
-
-        [Required]
-        [StringLength(20)]
-        public string Quality { get; set; } = string.Empty;
-
-        [Required]
-        [StringLength(100)]
-        public string CreatedBy { get; set; }
-
-        [Required]
-        public DateTime CreatedDate { get; set; }
+        public string Path { get; set; } = null;
 
         public virtual Repository Repository { get; set; }
     }

@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
+using System.Diagnostics;
 
 namespace ProjectScannerSaveToSqlServer
 {
@@ -229,9 +230,10 @@ namespace ProjectScannerSaveToSqlServer
 
         void IStorageWriter.SavePipeline(ProjData.Pipeline pipeline)
         {
+            Debug.WriteLine($"SavePipeline: Repo ID = {pipeline.RepositoryId}, Pipeline Name = {pipeline.Name}, Pipeline URL = {pipeline.Url}");
+
             var dbRepo = context.Repositories
-                                .SingleOrDefault(r => r.RepositoryId.Equals(pipeline.RepositoryId, StringComparison.InvariantCultureIgnoreCase))
-                                ?? throw new InvalidOperationException("No matching Repository defined");
+                                .SingleOrDefault(r => r.RepositoryId.Equals(pipeline.RepositoryId, StringComparison.InvariantCultureIgnoreCase));
 
             var dbPipeline = context.Pipelines
                                     .SingleOrDefault(p => p.PipelineId == pipeline.Id);
@@ -242,7 +244,7 @@ namespace ProjectScannerSaveToSqlServer
                 {
                     Repository = dbRepo,
                     PipelineId = pipeline.Id,
-                    RepositoryId = dbRepo.Id
+                    RepositoryId = dbRepo?.Id
                 };
 
                 context.Pipelines.Add(dbPipeline);
@@ -254,10 +256,7 @@ namespace ProjectScannerSaveToSqlServer
             dbPipeline.Url = pipeline.Url;
             dbPipeline.Type = pipeline.Type;
             dbPipeline.PipelineType = pipeline.PipelineType;
-            dbPipeline.QueueStatus = pipeline.QueueStatus;
-            dbPipeline.Quality = pipeline.Quality;
-            dbPipeline.CreatedBy = pipeline.CreatedBy;
-            dbPipeline.CreatedDate = pipeline.CreatedDate;
+            dbPipeline.Path = pipeline.Path;
 
             _ = context.SaveChangesAsync().Result;
         }

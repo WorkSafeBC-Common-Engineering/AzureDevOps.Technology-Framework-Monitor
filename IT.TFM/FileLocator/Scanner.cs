@@ -68,18 +68,16 @@ namespace RepoScan.FileLocator
                         };
 
                         // Write repo item to queue
-                        // TODO: change this to include a flag, indicating only writing the repo.
-                        // Otherwise we are re-writing the Org and Project with the same data for each repo
                         writer.Write(repoItem, repoOnly);
                         repoOnly = true;
                     }
 
-                    //var pipelines = await scanner.Pipelines(project.Id);
-                    //var pipelineWriter = StorageFactory.GetPipelineWriter();
-                    //foreach (var pipeline in pipelines)
-                    //{
-                    //    pipelineWriter.Write(pipeline);
-                    //}
+                    var pipelines = await scanner.Pipelines(project.Id);
+                    var pipelineWriter = StorageFactory.GetPipelineWriter();
+                    foreach (var pipeline in pipelines)
+                    {
+                        pipelineWriter.Write(pipeline);
+                    }
                 }
             }
         }
