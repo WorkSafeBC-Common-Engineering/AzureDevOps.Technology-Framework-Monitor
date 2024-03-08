@@ -175,16 +175,16 @@ namespace AzureDevOpsScannerFramework
                     Folder = pipeline.Folder,
                     Revision = pipeline.Revision ?? 0,
                     Url = pipeline.Url,
-                    Type = pipeline.Details.configuration.type,
+                    Type = pipeline.Details.Configuration.Type,
                 };
 
-                Console.WriteLine($"Pipeline: {pipeline.Name}, Type: {pipeline.Details.configuration.type}");
+                Console.WriteLine($"Pipeline: {pipeline.Name}, Type: {pipeline.Details.Configuration.Type}");
 
-                switch(pipeline.Details.configuration.type)
+                switch(pipeline.Details.Configuration.Type)
                 {
                     case "designerJson":
-                        p.PipelineType = pipeline.Details.configuration.designerJson.type;
-                        p.RepositoryId = pipeline.Details.configuration.designerJson.repository.id;
+                        p.PipelineType = pipeline.Details.Configuration.DesignerJson.Type;
+                        p.RepositoryId = pipeline.Details.Configuration.DesignerJson.Repository.Id;
                         break;
 
                     case "designerHyphenJson":
@@ -197,8 +197,8 @@ namespace AzureDevOpsScannerFramework
                         break;
 
                     case "yaml":
-                        p.RepositoryId = pipeline.Details.configuration.repository.id;
-                        p.Path = pipeline.Details.configuration.path;
+                        p.RepositoryId = pipeline.Details.Configuration.Repository.Id;
+                        p.Path = pipeline.Details.Configuration.Path;
                         break;
                 }
 

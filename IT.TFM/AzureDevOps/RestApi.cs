@@ -231,7 +231,7 @@ namespace AzureDevOps
                     continue;
                 }
 
-                Debug.WriteLine($"Pipeline Type: {pipelineDetails.configuration.type}");
+                Debug.WriteLine($"Pipeline Type: {pipelineDetails.Configuration.Type}");
                 pipeline.Details = pipelineDetails;
             }
 
