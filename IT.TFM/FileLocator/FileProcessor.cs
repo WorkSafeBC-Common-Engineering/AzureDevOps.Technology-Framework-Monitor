@@ -14,13 +14,14 @@ namespace RepoScan.FileLocator
 {
     public class FileProcessor
     {
+        #region Public Methods
+
         public static async Task GetFiles(int totalThreads, bool forceDetails, string projectId, string repositoryId)
         {
             Settings.Initialize();
 
             IReadRepoList reader = StorageFactory.GetRepoListReader();
             IWriteRepoList repoWriter = StorageFactory.GetRepoListWriter();
-            IReadFileItem fileReader = StorageFactory.GetFileItemReader();
 
             var orgName = string.Empty;
             IScanner scanner = null;
@@ -56,7 +57,7 @@ namespace RepoScan.FileLocator
                     {
                         pList.Add(p.Id);
                     }
-                    projectList = pList.ToArray();
+                    projectList = [.. pList];
 #if DEBUG
                     Console.WriteLine($"=> File Scan, GetFiles(): Get Project IDs returned {projectList.Count()} items");
 #endif
@@ -136,10 +137,6 @@ namespace RepoScan.FileLocator
 
                 Parallel.ForEach(fileList, options, (file) =>
                 {
-                    //if (!file.RepositoryId.Equals(new Guid("1aea9a89-b095-4184-8e07-8445fad0f0b9")))
-                    //{
-                    //    return;
-                    //}
 #if DEBUG
                     Console.WriteLine($"=> File Scan GetFiles(): Getting File: Repository = {repoItem.RepositoryName}, File Path = {file.Path}");
 #endif
@@ -170,5 +167,7 @@ namespace RepoScan.FileLocator
                 repoWriter.Write(repoItem, false);
             }
         }
+
+        #endregion
     }
 }

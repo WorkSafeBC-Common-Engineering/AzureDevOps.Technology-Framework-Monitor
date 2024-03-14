@@ -69,6 +69,11 @@ namespace ProjectScannerSaveToSqlServer.DataModels
                 .WithRequired(e => e.Repository)
                 .WillCascadeOnDelete(false);
 
+            //modelBuilder.Entity<Pipeline>()
+            //    .HasOptional(e => e.File)
+            //    .WithOptionalDependent(e => e.Pipeline)
+            //    .WillCascadeOnDelete(false);
+
             modelBuilder.Entity<ScannerType>()
                 .HasMany(e => e.Organizations)
                 .WithRequired(e => e.ScannerType)

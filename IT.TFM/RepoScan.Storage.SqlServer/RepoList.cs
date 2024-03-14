@@ -66,6 +66,7 @@ namespace RepoScan.Storage.SqlServer
                             RepositoryRemoteUrl = repo.RemoteUrl,
                             RepositorySize = repo.Size,
                             RepositoryTotalFiles = repo.FileCount,
+                            RepositoryTotalPipelines = repo.PipelineCount,
                             RepositoryUrl = repo.Url,
                             RepositoryWebUrl = repo.WebUrl,
                             IsDeleted = repo.Deleted,
@@ -79,6 +80,12 @@ namespace RepoScan.Storage.SqlServer
 
                 org = reader.GetOrganization(projectId, repositoryId);
             }
+        }
+
+        IEnumerable<string> IReadRepoList.GetRepositoryIds()
+        {
+            var reader = GetReader();
+            return reader.GetRepositoryIds();
         }
 
         #endregion

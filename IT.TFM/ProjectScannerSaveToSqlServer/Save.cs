@@ -238,6 +238,9 @@ namespace ProjectScannerSaveToSqlServer
             var dbPipeline = context.Pipelines
                                     .SingleOrDefault(p => p.PipelineId == pipeline.Id);
 
+            var dbFile = context.Files
+                                .SingleOrDefault(f => f.FileId == pipeline.FileId);
+
             if (dbPipeline == null)
             {
                 dbPipeline = new Pipeline
@@ -257,8 +260,28 @@ namespace ProjectScannerSaveToSqlServer
             dbPipeline.Type = pipeline.Type;
             dbPipeline.PipelineType = pipeline.PipelineType;
             dbPipeline.Path = pipeline.Path;
+            dbPipeline.FileId = dbFile?.Id;
+            dbPipeline.YamlType = pipeline.YamlType;
+            dbPipeline.Portfolio = pipeline.Portfolio;
+            dbPipeline.Product = pipeline.Product;
 
             _ = context.SaveChangesAsync().Result;
+        }
+
+        void IStorageWriter.UpdatePipelineFileId(int pipelineId, string repositoryId, string fileId)
+        {
+            var pipeline = context.Pipelines.SingleOrDefault(p => p.Id == pipelineId
+                                                               && p.Repository.RepositoryId == repositoryId);
+            if (pipeline != null)
+            {
+                var file = context.Files.SingleOrDefault(f => f.Repository.RepositoryId == repositoryId
+                                                           && f.FileId == fileId
+                                                           && f.Path.Equals(pipeline.Path, StringComparison.InvariantCultureIgnoreCase));
+                
+                pipeline.FileId = file?.Id;
+
+                _ = context.SaveChangesAsync().Result;
+            }
         }
 
         void IStorageWriter.DeleteFile(ProjData.FileItem file, Guid repoId)

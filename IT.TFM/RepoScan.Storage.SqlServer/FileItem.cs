@@ -81,6 +81,24 @@ namespace RepoScan.Storage.SqlServer
             reader.Close();
         }
 
+        IEnumerable<DataModels.FileItem> IReadFileItem.YamlRead(string repoId)
+        {
+            var reader = GetReader();
+
+            var repoFiles = reader.GetYamlFiles(repoId)
+                                  .ToArray();
+            reader.Close();
+
+            return repoFiles.Select(f => new DataModels.FileItem
+            {
+                Id = f.Id,
+                FileType = f.FileType,
+                Path = f.Path,
+                Url = f.Url,
+                CommitId = f.CommitId
+            });
+        }
+
         #endregion
 
         #region IWriteFileItem Implementation

@@ -11,5 +11,9 @@ namespace RepoScan.DataModels
     public interface IWritePipeline
     {
         void Write(Pipeline pipeline);
+
+        void UpdateFileId(int pipelineId, string repositoryId, string fileId);
+
+        void AddProperties(ProjectData.FileItem file);
     }
 }

@@ -17,6 +17,8 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
         public int? RepositoryId { get; set; }
 
+        public int? FileId { get; set; }
+
         [Required]
         public string Name { get; set; } = string.Empty;
 
@@ -37,6 +39,14 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
         public string Path { get; set; } = null;
 
+        public string YamlType { get; set; } = null;
+
+        public string Portfolio { get; set; } = null;
+
+        public string Product { get; set; } = null;
+
         public virtual Repository Repository { get; set; }
+
+        //public virtual File File { get; set; }
     }
 }

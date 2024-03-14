@@ -286,7 +286,7 @@ namespace AzureDevOpsScannerFramework
                 }
 
                 AddPropertyFields(file);
-                hasProperties = file.Properties.Count != 0 || file.References.Count != 0 || file.UrlReferences.Count != 0 || file.PackageReferences.Count != 0;
+                hasProperties = file.Properties.Count != 0 || file.References.Count != 0 || file.UrlReferences.Count != 0 || file.PackageReferences.Count != 0 || file.PipelineProperties.Count != 0;
 
             }
             catch (Exception ex)
@@ -327,7 +327,6 @@ namespace AzureDevOpsScannerFramework
             catch (Exception ex)
             {
                 file.AddProperty("Error", $"Unable to parse file. File: {file.Path}, Error Msg: {ex.Message}");
-                return;
             }
         }
 

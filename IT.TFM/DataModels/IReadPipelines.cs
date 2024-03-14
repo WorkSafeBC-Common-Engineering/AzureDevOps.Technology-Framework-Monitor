@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace RepoScan.DataModels
 {
-    public interface IReadRepoList
+    public interface IReadPipelines
     {
-        IEnumerable<RepositoryItem> Read(string projectId, string repositoryId);
+        IEnumerable<YamlPipeline> ReadYamlPipelines();
 
-        IEnumerable<string> GetRepositoryIds();
+        IEnumerable<ClassicPipeline> ReadClassicPipeline();
     }
 }

@@ -18,9 +18,17 @@ namespace ProjectData.Interfaces
 
         Repository GetRepository(Guid id);
 
+        IEnumerable<string> GetRepositoryIds();
+
         IEnumerable<FileItem> GetFiles();
 
         IEnumerable<FileItem> GetFiles(string id);
+
+        IEnumerable<FileItem> GetYamlFiles(string id);
+
+        IEnumerable<Pipeline> GetPipelines(string repositoryId, string fileId, string filePath);
+
+        IEnumerable<Pipeline> GetPipelines(string pipelineType);
 
         void Close();
     }

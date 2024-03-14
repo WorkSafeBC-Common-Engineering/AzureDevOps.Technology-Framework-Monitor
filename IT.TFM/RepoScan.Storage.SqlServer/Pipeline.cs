@@ -12,11 +12,12 @@ using System.Xml;
 
 namespace RepoScan.Storage.SqlServer
 {
-    internal class Pipeline : IWritePipeline
+    internal class Pipeline : IReadPipelines, IWritePipeline
     {
         #region Private Members
 
         private IStorageWriter sqlWriter = null;
+        private IStorageReader sqlReader = null;
 
         #endregion
 
@@ -29,6 +30,65 @@ namespace RepoScan.Storage.SqlServer
             writer.SavePipeline(pipeline);
         }
 
+        void IWritePipeline.UpdateFileId(int pipelineId, string repositoryId, string fileId)
+        {
+            var writer = GetWriter();
+            writer.UpdatePipelineFileId(pipelineId, repositoryId, fileId);
+        }
+
+        #endregion
+
+        #region IReadPipelines Implementation
+
+        IEnumerable<YamlPipeline> IReadPipelines.ReadYamlPipelines()
+        {
+            var reader = GetReader();
+            var pipelines = reader.GetPipelines(ProjectData.Pipeline.pipelineTypeYaml);
+            return pipelines.Select(p => new YamlPipeline
+                                   {
+                                       PipelineId = p.Id,
+                                       RepositoryId = p.RepositoryId,
+                                       Name = p.Name,
+                                       Path = p.Path,
+                                       FileId = p.FileId
+                                   })
+                            .ToArray()
+                            .AsEnumerable();
+        }
+
+        IEnumerable<ClassicPipeline> IReadPipelines.ReadClassicPipeline()
+        {
+            var reader = GetReader();
+            var pipelines = reader.GetPipelines(ProjectData.Pipeline.pipelineTypeClassic);
+            return pipelines.Select(p => new ClassicPipeline
+                                   {
+                                       PipelineId = p.Id,
+                                       RepositoryId = p.RepositoryId,
+                                       Name = p.Name,
+                                       Folder = p.Folder,
+                                       Type = p.Type,
+                                       IsBuildPipeline = p.PipelineType == ProjectData.Pipeline.pipelineTypeClassic
+                                   })
+                            .AsEnumerable();
+        }
+
+        void IWritePipeline.AddProperties(ProjectData.FileItem file)
+        {
+            var reader = GetReader();
+            var writer = GetWriter();
+
+            var pipelines = reader.GetPipelines(file.RepositoryId.ToString("D"), file.Id, file.Path);
+            foreach (var pipeline in pipelines )
+            {
+                pipeline.YamlType = file.PipelineProperties["templatetype"];
+                pipeline.Portfolio = file.PipelineProperties["portfolio"];
+                pipeline.Product = file.PipelineProperties["product"];
+
+                writer.SavePipeline(pipeline);
+            }
+
+        }
+
         #endregion
 
         #region Private Methods
@@ -36,8 +96,13 @@ namespace RepoScan.Storage.SqlServer
         private IStorageWriter GetWriter()
         {
             sqlWriter ??= DataStorage.StorageFactory.GetStorageWriter();
-
             return sqlWriter;
+        }
+
+        private IStorageReader GetReader()
+        {
+            sqlReader ??= DataStorage.StorageFactory.GetStorageReader();
+            return sqlReader;
         }
 
         #endregion

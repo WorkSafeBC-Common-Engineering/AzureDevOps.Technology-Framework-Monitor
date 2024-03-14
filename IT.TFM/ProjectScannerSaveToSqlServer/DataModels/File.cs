@@ -40,5 +40,7 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         public virtual FileType FileType { get; set; }
 
         public virtual Repository Repository { get; set; }
+
+        //public virtual Pipeline Pipeline { get; set; }
     }
 }

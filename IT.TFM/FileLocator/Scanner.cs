@@ -34,6 +34,8 @@ namespace RepoScan.FileLocator
 
                 await foreach (var project in scanner.Projects(projectId))
                 {
+                    await PipelineScanner.ScanAsync(scanner, project.Id);
+
                     bool repoOnly = false;
 
                     var repos = await scanner.Repositories(project, repositoryId);
@@ -70,13 +72,6 @@ namespace RepoScan.FileLocator
                         // Write repo item to queue
                         writer.Write(repoItem, repoOnly);
                         repoOnly = true;
-                    }
-
-                    var pipelines = await scanner.Pipelines(project.Id);
-                    var pipelineWriter = StorageFactory.GetPipelineWriter();
-                    foreach (var pipeline in pipelines)
-                    {
-                        pipelineWriter.Write(pipeline);
                     }
                 }
             }

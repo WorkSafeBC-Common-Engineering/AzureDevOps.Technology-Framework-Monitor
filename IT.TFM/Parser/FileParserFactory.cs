@@ -13,7 +13,7 @@ namespace Parser
         private const string configurationSection = "unity";
         private const string dependencyInjectionContainer = "FileParserContainer";
 
-        private static readonly IUnityContainer _container;
+        private static readonly IUnityContainer _container = new UnityContainer().AddExtension(new Diagnostic());
 
         #endregion
 
@@ -21,7 +21,6 @@ namespace Parser
 
         static FileParserFactory()
         {
-            _container = new UnityContainer().AddExtension(new Diagnostic());
             UnityConfigurationSection section = (UnityConfigurationSection)ConfigurationManager.GetSection(configurationSection);
             section.Configure(_container, dependencyInjectionContainer);
         }
