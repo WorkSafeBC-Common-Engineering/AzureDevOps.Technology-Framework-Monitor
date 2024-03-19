@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using ConfidentialSettings;
 
 namespace RepoScan.Storage.SqlServer
 {
@@ -80,9 +81,24 @@ namespace RepoScan.Storage.SqlServer
             var pipelines = reader.GetPipelines(file.RepositoryId.ToString("D"), file.Id, file.Path);
             foreach (var pipeline in pipelines )
             {
-                pipeline.YamlType = file.PipelineProperties["templatetype"];
-                pipeline.Portfolio = file.PipelineProperties["portfolio"];
-                pipeline.Product = file.PipelineProperties["product"];
+                foreach (var key in file.PipelineProperties.Keys)
+                {
+                    var value = file.PipelineProperties[key];
+                    switch(key)
+                    {
+                        case "template":
+                            pipeline.YamlType = value;
+                            break;
+
+                        case "portfolio":
+                            pipeline.Portfolio = value;
+                            break;
+
+                        case "product":
+                            pipeline.Product = value;
+                            break;
+                    }
+                }
 
                 writer.SavePipeline(pipeline);
             }

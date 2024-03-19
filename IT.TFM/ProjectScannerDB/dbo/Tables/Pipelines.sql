@@ -12,8 +12,8 @@
     [PipelineType] NVARCHAR(20) NULL, 
     [Path] NVARCHAR(MAX) NULL,
     [YamlType] NVARCHAR(20) NULL,
-    [Portfolio] NVARCHAR(50) NULL,
-    [Product] NVARCHAR(50) NULL,
+    [Portfolio] NVARCHAR(MAX) NULL,
+    [Product] NVARCHAR(MAX) NULL,
     CONSTRAINT [FK_Pipelines_ToRepository] FOREIGN KEY ([RepositoryId]) REFERENCES Repositories([Id]), 
     CONSTRAINT [FK_Pipelines_ToFile] FOREIGN KEY ([FileId]) REFERENCES [Files]([Id])
 )

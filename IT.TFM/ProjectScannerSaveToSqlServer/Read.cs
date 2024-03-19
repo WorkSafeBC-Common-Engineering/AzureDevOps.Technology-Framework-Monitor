@@ -420,7 +420,7 @@ namespace ProjectScannerSaveToSqlServer
                 Revision = p.Revision,
                 Url = p.Url,
                 Type = p.Type,
-                PipelineType = p.Type,
+                PipelineType = p.PipelineType,
                 Path= p.Path,
                 YamlType = p.YamlType,
                 Portfolio = p.Portfolio,

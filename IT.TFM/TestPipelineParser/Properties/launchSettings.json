@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TestPipelineParser": {
+      "commandName": "Project",
+      "commandLineArgs": "Yaml_V2.txt"
+    }
+  }
+}

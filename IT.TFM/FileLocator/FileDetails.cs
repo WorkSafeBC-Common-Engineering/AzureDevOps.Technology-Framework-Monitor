@@ -123,6 +123,12 @@ namespace RepoScan.FileLocator
                     var fileData = scanner.FileDetails(repoItem.ProjectId, repoItem.RepositoryId, fileInfo);
                     if (fileData != null)
                     {
+                        if (fileData.FileType == ProjectData.FileItemType.YamlPipeline && fileData.PipelineProperties.Count > 0)
+                        {
+                            fileData.RepositoryId = repoItem.RepositoryId;
+                            pipelineWriter.AddProperties(fileData);
+                        }
+
                         var fileDetails = new DataModels.FileDetails
                         {
                             Repository = fileItem.Repository ?? new RepositoryItem { RepositoryId = repoItem.RepositoryId },
@@ -139,11 +145,6 @@ namespace RepoScan.FileLocator
                         };
 
                         writer.Write(fileDetails, forceDetails);
-
-                        if (fileData.PipelineProperties.Count != 0)
-                        {
-                            pipelineWriter.AddProperties(fileData);
-                        }
                     }
 #if DEBUG
                     Console.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId}");

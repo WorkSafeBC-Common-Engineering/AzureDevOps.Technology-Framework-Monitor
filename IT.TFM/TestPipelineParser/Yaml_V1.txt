@@ -1,0 +1,198 @@
+# --------------------------------------------------------------------------
+# WorkSafeBC multi-stage YAML-based Continuous Integration (CI) Pipeline 
+#
+# --------------------------------------------------------------------------
+# See https://aka.ms/yaml for official Azure DevOps Pipeline documentation
+#
+# FLOW
+#     - Pipeline Initialization
+#     - Prerequisites
+#     - *Bootstrap Initialization
+#     - Build
+#     - Test
+#     - *Bootstrap Validation
+#
+# TODO
+#     - Look for TODO and update / fine-tune as needed
+#
+# IMPORTANT
+#     - If you remove, comment out, or change the flow sections prefixed 
+#       with an asterix (*) or tagged as SKULL & CROSS-BONES, your
+#       release pipeline validationx (*) or tagged as SKULL & CROSS-BONES, your
+#       release pipeline validation stage may fail, resulting in your
+#       deployment being blocked by DevSecOps and Engineering Practices.
+# --------------------------------------------------------------------------
+
+# --------------------------------------------------------------------------
+# PIPELINE INITIALIZATION
+# --------------------------------------------------------------------------
+# batch   - Batch if pipeline is running.
+# '*'     - Trigger on all branches. Artifact filters will be used in CD.
+# paths   - Exclude pipeline/ folder which contains pipeline yml files.
+# --------------------------------------------------------------------------
+trigger:
+  batch: true
+  branches:
+    include:
+    - '*'
+  paths:
+    exclude:
+    - pipeline
+
+# Semantic version as per Azure DevOps Naming Conventions.
+name: 
+  $(portfolioName)_$(productName)_$(GITVERSION_MAJORMINORPATCH)_$(date:yyyyMMdd).$(date:HHmmss)_$(Build.SourceBranchName)
+
+# Configure the default agent pool and image to use for your pipeline
+pool:
+  name:                 'Azure Pipelines'
+  vmImage:              'windows-latest'
+#  demands:
+#  - msbuild
+#  - visualstudio
+#  - vstest
+
+
+# VARIABLES
+variables:
+  apiClientVersion: '5.0.0'
+  solution:             '**/*.sln'  
+  BuildConfiguration:   'Production'
+  BuildPlatform:        'Any CPU'  
+  templateVersion:      1.0.4
+  portfolioName:        'ASSESSMENTS'
+  productName:          'Asmt-PayrollPrem-EmployerAccount-API'
+  productGuid:          'b04cfe3a-235e-4e46-ab69-1a9b77ae9c5b'
+  vstsFeed: '7fdb497b-0d3d-4cb1-b205-6818b76e3775'
+  nugetVersion: '$(apiClientVersion)'
+  projectPath: './src/wcb.Asmt.PRPrem.EmpAcct.API.sln'
+  ASPNETCORE_ENVIRONMENT: 'VSTS'
+
+#Repository resources
+resources:
+  repositories:
+    # =======================================================================
+    # SKULL & CROSS-BONES - DO NOT COMMENT OUT, OR REMOVE THIS REPOSITORY
+    - repository: CDTemplates
+      type: git
+      name: 'Common-Engineering-System/AzureDevOps.Automation.Pipeline.Templates'
+    # =======================================================================
+
+# --------------------------------------------------------------------------
+# START OF BUILD and TEST STAGE
+# - GitVersion task looks at your Git history and works out the semantic 
+#   version of the commit being built.
+# --------------------------------------------------------------------------
+stages:
+- stage: ContinuousIntegration
+  displayName: Continuous Integration
+  jobs:
+    # ==========================================================================
+    # START JOB: ContinuousIntegration
+    # ==========================================================================
+  - job: ContinuousIntegration
+    displayName: ContinuousIntegration
+    steps:
+
+    - task: gitversion/setup@0
+      displayName: Install GitVersion
+      inputs:
+        versionSpec: '5.x'
+
+    - task: gitversion/execute@0
+      displayName: Use GitVersion
+
+
+    # ==========================================================================
+    # BOOTSTRAP VALIDATION, STAGE: CI_BOOTSTRAP_INIT
+    # SKULL & CROSS-BONES - DO NOT COMMENT OUT, OR REMOVE THIS SECTION
+    # ==========================================================================
+    - template: Templates/Bootstrap.yml@CDTemplates
+      parameters:
+        bootstrapMode:     'init'
+        applicationType:   'dotnet' # dotnet, angular
+        applicationGuid:   $(productGuid)
+        portfolioName:     $(portfolioName)
+        productName:       $(productName)
+        sourcesDirectory:  $(Build.SourcesDirectory)
+        forceCheck:        'true'
+        previews:          'true'
+    # ==========================================================================
+
+    # --------------------------------------------------------------------------
+    # CONTINUOUS INTEGRATION BUILD
+    # - Run steps/tasks to build your solution here. 
+    # - Move initialisations (NPM, NuGet,...) to PREREQUISITES section
+    # --------------------------------------------------------------------------
+    #  TODO Insert your scripts, steps, and tasks here and remove these comments
+    
+    - task: UseDotNet@2
+      displayName: 'Use dotnet sdk 6.0.x'
+      inputs:
+       packageType: sdk
+       version: 6.0.x
+       includePreviewVersions: true
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore'
+      inputs:
+        command: 'restore'
+        projects: '$(projectPath)'
+        feedsToUse: 'select'
+        vstsFeed: '$(vstsFeed)'
+
+
+    - task: DotNetCoreCLI@2
+      displayName: 'DotNET Core Publish'
+      inputs:
+        command: 'build'
+        projects: '$(projectPath)'
+        arguments: '--configuration $(BuildConfiguration)'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Test Assemblies (DV + INT)'
+      inputs:
+        command: 'test'
+        projects: '**/*Tests/*.csproj'
+        arguments: '--configuration $(BuildConfiguration) --collect:"Code coverage" --settings src/default.runsettings'
+
+
+    - task: PublishTestResults@2
+      displayName: 'Publish Test Results **/result.xml'
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: '**/result.xml'
+
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish'
+      inputs:
+        command: 'publish'
+        publishWebProjects: true
+        arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+
+
+
+    # =====================================================================
+    # BOOTSTRAP VALIDATION, STAGE: CI_BOOTSTRAP
+    # SKULL & CROSS-BONES - DO NOT COMMENT OUT, OR REMOVE THIS SECTION
+    # ==========================================================================
+    - template: Templates/Bootstrap.yml@CDTemplates
+      parameters:
+        bootstrapMode:     'run'
+        applicationType:   'dotnet' # dotnet, angular
+        applicationGuid:   $(productGuid)
+        portfolioName:     $(portfolioName)
+        productName:       $(productName)
+        sourcesDirectory:  $(Build.SourcesDirectory)
+        forceCheck:        'true'
+        previews:          'false'
+    # ==========================================================================

@@ -1,7 +1,15 @@
-﻿using Parser.Interfaces;
+﻿using Microsoft.OpenApi;
+using Microsoft.OpenApi.Extensions;
+using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi.Readers;
+using Microsoft.OpenApi.Writers;
+
+using Parser.Interfaces;
 
 using ProjectData;
 
+using System.Diagnostics.Eventing.Reader;
+using System.Security.Cryptography;
 using System.Text.Json;
 
 namespace YamlFileParser
@@ -10,7 +18,9 @@ namespace YamlFileParser
     {
         #region Private Members
 
-        private const string jsonJoinChar = " ";
+        private static readonly char[] variableSeparator = [':'];
+
+        private const string jsonJoinChar = "\n";
         private const string v1TemplateRepo = "Common-Engineering-System/AzureDevOps.Automation.Pipeline.Templates";
         private const string v2TemplateRepo = "Common-Engineering-System/AzureDevOps.Automation.Pipeline.Templates.v2";
         private const string gitRepoType = "git";
@@ -26,75 +36,323 @@ namespace YamlFileParser
 
         void IFileParser.Parse(FileItem file, string[] content)
         {
-            var fileContents = string.Join(jsonJoinChar, content);
-            using var jsonDoc = JsonDocument.Parse(fileContents, new JsonDocumentOptions { CommentHandling = JsonCommentHandling.Skip });
-            var root = jsonDoc.RootElement;
+            var cleanContent = StripComments(content);
+            var variables = ParseVariables(cleanContent);
 
-            GetTemplateType(file, root);
-            GetPortfolioAndProduct(file, root);
+            var templateType = GetTemplateType(cleanContent);
+            file.PipelineProperties.Add("template", templateType.ToString());
+
+            switch(templateType)
+            {
+                case PipelineTemplateType.V1:
+                    ParseV1Template(cleanContent, variables, file);
+                    // In some cases, a V1 template extends a template similar to a V2 template
+                    if (file.PipelineProperties["portfolio"] == string.Empty && file.PipelineProperties["product"] == string.Empty)
+                    {
+                        ParseV2Template(cleanContent, variables, file);
+                    }
+                    break;
+
+                case PipelineTemplateType.V2:
+                    ParseV2Template(cleanContent, variables, file);
+
+                    // Generic pipelines are structured like a V1 with respect to parsing the portfolio and product values.
+                    if (file.PipelineProperties["portfolio"] == string.Empty && file.PipelineProperties["product"] == string.Empty)
+                    {
+                        ParseV1Template(cleanContent, variables, file);
+                    }
+                    break;
+            }
         }
 
         #endregion
 
         #region Private Methods
 
-        private static void GetTemplateType(FileItem file, JsonElement root)
+        private static string[] StripComments(string[] content)
+        {
+            List<string> lines = [];
+            foreach (var line in content)
+            {
+                if (!IsComment(line) && !string.IsNullOrWhiteSpace(line))
+                {
+                    var cleanline = StripTrailingComments(line);
+                    lines.Add(cleanline);
+                }
+            }
+
+            return [.. lines];
+        }
+
+
+        private static PipelineTemplateType GetTemplateType(string[] content)
         {
             var templateType = PipelineTemplateType.Custom;
-            var repoTypeValue = string.Empty;
-            var repoNameValue = string.Empty;
-
-            if (root.TryGetProperty("resources", out JsonElement resources) && resources.TryGetProperty("repositories", out JsonElement repositories))
+            for (var index = 0; index < content.Length; index++)
             {
-                foreach (JsonElement repository in repositories.EnumerateArray())
+                if (content[index].Equals("resources:"))
                 {
-                    if (repository.TryGetProperty("type", out JsonElement repoType) && 
-                        repository.TryGetProperty("name", out JsonElement repoName))
+                    index++;
+                    if (content[index].Equals("  repositories:"))
                     {
-                        repoTypeValue = repoType.GetString();
-                        repoNameValue = repoName.GetString();
-
-                        if (repoTypeValue != gitRepoType)
+                        index++;
+                        if (content[index].TrimStart().StartsWith("- repository:"))
                         {
-                            continue;
+                            do
+                            {
+                                index++;
+                                if (content[index].Trim().StartsWith("name:"))
+                                {
+                                    var fields = content[index].Split(variableSeparator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                                    if (fields.Length != 2)
+                                    {
+                                        return templateType;
+                                    }
+
+                                    var templateName = fields[1];
+                                    if (templateName.StartsWith('\'') && templateName.EndsWith('\''))
+                                    {
+                                        templateName = templateName.Replace("'", string.Empty);
+                                    }
+                                    else if (templateName.StartsWith('"') && templateName.EndsWith('"'))
+                                    {
+                                        templateName = templateName.Replace("\"", string.Empty);
+                                    }
+
+                                    if (templateName.Equals(v2TemplateRepo, StringComparison.InvariantCultureIgnoreCase))
+                                    {
+                                        templateType = PipelineTemplateType.V2;
+                                    }
+                                    else if (templateName.Equals(v1TemplateRepo, StringComparison.InvariantCultureIgnoreCase))
+                                    {
+                                        templateType = PipelineTemplateType.V1;
+                                    }
+                                    return templateType;
+                                }
+                            } while (index < content.Length);
+                        }
+                    }
+                }
+            }
+
+
+            return templateType;
+        }
+
+        private static void ParseV1Template(string[] content, Dictionary<string, string> variables, FileItem file)
+        {
+            var portfolio = string.Empty;
+            var product = string.Empty;
+
+            for (var index = 0; index < content.Length; index++)
+            {
+                if (content[index].Trim().StartsWith("- template:"))
+                {
+                    do
+                    {
+                        index++;
+                    } while (content[index].Trim().StartsWith("- template:"));
+
+                    if (content[index].Trim().Equals("parameters:"))
+                    {
+                        while (++index < content.Length)
+                        {
+                            if (content[index].Trim().StartsWith('-'))
+                            {
+                                break;
+                            }
+
+                            else
+                            {
+                                var fields = content[index].Split(variableSeparator, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                                if (fields.Length == 2)
+                                {
+                                    switch (fields[0])
+                                    {
+                                        case "portfolioName":
+                                            portfolio = GetParameterValue(fields[1], variables);
+                                            break;
+
+                                        case "productName":
+                                            product = GetParameterValue(fields[1], variables);
+                                            break;
+                                    }
+                                }
+                            }
                         }
 
-                        if (repoNameValue == v2TemplateRepo)
+                        if (portfolio != string.Empty && product != string.Empty)
                         {
-                            templateType = PipelineTemplateType.V2;
-                            break;
-                        }
-
-                        if (repoNameValue == v1TemplateRepo)
-                        {
-                            templateType = PipelineTemplateType.V1;
                             break;
                         }
                     }
                 }
             }
 
-            file.AddPackageProperty("templatetype", templateType.ToString());
-            file.AddPackageProperty("repotype", repoTypeValue);
-            file.AddPackageProperty("reponame", repoNameValue);
+            if (portfolio.StartsWith('$'))
+            {
+                portfolio = null;
+            }
+
+            if (product.StartsWith('$'))
+            {
+                product = null;
+            }
+
+            file.PipelineProperties["portfolio"] = portfolio;
+            file.PipelineProperties["product"] = product;
         }
 
-        private static void GetPortfolioAndProduct(FileItem file, JsonElement root)
+        private static void ParseV2Template(string[] content, Dictionary<string, string> variables, FileItem file)
         {
-            if (root.TryGetProperty("extends", out JsonElement extends) && extends.TryGetProperty("parameters", out JsonElement parameters))
-            {
-                if (parameters.TryGetProperty("portfolioName", out JsonElement portfolioName))
-                {
-                    var portfolio = portfolioName.GetString() ?? string.Empty;
-                    file.AddPackageProperty("portfolio", portfolio);
-                }
+            var portfolio = string.Empty;
+            var product = string.Empty;
 
-                if (parameters.TryGetProperty("productName", out JsonElement productName))
+            for (var index = 0; index < content.Length; index++)
+            {
+                if (content[index].Equals("extends:"))
                 {
-                    var product = productName.GetString() ?? string.Empty;
-                    file.AddPackageProperty("product", product);
+                    index++;
+                    if (content[index].Trim().StartsWith("template:"))
+                    {
+                        index++;
+                        if (content[index].Trim().Equals("parameters:"))
+                        {
+                            while (++index < content.Length)
+                            {
+                                var fields = content[index].Split(variableSeparator, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+                                if (fields[0].StartsWith('-'))
+                                {
+                                    break;
+                                }
+                                else if (fields.Length != 2)
+                                {
+                                    // This is probably a list of items assigned to a parameter
+
+                                    while (content[++index].Trim().StartsWith('-'))
+                                    {
+                                        //nop
+                                    }
+
+                                    index--;
+                                    continue;
+                                }
+
+                                switch (fields[0])
+                                {
+                                    case "portfolioName":
+                                        portfolio = GetParameterValue(fields[1], variables);
+                                        break;
+
+                                    case "productName":
+                                        product = GetParameterValue(fields[1], variables);
+                                        break;
+                                }
+                            }
+                        }
+                    }
                 }
             }
+
+            file.PipelineProperties["portfolio"] = portfolio;
+            file.PipelineProperties["product"] = product;
+        }
+
+        private static string GetParameterValue(string parameter, Dictionary<string, string> variables)
+        {
+            string value = parameter;
+            if (parameter.StartsWith("${{variables.") && parameter.EndsWith("}}"))
+            {
+                value = variables[parameter[13..^2]];
+            }
+
+            if (parameter.StartsWith("$(") && parameter.EndsWith(")"))
+            {
+                value = variables[parameter[2..^1]];
+            }
+
+            return value.Replace("\"", string.Empty).Replace("'", string.Empty);
+        }
+
+        private static bool IsComment(string line)
+        {
+            return line.TrimStart().StartsWith('#');
+        }
+
+        private static string StripTrailingComments(string line)
+        {
+            var cleanLine = line;
+            if (cleanLine.Contains('#'))
+            {
+                var index = cleanLine.IndexOf('#');
+                cleanLine = cleanLine[..index];
+            }
+
+            return cleanLine;
+        }
+
+        private Dictionary<string, string> ParseVariables(string[] content)
+        {
+            var variables = new Dictionary<string, string>();
+            bool inVariables = false;
+
+            for (var index = 0; index < content.Length; index++)
+            {
+                var line = content[index];
+
+                if (!inVariables)
+                {
+                    if (line.Trim().Equals("variables:"))
+                    {
+                        inVariables = true;
+                    }
+                }
+                else
+                {
+                    if (line.Trim().StartsWith('-'))
+                    {
+                        var variableLine = line[1..].Trim();
+                        var variableFields = variableLine.Split(variableSeparator, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                        if (variableFields.Length != 2 || variableFields[0] != "name")
+                        {
+                            break;
+                        }
+
+                        var name = variableFields[1];
+
+                        variableLine = content[++index];
+                        variableFields = variableLine.Split(variableSeparator, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                        if (variableFields.Length != 2 || variableFields[0] != "value")
+                        {
+                            break;
+                        }
+
+                        var value = variableFields[1];
+
+                        variables.Add(name, value);
+                    }
+
+                    else if (!line.StartsWith("  ")) // two space indent
+                    {
+                        break;
+                    }
+
+                    else
+                    {
+                        var fields = line.Split(variableSeparator, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                        if (fields.Length != 2)
+                        {
+                            break;
+                        }
+
+                        variables.Add(fields[0], fields[1]);
+                    }
+
+                }
+            }
+
+            return variables;
         }
 
         #endregion

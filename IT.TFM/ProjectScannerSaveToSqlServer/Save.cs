@@ -230,7 +230,7 @@ namespace ProjectScannerSaveToSqlServer
 
         void IStorageWriter.SavePipeline(ProjData.Pipeline pipeline)
         {
-            Debug.WriteLine($"SavePipeline: Repo ID = {pipeline.RepositoryId}, Pipeline Name = {pipeline.Name}, Pipeline URL = {pipeline.Url}");
+            Debug.WriteLine($"SavePipeline: PipelineId = {pipeline.Id}, Repo ID = {pipeline.RepositoryId}, Pipeline Name = {pipeline.Name}, Pipeline URL = {pipeline.Url}, Pipeline Path = {pipeline.Path}");
 
             var dbRepo = context.Repositories
                                 .SingleOrDefault(r => r.RepositoryId.Equals(pipeline.RepositoryId, StringComparison.InvariantCultureIgnoreCase));
@@ -238,14 +238,17 @@ namespace ProjectScannerSaveToSqlServer
             var dbPipeline = context.Pipelines
                                     .SingleOrDefault(p => p.PipelineId == pipeline.Id);
 
-            var dbFile = context.Files
-                                .SingleOrDefault(f => f.FileId == pipeline.FileId);
+            Debug.WriteLine($"SavePipeline, saving: ");
+
+            var dbFile = dbRepo != null ? context.Files
+                                                 .SingleOrDefault(f => f.RepositoryId == dbRepo.Id
+                                                                    && f.Path.Equals(pipeline.Path, StringComparison.InvariantCultureIgnoreCase))
+                                        : null;
 
             if (dbPipeline == null)
             {
                 dbPipeline = new Pipeline
                 {
-                    Repository = dbRepo,
                     PipelineId = pipeline.Id,
                     RepositoryId = dbRepo?.Id
                 };
@@ -322,6 +325,12 @@ namespace ProjectScannerSaveToSqlServer
                 {
                     context.FileProperties.Remove(fileProp);
                 }
+            }
+
+            var pipelines = context.Pipelines.Where(p => p.FileId == dbFile.Id);
+            foreach(var pipeline in pipelines)
+            {
+                pipeline.FileId = null;
             }
 
             context.Files.Remove(dbFile);

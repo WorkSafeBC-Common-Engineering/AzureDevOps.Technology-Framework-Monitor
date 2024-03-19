@@ -66,7 +66,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConfidentialSettings", "Con
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReportsRefresh", "ReportsRefresh\ReportsRefresh.csproj", "{74BF2608-108D-4CD4-9EC8-BE6513F7EDBA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YamlFileParser", "YamlFileParser\YamlFileParser.csproj", "{D3376B60-BE99-42E1-A252-5C10C241AEB0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YamlFileParser", "YamlFileParser\YamlFileParser.csproj", "{D3376B60-BE99-42E1-A252-5C10C241AEB0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestPipelineParser", "TestPipelineParser\TestPipelineParser.csproj", "{534FA323-5167-4277-804F-4B7F8BE480C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -172,6 +174,9 @@ Global
 		{D3376B60-BE99-42E1-A252-5C10C241AEB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3376B60-BE99-42E1-A252-5C10C241AEB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3376B60-BE99-42E1-A252-5C10C241AEB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{534FA323-5167-4277-804F-4B7F8BE480C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{534FA323-5167-4277-804F-4B7F8BE480C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{534FA323-5167-4277-804F-4B7F8BE480C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -203,6 +208,7 @@ Global
 		{2CEBFB57-78AF-46FC-977B-626DAF7C3619} = {AE122355-12E2-4890-8041-3B2B307CDDFB}
 		{74BF2608-108D-4CD4-9EC8-BE6513F7EDBA} = {69451FB6-F75A-48D7-A067-0F444AC23E83}
 		{D3376B60-BE99-42E1-A252-5C10C241AEB0} = {DAB4B476-8AFA-4AE7-9737-0FA45B6F55C1}
+		{534FA323-5167-4277-804F-4B7F8BE480C9} = {DAB4B476-8AFA-4AE7-9737-0FA45B6F55C1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {13E06812-4F34-4E3C-8E19-5A26F31CF9C8}
