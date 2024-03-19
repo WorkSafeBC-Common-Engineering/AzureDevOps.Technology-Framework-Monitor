@@ -25,12 +25,12 @@ namespace ProjectData
 
         public string PipelineType { get; set; } = string.Empty;
 
-        public string Path {  get; set; } = string.Empty;
+        public string Path { get; set; } = string.Empty;
 
         public string YamlType { get; set; }
 
         public string Portfolio { get;set; }
 
-        public string Product {  get; set; }
+        public string Product { get; set; }
     }
 }

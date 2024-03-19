@@ -57,22 +57,6 @@ namespace RepoScan.Storage.SqlServer
                             .AsEnumerable();
         }
 
-        IEnumerable<ClassicPipeline> IReadPipelines.ReadClassicPipeline()
-        {
-            var reader = GetReader();
-            var pipelines = reader.GetPipelines(ProjectData.Pipeline.pipelineTypeClassic);
-            return pipelines.Select(p => new ClassicPipeline
-                                   {
-                                       PipelineId = p.Id,
-                                       RepositoryId = p.RepositoryId,
-                                       Name = p.Name,
-                                       Folder = p.Folder,
-                                       Type = p.Type,
-                                       IsBuildPipeline = p.PipelineType == ProjectData.Pipeline.pipelineTypeClassic
-                                   })
-                            .AsEnumerable();
-        }
-
         void IWritePipeline.AddProperties(ProjectData.FileItem file)
         {
             var reader = GetReader();

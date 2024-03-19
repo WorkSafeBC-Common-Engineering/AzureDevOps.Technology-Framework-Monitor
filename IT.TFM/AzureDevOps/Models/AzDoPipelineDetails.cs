@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -78,6 +80,7 @@ namespace AzureDevOps.Models
     {
         public BuildConfiguration BuildConfiguration { get; set; }
         public BuildPlatform BuildPlatform { get; set; }
+        [JsonProperty("Portfolio.ProductName")]
         public PortfolioProductName PortfolioProductName { get; set; }
         public SystemDebug SystemDebug { get; set; }
     }

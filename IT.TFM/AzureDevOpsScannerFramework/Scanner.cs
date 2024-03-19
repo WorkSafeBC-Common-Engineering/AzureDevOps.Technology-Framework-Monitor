@@ -168,40 +168,7 @@ namespace AzureDevOpsScannerFramework
 
             foreach (var pipeline in azDoPipelines.Value)
             {
-                var p = new Pipeline
-                {
-                    Id = pipeline.Id ?? 0,
-                    Name = pipeline.Name,
-                    Folder = pipeline.Folder,
-                    Revision = pipeline.Revision ?? 0,
-                    Url = pipeline.Url,
-                    Type = pipeline.Details.Configuration.Type,
-                };
-
-                Console.WriteLine($"Pipeline: {pipeline.Name}, Type: {pipeline.Details.Configuration.Type}");
-
-                switch(pipeline.Details.Configuration.Type)
-                {
-                    case "designerJson":
-                        p.PipelineType = pipeline.Details.Configuration.DesignerJson.Type;
-                        p.RepositoryId = pipeline.Details.Configuration.DesignerJson.Repository.Id;
-                        break;
-
-                    case "designerHyphenJson":
-                        break;
-
-                    case "justInTime":
-                        break;
-
-                    case "unknown":
-                        break;
-
-                    case "yaml":
-                        p.RepositoryId = pipeline.Details.Configuration.Repository.Id;
-                        p.Path = pipeline.Details.Configuration.Path;
-                        break;
-                }
-
+                var p = GetPipeline(pipeline);
                 pipelineList.Add(p);
             }
 
@@ -380,6 +347,57 @@ namespace AzureDevOpsScannerFramework
         private static void GetProject(string projectId)
         {
 
+        }
+
+        private static Pipeline GetPipeline(AzDoPipeline pipeline)
+        {
+            var p = new Pipeline
+            {
+                Id = pipeline.Id ?? 0,
+                Name = pipeline.Name,
+                Folder = pipeline.Folder,
+                Revision = pipeline.Revision ?? 0,
+                Url = pipeline.Url,
+                Type = pipeline.Details.Configuration.Type,
+            };
+
+            Console.WriteLine($"Pipeline: {pipeline.Name}, Type: {pipeline.Details.Configuration.Type}");
+
+            switch (pipeline.Details.Configuration.Type)
+            {
+                case "designerJson":
+                    p.PipelineType = pipeline.Details.Configuration.DesignerJson.Type;
+                    p.RepositoryId = pipeline.Details.Configuration.DesignerJson.Repository.Id;
+
+                    var portfolioProduct = pipeline.Details.Configuration?.DesignerJson?.Variables?.PortfolioProductName?.Value;
+                    if (portfolioProduct != null)
+                    {
+                        var index = portfolioProduct.IndexOf('.');
+                        if (index > 0)
+                        {
+                            p.Portfolio = portfolioProduct[..index];
+                            p.Product = portfolioProduct[(index + 1)..];
+                        }
+                    }
+
+                    break;
+
+                case "designerHyphenJson":
+                    break;
+
+                case "justInTime":
+                    break;
+
+                case "unknown":
+                    break;
+
+                case "yaml":
+                    p.RepositoryId = pipeline.Details.Configuration.Repository.Id;
+                    p.Path = pipeline.Details.Configuration.Path;
+                    break;
+            }
+
+            return p;
         }
 
         #endregion
