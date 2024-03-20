@@ -264,9 +264,24 @@ namespace ProjectScannerSaveToSqlServer
             dbPipeline.PipelineType = pipeline.PipelineType;
             dbPipeline.Path = pipeline.Path;
             dbPipeline.FileId = dbFile?.Id;
-            dbPipeline.YamlType = pipeline.YamlType;
-            dbPipeline.Portfolio = pipeline.Portfolio;
-            dbPipeline.Product = pipeline.Product;
+
+            // For Classic pipelines we can immediately parse for the Portfolio and Product based on the JSON details.
+            // For Yaml pipelines, this happens at a later stage when we parse the actual file, so leave as is in the database.
+            if (pipeline.Type == ProjData.Pipeline.pipelineTypeClassic)
+            {
+                dbPipeline.Portfolio = pipeline.Portfolio;
+                dbPipeline.Product = pipeline.Product;
+            }
+
+            else if (pipeline.Type == ProjData.Pipeline.pipelineTypeYaml &&
+                (!string.IsNullOrEmpty(pipeline.YamlType) ||
+                 !string.IsNullOrEmpty(pipeline.Portfolio) ||
+                 !string.IsNullOrEmpty(pipeline.Product)))
+            {
+                dbPipeline.YamlType = pipeline.YamlType;
+                dbPipeline.Portfolio = pipeline.Portfolio;
+                dbPipeline.Product = pipeline.Product;
+            }
 
             _ = context.SaveChangesAsync().Result;
         }

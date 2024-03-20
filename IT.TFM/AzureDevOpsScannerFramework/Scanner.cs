@@ -160,13 +160,14 @@ namespace AzureDevOpsScannerFramework
             return repoList.AsEnumerable();
         }
 
-        async Task<IEnumerable<Pipeline>> IScanner.Pipelines(Guid projectId)
+        async Task<IEnumerable<Pipeline>> IScanner.Pipelines(Guid projectId, string repositoryId)
         {
             var pipelineList = new List<Pipeline>();
             api.Project = projectId.ToString();
+            api.Repository = repositoryId;
             var azDoPipelines = await api.GetPipelinesAsync();
 
-            foreach (var pipeline in azDoPipelines.Value)
+            foreach (var pipeline in azDoPipelines)
             {
                 var p = GetPipeline(pipeline);
                 pipelineList.Add(p);

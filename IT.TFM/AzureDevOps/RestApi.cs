@@ -185,21 +185,22 @@ namespace AzureDevOps
             return await CallApiAsync(GetUrl(downloadRepositoryUrl), mediaType: "application/zip", unzipContent: true);
         }
 
-        async Task<AzDoPipelineList> IRestApi.GetPipelinesAsync()
+        async Task<IEnumerable<AzDoPipeline>> IRestApi.GetPipelinesAsync()
         {
             var content = await CallApiAsync(GetUrl(getPipelinesUrl));
 
             if (content == string.Empty)
             {
-                return new AzDoPipelineList();
+                return [];
             }
 
             var pipelines = JsonConvert.DeserializeObject<AzDoPipelineList>(content);
             if (pipelines == null || pipelines.Value == null)
             {
-                return new AzDoPipelineList();
+                return [];
             }
 
+            var filteredPipelines = new List<AzDoPipeline>();
             foreach (var pipeline in pipelines.Value)
             {
                 if (string.IsNullOrEmpty(pipeline.Url))
@@ -225,6 +226,10 @@ namespace AzureDevOps
                     throw;
                 }
 
+                if (!string.IsNullOrEmpty(Repository) && pipelineDetails?.Configuration?.Repository?.Id != Repository)
+                {
+                    continue;
+                }
 
                 if (pipelineDetails == null)
                 {
@@ -233,10 +238,11 @@ namespace AzureDevOps
 
                 Debug.WriteLine($"Pipeline Type: {pipelineDetails.Configuration.Type}");
                 pipeline.Details = pipelineDetails;
+                filteredPipelines.Add(pipeline);
             }
 
 
-            return pipelines;
+            return filteredPipelines.AsEnumerable();
         }
 
         #endregion

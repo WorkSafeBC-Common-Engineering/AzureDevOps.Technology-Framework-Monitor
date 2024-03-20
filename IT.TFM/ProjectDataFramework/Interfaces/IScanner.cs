@@ -18,7 +18,7 @@ namespace ProjectData.Interfaces
 
         Task LoadFiles(Guid projectId, Guid repositoryId);
 
-        Task<IEnumerable<Pipeline>> Pipelines(Guid projectId);
+        Task<IEnumerable<Pipeline>> Pipelines(Guid projectId, string repositoryId);
 
         void DeleteFiles();
 

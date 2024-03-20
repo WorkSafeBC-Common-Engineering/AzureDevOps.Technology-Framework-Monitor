@@ -27,9 +27,9 @@ namespace RepoScan.FileLocator
 
         #region Public Methods
 
-        public static async Task ScanAsync(IScanner scanner, Guid projectId)
+        public static async Task ScanAsync(IScanner scanner, Guid projectId, string repositoryId)
         {
-            var pipelines = await scanner.Pipelines(projectId);
+            var pipelines = await scanner.Pipelines(projectId, repositoryId);
             var pipelineWriter = StorageFactory.GetPipelineWriter();
             foreach (var pipeline in pipelines)
             {
@@ -92,7 +92,7 @@ namespace RepoScan.FileLocator
                 }
             }
 
-            Debug.WriteLine($"Repository ID: {repositoryId}, Path: {filePath}, FileID: {fileId}");
+            Debug.WriteLine($"Link Yaml Pipeline: Repository ID: {repositoryId}, Path: {filePath}, FileID: {fileId}");
 
             // It is possible that multiple pipelines can be created from the same YAML file, so need to process each case
             var pipelines = yamlPipelines.Where(p => p.RepositoryId != null
