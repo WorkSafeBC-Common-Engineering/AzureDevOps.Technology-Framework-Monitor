@@ -15,6 +15,8 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
         public int PipelineId { get; set; }
 
+        public int? ProjectId { get; set; }
+        
         public int? RepositoryId { get; set; }
 
         public int? FileId { get; set; }
@@ -47,6 +49,6 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
         public virtual Repository Repository { get; set; }
 
-        //public virtual File File { get; set; }
+        public virtual Project Project { get; set; }
     }
 }

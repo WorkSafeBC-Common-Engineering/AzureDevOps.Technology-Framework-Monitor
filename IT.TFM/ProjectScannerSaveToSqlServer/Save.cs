@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Diagnostics;
+using ProjectData;
 
 namespace ProjectScannerSaveToSqlServer
 {
@@ -34,7 +35,7 @@ namespace ProjectScannerSaveToSqlServer
 
             if (org == null)
             {
-                org = new Organization()
+                org = new DataModels.Organization()
                 {
                     Uri = organization.Url,
                     ScannerType = context.ScannerTypes
@@ -68,7 +69,7 @@ namespace ProjectScannerSaveToSqlServer
 
             if (dbProject == null)
             {
-                dbProject = new Project()
+                dbProject = new DataModels.Project()
                 {
                     OrganizationId = organizationId,
                     ProjectId = project.Id.ToString()
@@ -108,7 +109,7 @@ namespace ProjectScannerSaveToSqlServer
 
             if (dbRepo == null)
             {
-                dbRepo = new Repository
+                dbRepo = new DataModels.Repository
                 {
                     ProjectId = projectId,
                     RepositoryId = repository.Id.ToString(),
@@ -157,8 +158,6 @@ namespace ProjectScannerSaveToSqlServer
                 }                    
             }
             
-            // CleanupRepositoryFiles(repository, dbRepo.Id);
-
             _ = context.SaveChangesAsync().Result;
 
             repositoryId = dbRepo.Id;
@@ -230,15 +229,16 @@ namespace ProjectScannerSaveToSqlServer
 
         void IStorageWriter.SavePipeline(ProjData.Pipeline pipeline)
         {
-            Debug.WriteLine($"SavePipeline: PipelineId = {pipeline.Id}, Repo ID = {pipeline.RepositoryId}, Pipeline Name = {pipeline.Name}, Pipeline URL = {pipeline.Url}, Pipeline Path = {pipeline.Path}");
+            Debug.WriteLine($"SavePipeline: PipelineId = {pipeline.Id}, ProjectId = {pipeline.ProjectId}, Repo ID = {pipeline.RepositoryId}, Pipeline Name = {pipeline.Name}, Pipeline URL = {pipeline.Url}, Pipeline Path = {pipeline.Path}");
+
+            var dbProject = context.Projects
+                                   .SingleOrDefault(p => p.ProjectId == pipeline.ProjectId);
 
             var dbRepo = context.Repositories
                                 .SingleOrDefault(r => r.RepositoryId.Equals(pipeline.RepositoryId, StringComparison.InvariantCultureIgnoreCase));
 
             var dbPipeline = context.Pipelines
                                     .SingleOrDefault(p => p.PipelineId == pipeline.Id);
-
-            Debug.WriteLine($"SavePipeline, saving: ");
 
             var dbFile = dbRepo != null ? context.Files
                                                  .SingleOrDefault(f => f.RepositoryId == dbRepo.Id
@@ -247,15 +247,16 @@ namespace ProjectScannerSaveToSqlServer
 
             if (dbPipeline == null)
             {
-                dbPipeline = new Pipeline
+                dbPipeline = new DataModels.Pipeline
                 {
                     PipelineId = pipeline.Id,
-                    RepositoryId = dbRepo?.Id
                 };
 
                 context.Pipelines.Add(dbPipeline);
             }
 
+            dbPipeline.ProjectId = dbProject?.Id;
+            dbPipeline.RepositoryId = dbRepo?.Id;
             dbPipeline.Name = pipeline.Name;
             dbPipeline.Folder = pipeline.Folder;
             dbPipeline.Revision = pipeline.Revision;
@@ -351,6 +352,16 @@ namespace ProjectScannerSaveToSqlServer
             context.Files.Remove(dbFile);
 
             _ = context.SaveChangesAsync().Result;
+        }
+
+        void IStorageWriter.DeletePipeline(int pipelineId)
+        {
+            var pipeline = context.Pipelines.SingleOrDefault(p => p.PipelineId == pipelineId);
+            if (pipeline != null)
+            {
+                context.Entry(pipeline).State = EntityState.Deleted;
+                _ = context.SaveChangesAsync().Result;
+            }
         }
 
         #endregion

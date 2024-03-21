@@ -29,6 +29,9 @@ namespace RepoScan.FileLocator
 
         public static async Task ScanAsync(IScanner scanner, Guid projectId, string repositoryId)
         {
+            var pipelineReader = StorageFactory.GetPipelineReader();
+            var pipelineIds = new List<int>(pipelineReader.GetPipelineIds(projectId.ToString()));
+
             var pipelines = await scanner.Pipelines(projectId, repositoryId);
             var pipelineWriter = StorageFactory.GetPipelineWriter();
             foreach (var pipeline in pipelines)
@@ -41,6 +44,14 @@ namespace RepoScan.FileLocator
                 }
 
                 pipelineWriter.Write(pipeline);
+
+                pipelineIds.Remove(pipeline.Id);
+            }
+
+            // remove any pipelines that are not being returned from the Scanner, must have been deleted.
+            foreach (var id in pipelineIds)
+            {
+                pipelineWriter.Delete(id);
             }
         }
 

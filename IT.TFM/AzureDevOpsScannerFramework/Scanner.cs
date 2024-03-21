@@ -170,6 +170,7 @@ namespace AzureDevOpsScannerFramework
             foreach (var pipeline in azDoPipelines)
             {
                 var p = GetPipeline(pipeline);
+                p.ProjectId = api.Project;
                 pipelineList.Add(p);
             }
 

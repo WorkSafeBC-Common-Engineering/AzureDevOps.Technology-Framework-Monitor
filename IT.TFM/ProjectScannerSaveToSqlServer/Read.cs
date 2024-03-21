@@ -385,6 +385,7 @@ namespace ProjectScannerSaveToSqlServer
                 Pipeline pipeline = new()
                 {
                     Id = dbPipeline.Id,
+                    ProjectId = dbPipeline?.Project?.ProjectId,
                     RepositoryId = dbPipeline?.Repository?.RepositoryId,
                     Name = dbPipeline.Name,
                     Folder = dbPipeline.Folder,
@@ -410,9 +411,12 @@ namespace ProjectScannerSaveToSqlServer
             var pipelines = context.Pipelines.Where(p => p.RepositoryId == repository.Id
                                                       && p.FileId == file.Id);
 
+            var projectId = repository.Project.ProjectId;
+
             return pipelines.Select(p => new Pipeline
             { 
                 Id = p.PipelineId,
+                ProjectId = projectId,
                 RepositoryId = p.Repository.RepositoryId,
                 FileId = file.FileId,
                 Name = p.Name,
@@ -426,6 +430,15 @@ namespace ProjectScannerSaveToSqlServer
                 Portfolio = p.Portfolio,
                 Product = p.Product
             }).AsEnumerable();
+        }
+
+        IEnumerable<int> IStorageReader.GetPipelineIdsForProject(string projectId)
+        {
+            var project = context.Projects.SingleOrDefault(p => p.ProjectId.Equals(projectId, StringComparison.InvariantCultureIgnoreCase));
+
+            return context.Pipelines.Where(p => p.ProjectId == project.Id)
+                                    .Select(p => p.PipelineId)
+                                    .AsEnumerable();
         }
 
         void IStorageReader.Close()

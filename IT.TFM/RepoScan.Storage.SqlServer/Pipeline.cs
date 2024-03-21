@@ -37,6 +37,44 @@ namespace RepoScan.Storage.SqlServer
             writer.UpdatePipelineFileId(pipelineId, repositoryId, fileId);
         }
 
+        void IWritePipeline.AddProperties(ProjectData.FileItem file)
+        {
+            var reader = GetReader();
+            var writer = GetWriter();
+
+            var pipelines = reader.GetPipelines(file.RepositoryId.ToString("D"), file.Id, file.Path);
+            foreach (var pipeline in pipelines)
+            {
+                foreach (var key in file.PipelineProperties.Keys)
+                {
+                    var value = file.PipelineProperties[key];
+                    switch (key)
+                    {
+                        case "template":
+                            pipeline.YamlType = value;
+                            break;
+
+                        case "portfolio":
+                            pipeline.Portfolio = value;
+                            break;
+
+                        case "product":
+                            pipeline.Product = value;
+                            break;
+                    }
+                }
+
+                writer.SavePipeline(pipeline);
+            }
+
+        }
+
+        void IWritePipeline.Delete(int id)
+        {
+            var writer = GetWriter();
+            writer.DeletePipeline(id);
+        }
+
         #endregion
 
         #region IReadPipelines Implementation
@@ -57,36 +95,10 @@ namespace RepoScan.Storage.SqlServer
                             .AsEnumerable();
         }
 
-        void IWritePipeline.AddProperties(ProjectData.FileItem file)
+        IEnumerable<int> IReadPipelines.GetPipelineIds(string projectId)
         {
             var reader = GetReader();
-            var writer = GetWriter();
-
-            var pipelines = reader.GetPipelines(file.RepositoryId.ToString("D"), file.Id, file.Path);
-            foreach (var pipeline in pipelines )
-            {
-                foreach (var key in file.PipelineProperties.Keys)
-                {
-                    var value = file.PipelineProperties[key];
-                    switch(key)
-                    {
-                        case "template":
-                            pipeline.YamlType = value;
-                            break;
-
-                        case "portfolio":
-                            pipeline.Portfolio = value;
-                            break;
-
-                        case "product":
-                            pipeline.Product = value;
-                            break;
-                    }
-                }
-
-                writer.SavePipeline(pipeline);
-            }
-
+            return reader.GetPipelineIdsForProject(projectId);
         }
 
         #endregion

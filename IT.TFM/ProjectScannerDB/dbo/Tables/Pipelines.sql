@@ -2,6 +2,7 @@
 (
 	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
     [PipelineId] INT NULL, 
+    [ProjectId] INT NULL,
     [RepositoryId] INT NULL, 
     [FileId] INT NULL,
     [Name] NVARCHAR(MAX) NOT NULL, 

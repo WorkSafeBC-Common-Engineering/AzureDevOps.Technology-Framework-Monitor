@@ -15,5 +15,7 @@ namespace RepoScan.DataModels
         void UpdateFileId(int pipelineId, string repositoryId, string fileId);
 
         void AddProperties(ProjectData.FileItem file);
+
+        void Delete(int id);
     }
 }

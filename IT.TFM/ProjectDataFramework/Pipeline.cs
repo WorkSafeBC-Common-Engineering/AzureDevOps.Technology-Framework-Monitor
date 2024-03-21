@@ -9,6 +9,8 @@ namespace ProjectData
 
         public int Id { get; set; } = 0;
 
+        public string ProjectId { get; set; } = string.Empty;
+
         public string RepositoryId { get; set; } = string.Empty;
 
         public string FileId { get; set; } = null;

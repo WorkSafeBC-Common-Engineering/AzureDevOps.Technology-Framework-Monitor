@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProjectData.Interfaces
 {
@@ -23,6 +19,8 @@ namespace ProjectData.Interfaces
         void SaveFile(FileItem file, Guid repoId, bool saveDetails, bool forceDetails);
 
         void DeleteFile(FileItem file, Guid repoId);
+
+        void DeletePipeline(int pipelineId);
 
         void Close();
     }
