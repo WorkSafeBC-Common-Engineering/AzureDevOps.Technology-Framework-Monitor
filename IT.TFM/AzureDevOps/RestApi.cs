@@ -48,6 +48,8 @@ namespace AzureDevOps
 
         private const string getPipelinesUrl = "https://{baseUrl}/{organization}/{project}/_apis/pipelines?{apiVersion}";
 
+        private const string getReleasesUrl = "https://vsrm.dev.azure.com/{organization}/{project}/_apis/release/definitions?{apiVersion}";
+
         private static readonly Dictionary<string, HttpClient> httpClients = [];
 
         private static readonly Semaphore waitOnApiCall = new(1, 1);
@@ -88,7 +90,7 @@ namespace AzureDevOps
             {
                 BaseUrl = url;
                 Organization = string.Empty;
-                CheckoutDirectory = Path.Combine(Environment.CurrentDirectory, BaseUrl);
+                CheckoutDirectory = Path.Combine(System.Environment.CurrentDirectory, BaseUrl);
             }
             else
             {
@@ -96,7 +98,7 @@ namespace AzureDevOps
 
                 BaseUrl = fields[0];
                 Organization = fields[1];
-                CheckoutDirectory = Path.Combine(Environment.CurrentDirectory, Organization);
+                CheckoutDirectory = Path.Combine(System.Environment.CurrentDirectory, Organization);
             }
 #if DEBUG
             Console.WriteLine($"=> Checkout Directory = {CheckoutDirectory}");
@@ -243,6 +245,43 @@ namespace AzureDevOps
 
 
             return filteredPipelines.AsEnumerable();
+        }
+
+        async Task<AzDoReleaseList> IRestApi.ListReleasesAsync()
+        {
+            var content = await CallApiAsync(GetUrl(getReleasesUrl));
+            if (content == string.Empty)
+            {
+                return new AzDoReleaseList();
+            }
+
+            var releases = JsonConvert.DeserializeObject<AzDoReleaseList>(content);
+            foreach (var release in releases.value)
+            {
+                if (string.IsNullOrEmpty(release.url))
+                {
+                    continue;
+                }
+
+                var releaseContent = await (CallApiAsync(release.url));
+                if (releaseContent == string.Empty)
+                {
+                    continue;
+                }
+
+                try
+                {
+                    var details = JsonConvert.DeserializeObject<AzDoReleaseDetails>(releaseContent);
+                    release.Details = details;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                    throw;
+                }
+            }
+
+            return releases ?? new AzDoReleaseList();
         }
 
         #endregion

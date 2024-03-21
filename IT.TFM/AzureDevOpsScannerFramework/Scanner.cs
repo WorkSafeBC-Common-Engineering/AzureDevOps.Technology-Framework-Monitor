@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
+
 using AzureDevOps.Models;
 
-using Microsoft.TeamFoundation.Core.WebApi;
-using Microsoft.TeamFoundation.SourceControl.WebApi;
-using Microsoft.VisualStudio.Services.Client;
 using Microsoft.VisualStudio.Services.Common;
-using Microsoft.VisualStudio.Services.WebApi;
+
 using ProjectData;
 using ProjectData.Interfaces;
+
+using Project = ProjectData.Project;
+using Repository = ProjectData.Repository;
 
 namespace AzureDevOpsScannerFramework
 {
@@ -170,6 +170,23 @@ namespace AzureDevOpsScannerFramework
             foreach (var pipeline in azDoPipelines)
             {
                 var p = GetPipeline(pipeline);
+                p.ProjectId = api.Project;
+                pipelineList.Add(p);
+            }
+
+            return pipelineList.AsEnumerable();
+        }
+
+        async Task<IEnumerable<Pipeline>> IScanner.Releases(Guid projectId, string repositoryId)
+        {
+            var pipelineList = new List<Pipeline>();
+            api.Project = projectId.ToString();
+            api.Repository = repositoryId;
+            var azdoReleases = await api.ListReleasesAsync();
+            foreach (var release in azdoReleases.value)
+            {
+                Debug.WriteLine($"Release: {release.id} - {release.name}");
+                var p = GetPipeline(release);
                 p.ProjectId = api.Project;
                 pipelineList.Add(p);
             }
@@ -400,6 +417,22 @@ namespace AzureDevOpsScannerFramework
             }
 
             return p;
+        }
+
+        private static Pipeline GetPipeline(AzDoRelease release)
+        {
+            var pipeline = new Pipeline
+            {
+                Id = release.id,
+                Name = release.name,
+                Folder = release.path,
+                Url = release.url,
+                Type = Pipeline.pipelineTypeRelease,
+                PipelineType = Pipeline.pipelineRelease,
+                Revision = release.revision,
+            };
+
+            return pipeline;
         }
 
         #endregion

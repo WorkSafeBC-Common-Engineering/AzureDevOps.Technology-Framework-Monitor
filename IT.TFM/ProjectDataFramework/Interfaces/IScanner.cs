@@ -20,6 +20,8 @@ namespace ProjectData.Interfaces
 
         Task<IEnumerable<Pipeline>> Pipelines(Guid projectId, string repositoryId);
 
+        Task<IEnumerable<Pipeline>> Releases(Guid projectId, string repositoryId);
+
         void DeleteFiles();
 
         FileItem FileDetails(Guid projectId, Guid repositoryId, FileItem file);

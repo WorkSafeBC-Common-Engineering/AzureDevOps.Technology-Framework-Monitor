@@ -6,6 +6,8 @@ namespace ProjectData
     {
         public const string pipelineTypeYaml = "yaml";
         public const string pipelineTypeClassic = "designerJson";
+        public const string pipelineTypeRelease = "release";
+        public const string pipelineRelease = "release";
 
         public int Id { get; set; } = 0;
 

@@ -33,6 +33,8 @@ namespace AzureDevOps
 
         Task<AzDoProjectList> GetProjectsAsync();
 
+        Task<AzDoReleaseList> ListReleasesAsync();
+
         Task<AzDoRepository?> GetRepositoryAsync(string repositoryId);
 
         Task<AzDoRepositoryList> GetRepositoriesAsync();

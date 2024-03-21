@@ -73,6 +73,8 @@ namespace RepoScan.FileLocator
                     }
 
                     await PipelineScanner.ScanAsync(scanner, project.Id, repositoryId);
+
+                    await PipelineScanner.ScanReleasesAsync(scanner, project.Id, repositoryId);
                 }
             }
         }
