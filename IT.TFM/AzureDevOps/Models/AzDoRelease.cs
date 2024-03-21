@@ -11,7 +11,6 @@ namespace AzureDevOps.Models
         public AzDoReleaseDetails? Details { get; set; }
         public string? source { get; set; }
         public int revision { get; set; }
-        public object? description { get; set; }
         public Createdby? createdBy { get; set; }
         public DateTime createdOn { get; set; }
         public Modifiedby? modifiedBy { get; set; }

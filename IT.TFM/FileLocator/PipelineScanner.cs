@@ -91,6 +91,11 @@ namespace RepoScan.FileLocator
         public static async Task ScanReleasesAsync(IScanner scanner, Guid projectId, string repositoryId)
         {
             var releases = await scanner.Releases(projectId, repositoryId);
+
+            foreach (var release in releases)
+            {
+                
+            }
         }
 
         #endregion

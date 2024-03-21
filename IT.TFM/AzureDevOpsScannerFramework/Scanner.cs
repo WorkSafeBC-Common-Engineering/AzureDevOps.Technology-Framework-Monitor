@@ -13,6 +13,7 @@ using Microsoft.VisualStudio.Services.Common;
 using ProjectData;
 using ProjectData.Interfaces;
 
+using Artifact = ProjectData.Artifact;
 using Project = ProjectData.Project;
 using Repository = ProjectData.Repository;
 
@@ -188,6 +189,7 @@ namespace AzureDevOpsScannerFramework
                 Debug.WriteLine($"Release: {release.id} - {release.name}");
                 var p = GetPipeline(release);
                 p.ProjectId = api.Project;
+               
                 pipelineList.Add(p);
             }
 
@@ -419,9 +421,9 @@ namespace AzureDevOpsScannerFramework
             return p;
         }
 
-        private static Pipeline GetPipeline(AzDoRelease release)
+        private static Release GetPipeline(AzDoRelease release)
         {
-            var pipeline = new Pipeline
+            var pipeline = new Release
             {
                 Id = release.id,
                 Name = release.name,
@@ -430,6 +432,32 @@ namespace AzureDevOpsScannerFramework
                 Type = Pipeline.pipelineTypeRelease,
                 PipelineType = Pipeline.pipelineRelease,
                 Revision = release.revision,
+                Source = release.source,
+                CreatedByName = release.createdBy.displayName,
+                CreatedById = release.createdBy.uniqueName,
+                CreatedDateTime = release.createdOn,
+                ModifiedByName = release.modifiedBy?.displayName,
+                ModifiedById = release.modifiedBy?.uniqueName,
+                ModifiedDateTime = release.modifiedOn,
+                IsDeleted = release.isDeleted,
+                IsDisabled = release.isDisabled,
+                LastReleaseId = release.Details?.lastRelease?.id ?? 0,
+                LastReleaseName = release.Details?.lastRelease?.name,
+                Environments = release.Details.environments.Select(e => e.name).ToArray(),
+                Artifacts = release.Details.artifacts.Select(a => new Artifact
+                    {
+                        SourceId = a.sourceId,
+                        Type = a.type,
+                        Alias = a.alias,
+                        Url = a.definitionReference?.artifactSourceDefinitionUrl?.id,
+                        DefaultVersionType = a.definitionReference?.defaultVersionType?.name,
+                        DefinitionId = a.definitionReference?.definition?.id,
+                        DefinitionName = a.definitionReference?.definition?.name,
+                        Project = a.definitionReference?.project?.name,
+                        ProjectId = a.definitionReference?.project?.id,
+                        IsPrimary = a.isPrimary,
+                        IsRetained = a.isRetained
+                    }).ToArray()
             };
 
             return pipeline;
