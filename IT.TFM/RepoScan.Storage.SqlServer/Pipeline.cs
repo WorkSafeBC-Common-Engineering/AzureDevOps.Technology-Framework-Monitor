@@ -39,10 +39,10 @@ namespace RepoScan.Storage.SqlServer
             writer.SaveRelease(release);
         }
 
-        void IWritePipeline.UpdateFileId(int pipelineId, string repositoryId, string fileId)
+        void IWritePipeline.LinkToFile(int pipelineId, string repositoryId, string filePath)
         {
             var writer = GetWriter();
-            writer.UpdatePipelineFileId(pipelineId, repositoryId, fileId);
+            writer.LinkPipelineToFile(pipelineId, repositoryId, filePath);
         }
 
         void IWritePipeline.AddProperties(ProjectData.FileItem file)
@@ -50,7 +50,7 @@ namespace RepoScan.Storage.SqlServer
             var reader = GetReader();
             var writer = GetWriter();
 
-            var pipelines = reader.GetPipelines(file.RepositoryId.ToString("D"), file.Id, file.Path);
+            var pipelines = reader.GetPipelines(file.RepositoryId.ToString("D"), file.Path);
             foreach (var pipeline in pipelines)
             {
                 foreach (var key in file.PipelineProperties.Keys)

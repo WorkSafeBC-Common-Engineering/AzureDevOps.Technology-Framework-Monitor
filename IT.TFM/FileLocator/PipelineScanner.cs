@@ -83,7 +83,7 @@ namespace RepoScan.FileLocator
 
                 Parallel.ForEach(yamlFiles, options, (file) =>
                 {
-                    LinkYamlPipeline(repoId, file.Path, file.Id);
+                    LinkYamlPipeline(repoId, file.Path);
                 });
             }
         }
@@ -104,7 +104,7 @@ namespace RepoScan.FileLocator
 
         #region Private Methods
 
-        public static void LinkYamlPipeline(string repositoryId, string filePath, string fileId)
+        public static void LinkYamlPipeline(string repositoryId, string filePath)
         {
             lock (pipelineReaderLock)
             {
@@ -115,7 +115,7 @@ namespace RepoScan.FileLocator
                 }
             }
 
-            Debug.WriteLine($"Link Yaml Pipeline: Repository ID: {repositoryId}, Path: {filePath}, FileID: {fileId}");
+            Debug.WriteLine($"Link Yaml Pipeline: Repository ID: {repositoryId}, Path: {filePath}");
 
             // It is possible that multiple pipelines can be created from the same YAML file, so need to process each case
             var pipelines = yamlPipelines.Where(p => p.RepositoryId != null
@@ -125,10 +125,7 @@ namespace RepoScan.FileLocator
             foreach (var pipeline in pipelines)
             {
                 Debug.WriteLine($"Pipeline to File match: {pipeline}");
-                if (!fileId.Equals(pipeline.FileId) )
-                {
-                    writer.UpdateFileId(pipeline.PipelineId, pipeline.RepositoryId, fileId);
-                }
+                writer.LinkToFile(pipeline.PipelineId, pipeline.RepositoryId, filePath);
             }
         }
 

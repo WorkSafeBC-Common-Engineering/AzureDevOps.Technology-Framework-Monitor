@@ -163,7 +163,7 @@ namespace ProjectScannerSaveToSqlServer
             repositoryId = dbRepo.Id;
         }
 
-        void IStorageWriter.SaveFile(ProjData.FileItem file, Guid repoId, bool saveDetails, bool forceDetails)
+        void IStorageWriter.SaveFile(FileItem file, Guid repoId, bool saveDetails, bool forceDetails)
         {
             var id = repoId.ToString("D").ToLower();
             var repo = context.Repositories
@@ -172,13 +172,9 @@ namespace ProjectScannerSaveToSqlServer
             int repositoryId = repo == null ? 0 : repo.Id;
 
             context.Database.CommandTimeout = 3600;
-            var allFiles = context.Files
-                                .Where(f => f.RepositoryId == repositoryId
-                                                        && f.FileId.Equals(file.Id, StringComparison.InvariantCultureIgnoreCase)
-                                                        && f.Url.Equals(file.Url, StringComparison.InvariantCultureIgnoreCase))
-                                .ToArray();
-
-            var dbFile = allFiles.SingleOrDefault(f => f.Url.Equals(file.Url, StringComparison.InvariantCultureIgnoreCase));
+            var dbFile = context.Files
+                                .SingleOrDefault(f => f.RepositoryId == repositoryId
+                                                   && f.Path.Equals(file.Path, StringComparison.InvariantCultureIgnoreCase));
 
             if (dbFile != null && !forceDetails
                 && (    (dbFile.CommitId == null && (file.CommitId == null || !saveDetails))
@@ -201,8 +197,7 @@ namespace ProjectScannerSaveToSqlServer
                 dbFile = new File
                 {
                     RepositoryId = repositoryId,
-                    FileId = file.Id,
-                    CommitId = string.Empty
+                    Path = file.Path
                 };
 
                 context.Files.Add(dbFile);
@@ -210,7 +205,7 @@ namespace ProjectScannerSaveToSqlServer
 
             dbFile.FileType = context.FileTypes.SingleAsync(ft => ft.Value.Equals(file.FileType.ToString(), StringComparison.InvariantCultureIgnoreCase))
                                                .Result;
-            dbFile.Path = file.Path;
+            dbFile.FileId = file.Id;
             dbFile.Url = file.Url;
             dbFile.CommitId = file.CommitId;
 
@@ -362,7 +357,7 @@ namespace ProjectScannerSaveToSqlServer
             _ = context.SaveChangesAsync().Result;
         }
 
-        void IStorageWriter.UpdatePipelineFileId(int pipelineId, string repositoryId, string fileId)
+        void IStorageWriter.LinkPipelineToFile(int pipelineId, string repositoryId, string path)
         {
             var pipeline = context.Pipelines.SingleOrDefault(p => p.Id == pipelineId
                                                                && p.Repository.RepositoryId == repositoryId
@@ -370,7 +365,6 @@ namespace ProjectScannerSaveToSqlServer
             if (pipeline != null)
             {
                 var file = context.Files.SingleOrDefault(f => f.Repository.RepositoryId == repositoryId
-                                                           && f.FileId == fileId
                                                            && f.Path.Equals(pipeline.Path, StringComparison.InvariantCultureIgnoreCase));
                 
                 pipeline.FileId = file?.Id;
@@ -379,7 +373,7 @@ namespace ProjectScannerSaveToSqlServer
             }
         }
 
-        void IStorageWriter.DeleteFile(ProjData.FileItem file, Guid repoId)
+        void IStorageWriter.DeleteFile(FileItem file, Guid repoId)
         {
             var id = repoId.ToString("D").ToLower();
             var repo = context.Repositories
@@ -388,14 +382,9 @@ namespace ProjectScannerSaveToSqlServer
             int repositoryId = repo == null ? 0 : repo.Id;
 
             context.Database.CommandTimeout = 3600;
-            var allFiles = context.Files
-                                .Where(f => f.RepositoryId == repositoryId
-                                                        && f.FileId.Equals(file.Id, StringComparison.InvariantCultureIgnoreCase)
-                                                        && f.Url.Equals(file.Url, StringComparison.InvariantCultureIgnoreCase))
-                                .ToArray();
-
-            var dbFile = allFiles.SingleOrDefault(f => f.Url.Equals(file.Url, StringComparison.InvariantCultureIgnoreCase));
-
+            var dbFile = context.Files
+                                .SingleOrDefault(f => f.RepositoryId == repositoryId
+                                                   && f.Path.Equals(file.Path, StringComparison.InvariantCultureIgnoreCase));
             if (dbFile == null)
             {
                 return;
@@ -419,7 +408,7 @@ namespace ProjectScannerSaveToSqlServer
                 }
             }
 
-            var pipelines = context.Pipelines.Where(p => p.FileId == dbFile.Id);
+            var pipelines = context.Pipelines.Where(p => p.Path.Equals(dbFile.Path, StringComparison.InvariantCultureIgnoreCase));
             foreach(var pipeline in pipelines)
             {
                 pipeline.FileId = null;

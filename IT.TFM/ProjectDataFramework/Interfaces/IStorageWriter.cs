@@ -16,7 +16,7 @@ namespace ProjectData.Interfaces
 
         void SaveRelease(Release release);
 
-        void UpdatePipelineFileId(int pipelineId, string repositoryId, string fileId);
+        void LinkPipelineToFile(int pipelineId, string repositoryId, string path);
 
         void SaveFile(FileItem file, Guid repoId, bool saveDetails, bool forceDetails);
 

@@ -14,7 +14,7 @@ namespace RepoScan.DataModels
 
         void WriteRelease(Release release);
 
-        void UpdateFileId(int pipelineId, string repositoryId, string fileId);
+        void LinkToFile(int pipelineId, string repositoryId, string filePath);
 
         void AddProperties(ProjectData.FileItem file);
 

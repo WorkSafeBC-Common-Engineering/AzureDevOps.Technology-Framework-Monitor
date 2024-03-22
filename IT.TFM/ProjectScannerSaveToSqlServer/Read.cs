@@ -401,16 +401,15 @@ namespace ProjectScannerSaveToSqlServer
             }
         }
 
-        public IEnumerable<Pipeline> GetPipelines(string repositoryId, string fileId, string filePath)
+        public IEnumerable<Pipeline> GetPipelines(string repositoryId, string filePath)
         {
             var repository = context.Repositories.Single(r => r.RepositoryId == repositoryId);
             var file = context.Files.Single(f => f.RepositoryId == repository.Id
-                                              && f.FileId.Equals(fileId, StringComparison.InvariantCultureIgnoreCase)
                                               && f.Path.Equals(filePath, StringComparison.InvariantCultureIgnoreCase));
 
             var pipelines = context.Pipelines.Where(p => p.RepositoryId == repository.Id
                                                       && p.FileId == file.Id
-                                                      && p.Type != ProjectData.Pipeline.pipelineTypeRelease);
+                                                      && p.Type != Pipeline.pipelineTypeRelease);
 
             var projectId = repository.Project.ProjectId;
 
