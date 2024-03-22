@@ -15,6 +15,18 @@
     [YamlType] NVARCHAR(20) NULL,
     [Portfolio] NVARCHAR(MAX) NULL,
     [Product] NVARCHAR(MAX) NULL,
+    [Source] NVARCHAR(MAX) NULL,
+    [CreatedByName] NVARCHAR(MAX) NULL,
+    [CreatedById] NVARCHAR(MAX) NULL,
+    [CreatedDateTime] DATETIME NULL,
+    [ModifiedByName] NVARCHAR(MAX) NULL,
+    [ModifiedById] NVARCHAR(MAX) NULL,
+    [ModifiedDateTime] DATETIME NULL,
+    [IsDeleted] BIT NOT NULL DEFAULT(0),
+    [IsDisabled] BIT NOT NULL DEFAULT(0),
+    [LastReleaseId] INT NULL,
+    [LastReleaseName] NVARCHAR(MAX) NULL,
+    [Environments] NVARCHAR(MAX) NULL,
     CONSTRAINT [FK_Pipelines_ToRepository] FOREIGN KEY ([RepositoryId]) REFERENCES Repositories([Id]), 
     CONSTRAINT [FK_Pipelines_ToFile] FOREIGN KEY ([FileId]) REFERENCES [Files]([Id])
 )

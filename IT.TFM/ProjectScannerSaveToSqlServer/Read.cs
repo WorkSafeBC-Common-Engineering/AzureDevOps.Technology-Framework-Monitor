@@ -409,7 +409,8 @@ namespace ProjectScannerSaveToSqlServer
                                               && f.Path.Equals(filePath, StringComparison.InvariantCultureIgnoreCase));
 
             var pipelines = context.Pipelines.Where(p => p.RepositoryId == repository.Id
-                                                      && p.FileId == file.Id);
+                                                      && p.FileId == file.Id
+                                                      && p.Type != ProjectData.Pipeline.pipelineTypeRelease);
 
             var projectId = repository.Project.ProjectId;
 
@@ -436,7 +437,8 @@ namespace ProjectScannerSaveToSqlServer
         {
             var project = context.Projects.SingleOrDefault(p => p.ProjectId.Equals(projectId, StringComparison.InvariantCultureIgnoreCase));
 
-            return context.Pipelines.Where(p => p.ProjectId == project.Id)
+            return context.Pipelines.Where(p => p.ProjectId == project.Id
+                                             && p.Type != Pipeline.pipelineTypeRelease)
                                     .Select(p => p.PipelineId)
                                     .AsEnumerable();
         }

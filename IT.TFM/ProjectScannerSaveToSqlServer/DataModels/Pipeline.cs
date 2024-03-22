@@ -11,6 +11,11 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 {
     public class Pipeline
     {
+        public Pipeline()
+        {
+            ReleaseArtifacts = [];
+        }
+
         public int Id { get; set; }
 
         public int PipelineId { get; set; }
@@ -47,8 +52,34 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
         public string Product { get; set; } = null;
 
+        public string Source { get; set; }
+
+        public string CreatedByName { get; set; }
+
+        public string CreatedById { get; set; }
+
+        public DateTime? CreatedDateTime { get; set; }
+
+        public string ModifiedByName { get; set; }
+
+        public string ModifiedById { get; set; }
+
+        public DateTime? ModifiedDateTime { get; set; }
+
+        public bool IsDeleted { get; set; } = false;
+
+        public bool IsDisabled { get; set; } = false;
+
+        public int? LastReleaseId { get; set; }
+
+        public string LastReleaseName { get; set; }
+
+        public string Environments { get; set; }
+
         public virtual Repository Repository { get; set; }
 
         public virtual Project Project { get; set; }
+
+        public virtual ICollection<ReleaseArtifact> ReleaseArtifacts { get; set; }
     }
 }

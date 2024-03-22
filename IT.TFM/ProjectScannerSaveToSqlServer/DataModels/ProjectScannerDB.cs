@@ -20,6 +20,7 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         public virtual DbSet<Repository> Repositories { get; set; }
         public virtual DbSet<ScannerType> ScannerTypes { get; set; }
         public virtual DbSet<Pipeline> Pipelines { get; set; }
+        public virtual DbSet<ReleaseArtifact> ReleaseArtifacts { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -77,6 +78,11 @@ namespace ProjectScannerSaveToSqlServer.DataModels
             modelBuilder.Entity<ScannerType>()
                 .HasMany(e => e.Organizations)
                 .WithRequired(e => e.ScannerType)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity <Pipeline>()
+                .HasMany(e => e.ReleaseArtifacts)
+                .WithRequired(e => e.Pipeline)
                 .WillCascadeOnDelete(false);
         }
     }

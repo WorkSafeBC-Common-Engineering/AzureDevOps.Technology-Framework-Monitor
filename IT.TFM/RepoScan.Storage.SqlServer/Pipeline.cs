@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using ConfidentialSettings;
+using ProjectData;
 
 namespace RepoScan.Storage.SqlServer
 {
@@ -29,6 +30,13 @@ namespace RepoScan.Storage.SqlServer
             var writer = GetWriter();
 
             writer.SavePipeline(pipeline);
+        }
+
+        void IWritePipeline.WriteRelease(Release release)
+        {
+            var writer = GetWriter();
+
+            writer.SaveRelease(release);
         }
 
         void IWritePipeline.UpdateFileId(int pipelineId, string repositoryId, string fileId)

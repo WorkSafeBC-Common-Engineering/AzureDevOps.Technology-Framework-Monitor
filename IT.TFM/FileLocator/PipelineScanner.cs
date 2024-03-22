@@ -91,10 +91,12 @@ namespace RepoScan.FileLocator
         public static async Task ScanReleasesAsync(IScanner scanner, Guid projectId, string repositoryId)
         {
             var releases = await scanner.Releases(projectId, repositoryId);
+            var pipelineWriter = StorageFactory.GetPipelineWriter();
 
-            foreach (var release in releases)
+            foreach (var pipeline in releases)
             {
-                
+                var release = pipeline as Release;
+                pipelineWriter.WriteRelease(release);
             }
         }
 

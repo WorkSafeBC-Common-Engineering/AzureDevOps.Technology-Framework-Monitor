@@ -238,7 +238,7 @@ namespace ProjectScannerSaveToSqlServer
                                 .SingleOrDefault(r => r.RepositoryId.Equals(pipeline.RepositoryId, StringComparison.InvariantCultureIgnoreCase));
 
             var dbPipeline = context.Pipelines
-                                    .SingleOrDefault(p => p.PipelineId == pipeline.Id);
+                                    .SingleOrDefault(p => p.PipelineId == pipeline.Id && p.Type != ProjData.Pipeline.pipelineTypeRelease);
 
             var dbFile = dbRepo != null ? context.Files
                                                  .SingleOrDefault(f => f.RepositoryId == dbRepo.Id
@@ -287,10 +287,86 @@ namespace ProjectScannerSaveToSqlServer
             _ = context.SaveChangesAsync().Result;
         }
 
+        void IStorageWriter.SaveRelease(Release release)
+        {
+            Debug.WriteLine($"SavePipeline: PipelineId = {release.Id}, ProjectId = {release.ProjectId}, Pipeline Name = {release.Name}, Pipeline URL = {release.Url}, Pipeline Path = {release.Folder}");
+
+            var dbProject = context.Projects
+                                   .SingleOrDefault(p => p.ProjectId == release.ProjectId);
+
+            var dbPipeline = context.Pipelines
+                                    .SingleOrDefault(p => p.PipelineId == release.Id
+                                                       && p.Type == ProjData.Pipeline.pipelineTypeRelease);
+
+            if (dbPipeline == null)
+            {
+                dbPipeline = new DataModels.Pipeline
+                {
+                    PipelineId = release.Id,
+                };
+
+                context.Pipelines.Add(dbPipeline);
+            }
+
+            dbPipeline.ProjectId = dbProject?.Id;
+            dbPipeline.Name = release.Name;
+            dbPipeline.Folder = release.Folder;
+            dbPipeline.Revision = release.Revision;
+            dbPipeline.Url = release.Url;
+            dbPipeline.Type = release.Type;
+            dbPipeline.PipelineType = release.PipelineType;
+
+            dbPipeline.Source = release.Source;
+            dbPipeline.CreatedById = release.CreatedById;
+            dbPipeline.CreatedByName = release.CreatedByName;
+            dbPipeline.CreatedDateTime = release.CreatedDateTime;
+            dbPipeline.ModifiedById = release.ModifiedById;
+            dbPipeline.ModifiedByName = release.ModifiedByName;
+            dbPipeline.ModifiedDateTime = release.ModifiedDateTime;
+            dbPipeline.IsDeleted = release.IsDeleted;
+            dbPipeline.IsDisabled = release.IsDisabled;
+            dbPipeline.LastReleaseId = release.LastReleaseId;
+            dbPipeline.LastReleaseName = release.LastReleaseName;
+            dbPipeline.Environments = string.Join('|', release.Environments);
+
+            _ = context.SaveChangesAsync().Result;
+
+            var currentArtifacts = context.ReleaseArtifacts.Where(a => a.PipelineId == dbPipeline.Id);
+            foreach (var artifact in release.Artifacts)
+            {
+                var dbArtifact = currentArtifacts.SingleOrDefault(a => a.SourceId.Equals(artifact.SourceId, StringComparison.InvariantCultureIgnoreCase)
+                                                                    && a.Alias.Equals(artifact.Alias, StringComparison.InvariantCultureIgnoreCase));
+
+                if (dbArtifact == null)
+                {
+                    dbArtifact = new()
+                    {
+                        SourceId = artifact.SourceId,
+                        Alias = artifact.Alias
+                    };
+                    context.ReleaseArtifacts.Add(dbArtifact);
+                }
+
+                dbArtifact.Url = artifact.Url;
+                dbArtifact.PipelineId = dbPipeline.Id;
+                dbArtifact.Type = artifact.Type;
+                dbArtifact.DefaultVersionType = artifact.DefaultVersionType;
+                dbArtifact.DefinitionId = artifact.DefinitionId;
+                dbArtifact.DefinitionName = artifact.DefinitionName;
+                dbArtifact.Project = artifact.Project;
+                dbArtifact.ProjectId = artifact.ProjectId;
+                dbArtifact.IsPrimary = artifact.IsPrimary;
+                dbArtifact.IsRetained = artifact.IsRetained;
+            }
+
+            _ = context.SaveChangesAsync().Result;
+        }
+
         void IStorageWriter.UpdatePipelineFileId(int pipelineId, string repositoryId, string fileId)
         {
             var pipeline = context.Pipelines.SingleOrDefault(p => p.Id == pipelineId
-                                                               && p.Repository.RepositoryId == repositoryId);
+                                                               && p.Repository.RepositoryId == repositoryId
+                                                               && p.Type != ProjData.Pipeline.pipelineTypeRelease);
             if (pipeline != null)
             {
                 var file = context.Files.SingleOrDefault(f => f.Repository.RepositoryId == repositoryId
@@ -356,7 +432,8 @@ namespace ProjectScannerSaveToSqlServer
 
         void IStorageWriter.DeletePipeline(int pipelineId)
         {
-            var pipeline = context.Pipelines.SingleOrDefault(p => p.PipelineId == pipelineId);
+            var pipeline = context.Pipelines.SingleOrDefault(p => p.PipelineId == pipelineId
+                                                               && p.Type != ProjData.Pipeline.pipelineTypeRelease);
             if (pipeline != null)
             {
                 context.Entry(pipeline).State = EntityState.Deleted;
