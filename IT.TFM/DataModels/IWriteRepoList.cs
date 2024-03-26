@@ -2,6 +2,6 @@
 {
     public interface IWriteRepoList
     {
-        void Write(RepositoryItem item, bool repoOnly);
+        int Write(RepositoryItem item, int projectId, bool repoOnly);
     }
 }

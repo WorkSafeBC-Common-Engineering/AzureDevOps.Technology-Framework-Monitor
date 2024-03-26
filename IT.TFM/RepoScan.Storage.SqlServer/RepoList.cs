@@ -10,19 +10,11 @@ namespace RepoScan.Storage.SqlServer
 {
     public class RepoList : IReadRepoList, IWriteRepoList
     {
-        #region Private Members
-
-        private IStorageWriter sqlWriter = null;
-
-        private IStorageReader sqlReader = null;
-
-        #endregion
-
         #region IReadRepoList Implementation
 
         IEnumerable<RepositoryItem> IReadRepoList.Read(string projectId, string repositoryId)
         {
-            var reader = GetReader();
+            using var reader = GetReader();
             var org = reader.GetOrganization(projectId, repositoryId);
 
             if (org == null)
@@ -84,7 +76,7 @@ namespace RepoScan.Storage.SqlServer
 
         IEnumerable<string> IReadRepoList.GetRepositoryIds()
         {
-            var reader = GetReader();
+            using var reader = GetReader();
             return reader.GetRepositoryIds();
         }
 
@@ -92,14 +84,15 @@ namespace RepoScan.Storage.SqlServer
 
         #region IWriteRepoList Implementation
 
-        void IWriteRepoList.Write(RepositoryItem item, bool repoOnly)
+        int IWriteRepoList.Write(RepositoryItem item, int projectId, bool repoOnly)
         {
-            var writer = GetWriter();
+            using var writer = GetWriter();
+            int organizationId = 0;
 
             if (!repoOnly)
             {
                 var organization = new Organization(item.Source, item.OrgName, item.OrgUrl);
-                writer.SaveOrganization(organization);
+                organizationId = writer.SaveOrganization(organization);
 
                 var project = new Project()
                 {
@@ -115,7 +108,7 @@ namespace RepoScan.Storage.SqlServer
                     Deleted = item.ProjectIsDeleted
                 };
 
-                writer.SaveProject(project);
+                projectId = writer.SaveProject(project, organizationId);
             }
 
             var repository = new Repository
@@ -132,25 +125,23 @@ namespace RepoScan.Storage.SqlServer
                 LastCommitId = item.RepositoryLastCommitId
             };
 
-            writer.SaveRepository(repository);
+            _ = writer.SaveRepository(repository, projectId);
+
+            return projectId;
         }
 
         #endregion
 
         #region Private Methods
 
-        private IStorageWriter GetWriter()
+        private static IStorageWriter GetWriter()
         {
-            sqlWriter ??= DataStorage.StorageFactory.GetStorageWriter();
-
-            return sqlWriter;
+            return DataStorage.StorageFactory.GetStorageWriter();
         }
 
-        private IStorageReader GetReader()
+        private static IStorageReader GetReader()
         {
-            sqlReader ??= DataStorage.StorageFactory.GetStorageReader();
-
-            return sqlReader;
+            return DataStorage.StorageFactory.GetStorageReader();
         }
 
         #endregion

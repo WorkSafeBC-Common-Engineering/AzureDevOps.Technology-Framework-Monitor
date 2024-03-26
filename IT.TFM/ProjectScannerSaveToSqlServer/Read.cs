@@ -9,11 +9,11 @@ using System.Linq;
 namespace ProjectScannerSaveToSqlServer
 {
     public class Read : DbCore, IStorageReader
-    {
+    { 
         #region Private Members
 
         private Organization organization = null;
-        private int yamlFileType = 10;
+        private const int yamlFileType = 10;
 
         #endregion
 
@@ -440,11 +440,6 @@ namespace ProjectScannerSaveToSqlServer
                                              && p.Type != Pipeline.pipelineTypeRelease)
                                     .Select(p => p.PipelineId)
                                     .AsEnumerable();
-        }
-
-        void IStorageReader.Close()
-        {
-            Close();
         }
 
         #endregion

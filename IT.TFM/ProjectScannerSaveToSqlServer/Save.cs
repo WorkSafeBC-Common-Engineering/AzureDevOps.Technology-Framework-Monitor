@@ -22,12 +22,7 @@ namespace ProjectScannerSaveToSqlServer
             Initialize(configuration);
         }
 
-        void IStorageWriter.Close()
-        {
-            Close();
-        }
-
-        void IStorageWriter.SaveOrganization(ProjData.Organization organization)
+        int IStorageWriter.SaveOrganization(ProjData.Organization organization)
         {
             var org = context.Organizations
                              .SingleOrDefault(o => o.ScannerType.Value.Equals(organization.Source.ToString(), StringComparison.InvariantCultureIgnoreCase)
@@ -47,16 +42,16 @@ namespace ProjectScannerSaveToSqlServer
 
             org.Name = organization.Name;
 
-            // CleanupOrganizationProjects(organization, org.Id);
-
             _ = context.SaveChangesAsync().Result;
 
             organizationId = org.Id;
             projectId = 0;
             repositoryId = 0;
+
+            return org.Id;
         }
 
-        void IStorageWriter.SaveProject(ProjData.Project project)
+        int IStorageWriter.SaveProject(ProjData.Project project, int organizationId)
         {
             if (organizationId == 0)
             {
@@ -88,15 +83,14 @@ namespace ProjectScannerSaveToSqlServer
             dbProject.Visibility = project.Visibility;
             dbProject.Deleted = project.Deleted;
 
-            // CleanupProjectRepositories(project, dbProject.Id);
-
             _ = context.SaveChangesAsync().Result;
 
             projectId = dbProject.Id;
             repositoryId = 0;
+            return dbProject.Id;
         }
 
-        void IStorageWriter.SaveRepository(ProjData.Repository repository)
+        int IStorageWriter.SaveRepository(ProjData.Repository repository, int projectId)
         {
             if (projectId == 0)
             {
@@ -161,6 +155,7 @@ namespace ProjectScannerSaveToSqlServer
             _ = context.SaveChangesAsync().Result;
 
             repositoryId = dbRepo.Id;
+            return dbRepo.Id;
         }
 
         void IStorageWriter.SaveFile(FileItem file, Guid repoId, bool saveDetails, bool forceDetails)
@@ -224,7 +219,9 @@ namespace ProjectScannerSaveToSqlServer
 
         void IStorageWriter.SavePipeline(ProjData.Pipeline pipeline)
         {
-            Debug.WriteLine($"SavePipeline: PipelineId = {pipeline.Id}, ProjectId = {pipeline.ProjectId}, Repo ID = {pipeline.RepositoryId}, Pipeline Name = {pipeline.Name}, Pipeline URL = {pipeline.Url}, Pipeline Path = {pipeline.Path}");
+#if DEBUG
+            Console.WriteLine($"SavePipeline: PipelineId = {pipeline.Id}, ProjectId = {pipeline.ProjectId}, Repo ID = {pipeline.RepositoryId}, Pipeline Name = {pipeline.Name}, Pipeline URL = {pipeline.Url}, Pipeline Path = {pipeline.Path}");
+#endif
 
             var dbProject = context.Projects
                                    .SingleOrDefault(p => p.ProjectId == pipeline.ProjectId);
@@ -284,7 +281,9 @@ namespace ProjectScannerSaveToSqlServer
 
         void IStorageWriter.SaveRelease(Release release)
         {
-            Debug.WriteLine($"SavePipeline: PipelineId = {release.Id}, ProjectId = {release.ProjectId}, Pipeline Name = {release.Name}, Pipeline URL = {release.Url}, Pipeline Path = {release.Folder}");
+#if DEBUG
+            Console.WriteLine($"SavePipeline: PipelineId = {release.Id}, ProjectId = {release.ProjectId}, Pipeline Name = {release.Name}, Pipeline URL = {release.Url}, Pipeline Path = {release.Folder}");
+#endif
 
             var dbProject = context.Projects
                                    .SingleOrDefault(p => p.ProjectId == release.ProjectId);

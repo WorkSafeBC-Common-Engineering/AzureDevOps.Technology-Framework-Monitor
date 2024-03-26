@@ -35,6 +35,7 @@ namespace RepoScan.FileLocator
 
             var lastProject = Guid.Empty;
             IEnumerable<Repository> repoList = null;
+            var dbProjectId = 0;
 
             foreach (var repoItem in reader.Read(projectId, repositoryId))
             {
@@ -67,7 +68,7 @@ namespace RepoScan.FileLocator
                 if (!projectList.Any(p => p == repoItem.ProjectId))
                 {
                     repoItem.ProjectIsDeleted = true;
-                    repoWriter.Write(repoItem, false);
+                    dbProjectId = repoWriter.Write(repoItem, dbProjectId, false);
 #if DEBUG
                     Console.WriteLine($"=> File Scan GetFiles(): Project {repoItem.ProjectName} was deleted");
 #endif
@@ -112,7 +113,7 @@ namespace RepoScan.FileLocator
                 {
                     // flag repo as deleted.
                     repoItem.IsDeleted = true;
-                    repoWriter.Write(repoItem, false);
+                    dbProjectId = repoWriter.Write(repoItem, dbProjectId, false);
 #if DEBUG
                     Console.WriteLine($"=> File Scan GetFiles(): repository {repoItem.RepositoryName} was deleted");
 #endif
@@ -164,7 +165,7 @@ namespace RepoScan.FileLocator
                     }
                 });
 
-                repoWriter.Write(repoItem, false);
+                dbProjectId = repoWriter.Write(repoItem, dbProjectId, false);
             }
         }
 

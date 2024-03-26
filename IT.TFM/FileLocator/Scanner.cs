@@ -37,6 +37,7 @@ namespace RepoScan.FileLocator
                     bool repoOnly = false;
 
                     var repos = await scanner.Repositories(project, repositoryId);
+                    var dbProjectId = 0;
 
                     foreach (var repo in repos)
                     {
@@ -68,7 +69,7 @@ namespace RepoScan.FileLocator
                         };
 
                         // Write repo item to queue
-                        writer.Write(repoItem, repoOnly);
+                        dbProjectId = writer.Write(repoItem, dbProjectId, repoOnly);
                         repoOnly = true;
                     }
 

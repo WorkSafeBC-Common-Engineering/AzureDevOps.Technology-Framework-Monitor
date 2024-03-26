@@ -237,8 +237,9 @@ namespace AzureDevOps
                 {
                     continue;
                 }
-
-                Debug.WriteLine($"Pipeline Type: {pipelineDetails.Configuration.Type}");
+#if DEBUG
+                Console.WriteLine($"Pipeline Type: {pipelineDetails.Configuration.Type}");
+#endif
                 pipeline.Details = pipelineDetails;
                 filteredPipelines.Add(pipeline);
             }
@@ -380,8 +381,9 @@ namespace AzureDevOps
                     {
                         var msg = $"\t *** Exception occured with this URL: {url}\n{ex}";
                         Console.WriteLine(msg);
-                        Debug.WriteLine(msg);
-
+#if DEBUG
+                        Console.WriteLine(msg);
+#endif
                         if (retries-- <= 0)
                         {
                             throw;

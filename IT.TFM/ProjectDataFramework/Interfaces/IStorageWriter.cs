@@ -2,15 +2,15 @@
 
 namespace ProjectData.Interfaces
 {
-    public interface IStorageWriter
+    public interface IStorageWriter : IDisposable
     {
         void Initialize(string configuration);
 
-        void SaveOrganization(Organization organization);
+        int SaveOrganization(Organization organization);
 
-        void SaveProject(Project project);
+        int SaveProject(Project project, int organizationId);
 
-        void SaveRepository(Repository repository);
+        int SaveRepository(Repository repository, int projectId);
 
         void SavePipeline(Pipeline pipeline);
 
@@ -23,7 +23,5 @@ namespace ProjectData.Interfaces
         void DeleteFile(FileItem file, Guid repoId);
 
         void DeletePipeline(int pipelineId);
-
-        void Close();
     }
 }

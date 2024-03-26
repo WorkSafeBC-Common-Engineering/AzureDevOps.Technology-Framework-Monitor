@@ -16,39 +16,32 @@ namespace RepoScan.Storage.SqlServer
 {
     internal class Pipeline : IReadPipelines, IWritePipeline
     {
-        #region Private Members
-
-        private IStorageWriter sqlWriter = null;
-        private IStorageReader sqlReader = null;
-
-        #endregion
-
         #region IWritePipeline Members
 
         void IWritePipeline.Write(ProjectData.Pipeline pipeline)
         {
-            var writer = GetWriter();
+            using var writer = GetWriter();
 
             writer.SavePipeline(pipeline);
         }
 
         void IWritePipeline.WriteRelease(Release release)
         {
-            var writer = GetWriter();
+            using var writer = GetWriter();
 
             writer.SaveRelease(release);
         }
 
         void IWritePipeline.LinkToFile(int pipelineId, string repositoryId, string filePath)
         {
-            var writer = GetWriter();
+            using var writer = GetWriter();
             writer.LinkPipelineToFile(pipelineId, repositoryId, filePath);
         }
 
         void IWritePipeline.AddProperties(ProjectData.FileItem file)
         {
-            var reader = GetReader();
-            var writer = GetWriter();
+            using var reader = GetReader();
+            using var writer = GetWriter();
 
             var pipelines = reader.GetPipelines(file.RepositoryId.ToString("D"), file.Path);
             foreach (var pipeline in pipelines)
@@ -79,7 +72,7 @@ namespace RepoScan.Storage.SqlServer
 
         void IWritePipeline.Delete(int id)
         {
-            var writer = GetWriter();
+            using var writer = GetWriter();
             writer.DeletePipeline(id);
         }
 
@@ -89,7 +82,7 @@ namespace RepoScan.Storage.SqlServer
 
         IEnumerable<YamlPipeline> IReadPipelines.ReadYamlPipelines()
         {
-            var reader = GetReader();
+            using var reader = GetReader();
             var pipelines = reader.GetPipelines(ProjectData.Pipeline.pipelineTypeYaml);
             return pipelines.Select(p => new YamlPipeline
                                    {
@@ -105,24 +98,22 @@ namespace RepoScan.Storage.SqlServer
 
         IEnumerable<int> IReadPipelines.GetPipelineIds(string projectId)
         {
-            var reader = GetReader();
-            return reader.GetPipelineIdsForProject(projectId);
+            using var reader = GetReader();
+            return reader.GetPipelineIdsForProject(projectId).ToArray();
         }
 
         #endregion
 
         #region Private Methods
 
-        private IStorageWriter GetWriter()
+        private static IStorageWriter GetWriter()
         {
-            sqlWriter ??= DataStorage.StorageFactory.GetStorageWriter();
-            return sqlWriter;
+            return DataStorage.StorageFactory.GetStorageWriter();
         }
 
-        private IStorageReader GetReader()
+        private static IStorageReader GetReader()
         {
-            sqlReader ??= DataStorage.StorageFactory.GetStorageReader();
-            return sqlReader;
+            return DataStorage.StorageFactory.GetStorageReader();
         }
 
         #endregion

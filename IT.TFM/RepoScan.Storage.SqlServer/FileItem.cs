@@ -16,7 +16,7 @@ namespace RepoScan.Storage.SqlServer
 
         IEnumerable<DataModels.FileItem> IReadFileItem.Read()
         {
-            var reader = GetReader();
+            using var reader = GetReader();
             foreach (var item in reader.GetFiles())
             {
                 var fileItem = new DataModels.FileItem
@@ -29,17 +29,14 @@ namespace RepoScan.Storage.SqlServer
 
                 yield return fileItem;
             }
-
-            reader.Close();
         }
 
         IEnumerable<DataModels.FileItem> IReadFileItem.Read(string repoId)
         {
-            var reader = GetReader();
+            using var reader = GetReader();
 
             var repoFiles = reader.GetFiles(repoId)
                                   .ToArray();
-            reader.Close();
 
             return repoFiles.Select(f => new DataModels.FileItem
             {
@@ -53,7 +50,7 @@ namespace RepoScan.Storage.SqlServer
 
         IEnumerable<DataModels.FileItem> IReadFileItem.ReadDetails()
         {
-            var reader = GetReader();
+            using var reader = GetReader();
             foreach (var item in reader.GetFiles())
             {
                 var repo = reader.GetRepository(item.RepositoryId);
@@ -77,17 +74,14 @@ namespace RepoScan.Storage.SqlServer
 
                 yield return fileItem;
             }
-
-            reader.Close();
         }
 
         IEnumerable<DataModels.FileItem> IReadFileItem.YamlRead(string repoId)
         {
-            var reader = GetReader();
+            using var reader = GetReader();
 
             var repoFiles = reader.GetYamlFiles(repoId)
                                   .ToArray();
-            reader.Close();
 
             return repoFiles.Select(f => new DataModels.FileItem
             {
@@ -105,7 +99,7 @@ namespace RepoScan.Storage.SqlServer
 
         void IWriteFileItem.Write(DataModels.FileItem item, bool saveDetails, bool forceDetails)
         {
-            var writer = GetWriter();
+            using var writer = GetWriter();
 
             var fileItem = new ProjectData.FileItem
             {
@@ -117,13 +111,11 @@ namespace RepoScan.Storage.SqlServer
             };
 
             writer.SaveFile(fileItem, item.Repository.RepositoryId, saveDetails, forceDetails);
-
-            writer.Close();
         }
 
         void IWriteFileItem.Delete(DataModels.FileItem item)
         {
-            var writer = GetWriter();
+            using var writer = GetWriter();
 
             var fileItem = new ProjectData.FileItem
             {
