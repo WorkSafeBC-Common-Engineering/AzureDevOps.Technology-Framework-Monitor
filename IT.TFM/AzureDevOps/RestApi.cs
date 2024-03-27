@@ -257,6 +257,11 @@ namespace AzureDevOps
             }
 
             var releases = JsonConvert.DeserializeObject<AzDoReleaseList>(content);
+            if (releases == null)
+            {
+                return new AzDoReleaseList();
+            }
+
             foreach (var release in releases.value)
             {
                 if (string.IsNullOrEmpty(release.url))
@@ -282,7 +287,7 @@ namespace AzureDevOps
                 }
             }
 
-            return releases ?? new AzDoReleaseList();
+            return releases;
         }
 
         #endregion

@@ -289,20 +289,21 @@ namespace ProjectScannerSaveToSqlServer
                                    .SingleOrDefault(p => p.ProjectId == release.ProjectId);
 
             var dbPipeline = context.Pipelines
-                                    .SingleOrDefault(p => p.PipelineId == release.Id
+                                    .SingleOrDefault(p => p.ProjectId == dbProject.Id
+                                                       && p.PipelineId == release.Id
                                                        && p.Type == ProjData.Pipeline.pipelineTypeRelease);
 
             if (dbPipeline == null)
             {
                 dbPipeline = new DataModels.Pipeline
                 {
-                    PipelineId = release.Id,
+                    ProjectId = dbProject?.Id,
+                    PipelineId = release.Id
                 };
 
                 context.Pipelines.Add(dbPipeline);
             }
 
-            dbPipeline.ProjectId = dbProject?.Id;
             dbPipeline.Name = release.Name;
             dbPipeline.Folder = release.Folder;
             dbPipeline.Revision = release.Revision;
@@ -335,6 +336,7 @@ namespace ProjectScannerSaveToSqlServer
                 {
                     dbArtifact = new()
                     {
+                        PipelineId = dbPipeline.Id,
                         SourceId = artifact.SourceId,
                         Alias = artifact.Alias
                     };
@@ -342,7 +344,6 @@ namespace ProjectScannerSaveToSqlServer
                 }
 
                 dbArtifact.Url = artifact.Url;
-                dbArtifact.PipelineId = dbPipeline.Id;
                 dbArtifact.Type = artifact.Type;
                 dbArtifact.DefaultVersionType = artifact.DefaultVersionType;
                 dbArtifact.DefinitionId = artifact.DefinitionId;
