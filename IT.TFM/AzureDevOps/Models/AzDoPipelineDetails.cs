@@ -155,7 +155,6 @@ namespace AzureDevOps.Models
         public string BuildProperties { get; set; }
         public string VerbosityPack { get; set; }
         public string RefName { get; set; }
-        public string SonarQube { get; set; }
         public string ScannerMode { get; set; }
         public string ConfigMode { get; set; }
         public string ConfigFile { get; set; }
