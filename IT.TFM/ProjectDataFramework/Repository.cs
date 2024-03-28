@@ -37,6 +37,8 @@ namespace ProjectData
 
         public long FileCount { get; set; }
 
+        public int PipelineCount { get; set; }
+
         public string OrgName { get; set; }
 
         public bool Deleted { get; set; }

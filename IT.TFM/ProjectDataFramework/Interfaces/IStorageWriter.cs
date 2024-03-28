@@ -1,27 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProjectData.Interfaces
 {
-    public interface IStorageWriter
+    public interface IStorageWriter : IDisposable
     {
         void Initialize(string configuration);
 
-        void SaveOrganization(Organization organization);
+        int SaveOrganization(Organization organization);
 
-        void SaveProject(Project project);
+        int SaveProject(Project project, int organizationId);
 
-        void SaveRepository(Repository repository);
+        int SaveRepository(Repository repository, int projectId);
 
         void SavePipeline(Pipeline pipeline);
+
+        void SaveRelease(Release release);
+
+        void LinkPipelineToFile(int pipelineId, string repositoryId, string path);
 
         void SaveFile(FileItem file, Guid repoId, bool saveDetails, bool forceDetails);
 
         void DeleteFile(FileItem file, Guid repoId);
 
-        void Close();
+        void DeletePipeline(int pipelineId);
     }
 }

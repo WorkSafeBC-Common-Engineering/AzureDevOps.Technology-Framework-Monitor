@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -79,6 +80,7 @@ namespace RepoScan.FileLocator
 
                     //TODO: Create a pool of writer items (one per totalThread) to create the necessary DB connections ahead of time.
                     IWriteFileDetails writer = StorageFactory.GetFileDetailsWriter();
+                    var pipelineWriter = StorageFactory.GetPipelineWriter();
 
                     var azDoFiles = fileList.Where(f => f.Id == fileItem.Id);
                     var azDoFile = azDoFiles.SingleOrDefault(f => f.Path == fileItem.Path);
@@ -121,6 +123,12 @@ namespace RepoScan.FileLocator
                     var fileData = scanner.FileDetails(repoItem.ProjectId, repoItem.RepositoryId, fileInfo);
                     if (fileData != null)
                     {
+                        if (fileData.FileType == ProjectData.FileItemType.YamlPipeline && fileData.PipelineProperties.Count > 0)
+                        {
+                            fileData.RepositoryId = repoItem.RepositoryId;
+                            pipelineWriter.AddProperties(fileData);
+                        }
+
                         var fileDetails = new DataModels.FileDetails
                         {
                             Repository = fileItem.Repository ?? new RepositoryItem { RepositoryId = repoItem.RepositoryId },

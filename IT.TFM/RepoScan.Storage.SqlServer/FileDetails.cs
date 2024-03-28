@@ -15,7 +15,7 @@ namespace RepoScan.Storage.SqlServer
 
         void IWriteFileDetails.Write(DataModels.FileDetails item, bool forceDetails)
         {
-            var writer = GetWriter();
+            using var writer = GetWriter();
             var fileItem = new ProjectData.FileItem
             {
                 Id = item.Id,
@@ -51,12 +51,11 @@ namespace RepoScan.Storage.SqlServer
             }
 
             writer.SaveFile(fileItem, item.Repository.RepositoryId, true, forceDetails);
-            writer.Close();            
         }
 
         void IWriteFileDetails.Delete(DataModels.FileDetails item)
         {
-            var writer = GetWriter();
+            using var writer = GetWriter();
             var fileItem = new ProjectData.FileItem
             {
                 Id = item.Id,
@@ -67,7 +66,6 @@ namespace RepoScan.Storage.SqlServer
             };
 
             writer.DeleteFile(fileItem, item.Repository.RepositoryId);
-            writer.Close();
         }
 
         #endregion

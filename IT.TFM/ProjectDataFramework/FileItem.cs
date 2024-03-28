@@ -33,6 +33,8 @@ namespace ProjectData
 
         public string ErrorMessage { get; set; } = string.Empty;
 
+        public Dictionary<string, string> PipelineProperties { get; } = [];
+
         #endregion
 
         #region Public Methods
@@ -69,6 +71,11 @@ namespace ProjectData
                 VersionComparator = versionComparator ?? string.Empty,
                 FrameworkVersion = framework ?? string.Empty
             });
+        }
+
+        public void AddPackageProperty(string name, string value)
+        {
+            PipelineProperties.Add(name, value);
         }
 
         #endregion

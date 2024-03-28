@@ -2,13 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ProjectScannerSaveToSqlServer
 {
-    public abstract class DbCore
+    public abstract class DbCore : IDisposable
     {
         #region Protected Members
 
@@ -32,6 +34,9 @@ namespace ProjectScannerSaveToSqlServer
 
         protected string connection;
         protected ProjectScannerDB context;
+        protected Guid instanceId;
+        private static long instanceCount = 0;
+        private bool disposedValue;
 
         #endregion
 
@@ -39,6 +44,12 @@ namespace ProjectScannerSaveToSqlServer
 
         protected void Initialize(string configuration)
         {
+            instanceId = Guid.NewGuid();
+            Interlocked.Increment(ref instanceCount);
+#if DEBUG
+            Console.WriteLine($"\t >>> DbCore - Initialize: {instanceId}, count = {Interlocked.Read(ref instanceCount)}");
+#endif
+
             connection = configuration;
             context = GetConnection();
         }
@@ -50,11 +61,34 @@ namespace ProjectScannerSaveToSqlServer
 
         protected void Close()
         {
+            var st = new StackTrace();
+            var st1 = new StackTrace(new StackFrame(true));
+#if DEBUG
+            Console.WriteLine($"Stack Trace for Main: {st1}");
+            Console.WriteLine(st.ToString());
+#endif
+
             context.Dispose();
             organizationId = 0;
             projectId = 0;
             repositoryId = 0;
             fileId = 0;
+        }
+
+        #endregion
+
+        #region IDisposable Implementation
+
+        public void Dispose()
+        {
+            ((IDisposable)context).Dispose();
+            GC.SuppressFinalize(this);
+
+            Interlocked.Decrement(ref instanceCount);
+#if DEBUG
+            Console.WriteLine($"\t >>> DbCore - Close: {instanceId}, count = {Interlocked.Read(ref instanceCount)}");
+#endif
+            instanceId = Guid.Empty;
         }
 
         #endregion

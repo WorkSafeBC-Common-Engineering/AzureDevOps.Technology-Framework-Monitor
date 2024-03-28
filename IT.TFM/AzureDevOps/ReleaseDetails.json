@@ -1,0 +1,1828 @@
+{
+  "source": "userInterface",
+  "revision": 1238,
+  "description": null,
+  "createdBy": {
+    "displayName": "Sutherland, Aaron",
+    "url": "https://spsprodcca1.vssps.visualstudio.com/A4eba774c-c9f9-4035-b5a2-0076caa7aae7/_apis/Identities/1303d0fb-f5cc-6a4f-ad59-d8ca89ac485c",
+    "_links": {
+      "avatar": {
+        "href": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aad.MTMwM2QwZmItZjVjYy03YTRmLWFkNTktZDhjYTg5YWM0ODVj"
+      }
+    },
+    "id": "1303d0fb-f5cc-6a4f-ad59-d8ca89ac485c",
+    "uniqueName": "AS16073@worksafebc.com",
+    "imageUrl": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aad.MTMwM2QwZmItZjVjYy03YTRmLWFkNTktZDhjYTg5YWM0ODVj",
+    "descriptor": "aad.MTMwM2QwZmItZjVjYy03YTRmLWFkNTktZDhjYTg5YWM0ODVj"
+  },
+  "createdOn": "2019-06-20T22:15:19.89Z",
+  "modifiedBy": {
+    "displayName": "AZDOAzureDevOps",
+    "url": "https://spsprodcca1.vssps.visualstudio.com/A4eba774c-c9f9-4035-b5a2-0076caa7aae7/_apis/Identities/d8ce5309-e5b3-63cf-8a51-c641b20cb10f",
+    "_links": {
+      "avatar": {
+        "href": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aad.ZDhjZTUzMDktZTViMy03M2NmLThhNTEtYzY0MWIyMGNiMTBm"
+      }
+    },
+    "id": "d8ce5309-e5b3-63cf-8a51-c641b20cb10f",
+    "uniqueName": "AzureDevOps_Automation_ServAcc@worksafebc.com",
+    "imageUrl": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aad.ZDhjZTUzMDktZTViMy03M2NmLThhNTEtYzY0MWIyMGNiMTBm",
+    "descriptor": "aad.ZDhjZTUzMDktZTViMy03M2NmLThhNTEtYzY0MWIyMGNiMTBm"
+  },
+  "modifiedOn": "2024-03-17T12:04:11.417Z",
+  "isDeleted": false,
+  "isDisabled": false,
+  "lastRelease": {
+    "id": 37743,
+    "name": "ASMT.MESSAGING.IPAY.API 2.0.1-b47(refs_heads_release_2.0.1).r2",
+    "artifacts": [],
+    "_links": {},
+    "description": "",
+    "releaseDefinition": {
+      "id": 56,
+      "projectReference": null,
+      "_links": {}
+    },
+    "createdOn": "2023-04-26T21:42:21.923Z",
+    "createdBy": {
+      "displayName": "Zhen Tian (Jim) Xu",
+      "url": "https://spsprodcca1.vssps.visualstudio.com/A4eba774c-c9f9-4035-b5a2-0076caa7aae7/_apis/Identities/f34b2775-acfd-648e-b20c-ec4f3396ce54",
+      "_links": {
+        "avatar": {
+          "href": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aad.ZjM0YjI3NzUtYWNmZC03NDhlLWIyMGMtZWM0ZjMzOTZjZTU0"
+        }
+      },
+      "id": "f34b2775-acfd-648e-b20c-ec4f3396ce54",
+      "uniqueName": "ZX57154@worksafebc.com",
+      "imageUrl": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aad.ZjM0YjI3NzUtYWNmZC03NDhlLWIyMGMtZWM0ZjMzOTZjZTU0",
+      "descriptor": "aad.ZjM0YjI3NzUtYWNmZC03NDhlLWIyMGMtZWM0ZjMzOTZjZTU0"
+    }
+  },
+  "variables": {
+    "AppRootFolder": {
+      "value": "D:\\Apps"
+    },
+    "ProductFamilyName": {
+      "value": "Assessment"
+    },
+    "system.debug": {
+      "value": "true"
+    },
+    "TempRootFolder": {
+      "value": "D:\\temp"
+    },
+    "WebServiceName": {
+      "value": "wcb.Messaging.IPay.Wcf"
+    },
+    "WebsiteNameLayer7": {
+      "value": "L7svc"
+    }
+  },
+  "variableGroups": [
+    20
+  ],
+  "environments": [
+    {
+      "id": 122,
+      "name": "Development",
+      "rank": 1,
+      "owner": {
+        "displayName": "Sutherland, Aaron",
+        "url": "https://spsprodcca1.vssps.visualstudio.com/A4eba774c-c9f9-4035-b5a2-0076caa7aae7/_apis/Identities/1303d0fb-f5cc-6a4f-ad59-d8ca89ac485c",
+        "_links": {
+          "avatar": {
+            "href": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aad.MTMwM2QwZmItZjVjYy03YTRmLWFkNTktZDhjYTg5YWM0ODVj"
+          }
+        },
+        "id": "1303d0fb-f5cc-6a4f-ad59-d8ca89ac485c",
+        "uniqueName": "AS16073@worksafebc.com",
+        "imageUrl": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aad.MTMwM2QwZmItZjVjYy03YTRmLWFkNTktZDhjYTg5YWM0ODVj",
+        "descriptor": "aad.MTMwM2QwZmItZjVjYy03YTRmLWFkNTktZDhjYTg5YWM0ODVj"
+      },
+      "variables": {
+        "AppPoolIdentityUsername": {
+          "value": "ApplicationPoolIdentity"
+        }
+      },
+      "variableGroups": [],
+      "preDeployApprovals": {
+        "approvals": [
+          {
+            "rank": 1,
+            "isAutomated": true,
+            "isNotificationOn": false,
+            "id": 564431
+          }
+        ],
+        "approvalOptions": {
+          "requiredApproverCount": null,
+          "releaseCreatorCanBeApprover": false,
+          "autoTriggeredAndPreviousEnvironmentApprovedCanBeSkipped": false,
+          "enforceIdentityRevalidation": false,
+          "timeoutInMinutes": 0,
+          "executionOrder": "beforeGates"
+        }
+      },
+      "deployStep": {
+        "id": 426
+      },
+      "postDeployApprovals": {
+        "approvals": [
+          {
+            "rank": 1,
+            "isAutomated": true,
+            "isNotificationOn": false,
+            "id": 564432
+          }
+        ],
+        "approvalOptions": {
+          "requiredApproverCount": null,
+          "releaseCreatorCanBeApprover": false,
+          "autoTriggeredAndPreviousEnvironmentApprovedCanBeSkipped": false,
+          "enforceIdentityRevalidation": false,
+          "timeoutInMinutes": 0,
+          "executionOrder": "afterSuccessfulGates"
+        }
+      },
+      "deployPhases": [
+        {
+          "deploymentInput": {
+            "parallelExecution": {
+              "parallelExecutionType": "none"
+            },
+            "agentSpecification": null,
+            "skipArtifactsDownload": false,
+            "artifactsDownloadInput": {
+              "downloadInputs": []
+            },
+            "queueId": 696,
+            "demands": [],
+            "enableAccessToken": false,
+            "timeoutInMinutes": 0,
+            "jobCancelTimeoutInMinutes": 1,
+            "condition": "succeeded()",
+            "overrideInputs": {}
+          },
+          "rank": 1,
+          "phaseType": "agentBasedDeployment",
+          "name": "Agent job - WCF (Web Service) Deployment",
+          "refName": null,
+          "workflowTasks": [
+            {
+              "environment": {},
+              "taskId": "1e244d32-2dd4-4165-96fb-b7441ca9331e",
+              "version": "1.*",
+              "name": "Azure Key Vault: DV-DV-ITAppDelivery-KV",
+              "refName": "",
+              "enabled": true,
+              "alwaysRun": false,
+              "continueOnError": false,
+              "timeoutInMinutes": 0,
+              "retryCountOnTaskFailure": 0,
+              "definitionType": "task",
+              "overrideInputs": {},
+              "condition": "succeeded()",
+              "inputs": {
+                "ConnectedServiceName": "8040b62c-c752-455e-be9c-b1cf3ac8c1c4",
+                "KeyVaultName": "DV-DV-ITAppDelivery-KV",
+                "SecretsFilter": "*",
+                "RunAsPreJob": "false"
+              }
+            },
+            {
+              "environment": {},
+              "taskId": "99ff138c-7ce6-4d03-98bb-f99794d94afb",
+              "version": "1.*",
+              "name": "Task group: Assessment.wcb.Messaging.IPay.Wcf $(ServerNameDV)",
+              "refName": "",
+              "enabled": true,
+              "alwaysRun": true,
+              "continueOnError": true,
+              "timeoutInMinutes": 0,
+              "retryCountOnTaskFailure": 0,
+              "definitionType": "metaTask",
+              "overrideInputs": {},
+              "condition": "succeededOrFailed()",
+              "inputs": {
+                "ApiServer": "$(ServerNameDV)",
+                "AppRootFolder": "$(AppRootFolder)",
+                "Password": "$(Password)",
+                "ProductFamilyName": "$(ProductFamilyName)",
+                "TempRootFolder": "$(TempRootFolder)",
+                "Username": "$(UsernameDV)",
+                "WebServiceName": "$(WebServiceName)",
+                "WebsiteNameLayer7": "$(WebsiteNameLayer7)"
+              }
+            }
+          ]
+        }
+      ],
+      "environmentOptions": {
+        "emailNotificationType": "OnlyOnFailure",
+        "emailRecipients": "release.environment.owner;release.creator",
+        "skipArtifactsDownload": false,
+        "timeoutInMinutes": 0,
+        "enableAccessToken": false,
+        "publishDeploymentStatus": true,
+        "badgeEnabled": false,
+        "autoLinkWorkItems": false,
+        "pullRequestDeploymentEnabled": false
+      },
+      "demands": [],
+      "conditions": [
+        {
+          "name": "ReleaseStarted",
+          "conditionType": "event",
+          "value": "",
+          "result": null
+        }
+      ],
+      "executionPolicy": {
+        "concurrencyCount": 1,
+        "queueDepthCount": 0
+      },
+      "schedules": [],
+      "currentRelease": {
+        "id": 37743,
+        "url": "https://vsrm.dev.azure.com/wcbbc/044d2d6a-c021-46b5-8193-fb552055dcb0/_apis/Release/releases/37743",
+        "_links": {}
+      },
+      "retentionPolicy": {
+        "daysToKeep": 30,
+        "releasesToKeep": 3,
+        "retainBuild": true
+      },
+      "processParameters": {},
+      "properties": {
+        "LinkBoardsWorkItems": {
+          "$type": "System.String",
+          "$value": "False"
+        }
+      },
+      "preDeploymentGates": {
+        "id": 0,
+        "gatesOptions": null,
+        "gates": []
+      },
+      "postDeploymentGates": {
+        "id": 0,
+        "gatesOptions": null,
+        "gates": []
+      },
+      "environmentTriggers": [],
+      "badgeUrl": "https://vsrm.dev.azure.com/wcbbc/_apis/public/Release/badge/044d2d6a-c021-46b5-8193-fb552055dcb0/56/122"
+    },
+    {
+      "id": 123,
+      "name": "IntegrationTest",
+      "rank": 2,
+      "owner": {
+        "displayName": "Sutherland, Aaron",
+        "url": "https://spsprodcca1.vssps.visualstudio.com/A4eba774c-c9f9-4035-b5a2-0076caa7aae7/_apis/Identities/1303d0fb-f5cc-6a4f-ad59-d8ca89ac485c",
+        "_links": {
+          "avatar": {
+            "href": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aad.MTMwM2QwZmItZjVjYy03YTRmLWFkNTktZDhjYTg5YWM0ODVj"
+          }
+        },
+        "id": "1303d0fb-f5cc-6a4f-ad59-d8ca89ac485c",
+        "uniqueName": "AS16073@worksafebc.com",
+        "imageUrl": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aad.MTMwM2QwZmItZjVjYy03YTRmLWFkNTktZDhjYTg5YWM0ODVj",
+        "descriptor": "aad.MTMwM2QwZmItZjVjYy03YTRmLWFkNTktZDhjYTg5YWM0ODVj"
+      },
+      "variables": {
+        "AppPoolIdentityUsername": {
+          "value": "ApplicationPoolIdentity"
+        }
+      },
+      "variableGroups": [],
+      "preDeployApprovals": {
+        "approvals": [
+          {
+            "rank": 1,
+            "isAutomated": false,
+            "isNotificationOn": false,
+            "approver": {
+              "displayName": "[TEAM FOUNDATION]\\AzureDevOps_IT_EDO_ART_Employer_LoEnv_Approvers",
+              "url": "https://spsprodcca1.vssps.visualstudio.com/A4eba774c-c9f9-4035-b5a2-0076caa7aae7/_apis/Identities/0f888fd9-8d0f-4e95-b3ef-e0f7d5c4faa9",
+              "_links": {
+                "avatar": {
+                  "href": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aadgp.Uy0xLTktMTU1MTM3NDI0NS0xMjA0NDAwOTY5LTI0MDI5ODY0MTMtMjE3OTQwODYxNi0zLTM4MjQ2NDU5MC0yNjg2NzgyNzk0LTI3MDk4NDg0NzAtMTYzMTc3ODM2MQ"
+                }
+              },
+              "id": "0f888fd9-8d0f-4e95-b3ef-e0f7d5c4faa9",
+              "uniqueName": "vstfs:///Framework/IdentityDomain/4eba774c-c9f9-4035-b5a2-0076caa7aae7\\AzureDevOps_IT_EDO_ART_Employer_LoEnv_Approvers",
+              "imageUrl": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aadgp.Uy0xLTktMTU1MTM3NDI0NS0xMjA0NDAwOTY5LTI0MDI5ODY0MTMtMjE3OTQwODYxNi0zLTM4MjQ2NDU5MC0yNjg2NzgyNzk0LTI3MDk4NDg0NzAtMTYzMTc3ODM2MQ",
+              "isContainer": true,
+              "descriptor": "aadgp.Uy0xLTktMTU1MTM3NDI0NS0xMjA0NDAwOTY5LTI0MDI5ODY0MTMtMjE3OTQwODYxNi0zLTM4MjQ2NDU5MC0yNjg2NzgyNzk0LTI3MDk4NDg0NzAtMTYzMTc3ODM2MQ"
+            },
+            "id": 621880
+          }
+        ],
+        "approvalOptions": {
+          "requiredApproverCount": null,
+          "releaseCreatorCanBeApprover": true,
+          "autoTriggeredAndPreviousEnvironmentApprovedCanBeSkipped": false,
+          "enforceIdentityRevalidation": false,
+          "timeoutInMinutes": 0,
+          "executionOrder": "beforeGates"
+        }
+      },
+      "deployStep": {
+        "id": 437
+      },
+      "postDeployApprovals": {
+        "approvals": [
+          {
+            "rank": 1,
+            "isAutomated": true,
+            "isNotificationOn": false,
+            "id": 621881
+          }
+        ],
+        "approvalOptions": {
+          "requiredApproverCount": null,
+          "releaseCreatorCanBeApprover": false,
+          "autoTriggeredAndPreviousEnvironmentApprovedCanBeSkipped": false,
+          "enforceIdentityRevalidation": false,
+          "timeoutInMinutes": 0,
+          "executionOrder": "afterSuccessfulGates"
+        }
+      },
+      "deployPhases": [
+        {
+          "deploymentInput": {
+            "parallelExecution": {
+              "parallelExecutionType": "none"
+            },
+            "agentSpecification": null,
+            "skipArtifactsDownload": false,
+            "artifactsDownloadInput": {
+              "downloadInputs": []
+            },
+            "queueId": 696,
+            "demands": [],
+            "enableAccessToken": false,
+            "timeoutInMinutes": 0,
+            "jobCancelTimeoutInMinutes": 1,
+            "condition": "succeeded()",
+            "overrideInputs": {}
+          },
+          "rank": 1,
+          "phaseType": "agentBasedDeployment",
+          "name": "Agent job - WCF (Web Service) Deployment",
+          "refName": null,
+          "workflowTasks": [
+            {
+              "environment": {},
+              "taskId": "1e244d32-2dd4-4165-96fb-b7441ca9331e",
+              "version": "1.*",
+              "name": "Azure Key Vault: DV-IN-ITAppDelivery-KV",
+              "refName": "",
+              "enabled": true,
+              "alwaysRun": false,
+              "continueOnError": false,
+              "timeoutInMinutes": 0,
+              "retryCountOnTaskFailure": 0,
+              "definitionType": "task",
+              "overrideInputs": {},
+              "condition": "succeeded()",
+              "inputs": {
+                "ConnectedServiceName": "5967ba36-5888-4c7e-997c-5c2ac4ce07bb",
+                "KeyVaultName": "DV-IN-ITAppDelivery-KV",
+                "SecretsFilter": "*",
+                "RunAsPreJob": "false"
+              }
+            },
+            {
+              "environment": {},
+              "taskId": "99ff138c-7ce6-4d03-98bb-f99794d94afb",
+              "version": "1.*",
+              "name": "Task group: Assessment.wcb.Messaging.IPay.Wcf $(ServerNameINT)",
+              "refName": "",
+              "enabled": true,
+              "alwaysRun": true,
+              "continueOnError": true,
+              "timeoutInMinutes": 0,
+              "retryCountOnTaskFailure": 0,
+              "definitionType": "metaTask",
+              "overrideInputs": {},
+              "condition": "succeededOrFailed()",
+              "inputs": {
+                "ApiServer": "$(ServerNameINT)",
+                "AppRootFolder": "$(AppRootFolder)",
+                "Password": "$(Password)",
+                "ProductFamilyName": "$(ProductFamilyName)",
+                "TempRootFolder": "$(TempRootFolder)",
+                "Username": "$(UsernameINT)",
+                "WebServiceName": "$(WebServiceName)",
+                "WebsiteNameLayer7": "$(WebsiteNameLayer7)"
+              }
+            }
+          ]
+        }
+      ],
+      "environmentOptions": {
+        "emailNotificationType": "OnlyOnFailure",
+        "emailRecipients": "release.environment.owner;release.creator",
+        "skipArtifactsDownload": false,
+        "timeoutInMinutes": 0,
+        "enableAccessToken": false,
+        "publishDeploymentStatus": true,
+        "badgeEnabled": false,
+        "autoLinkWorkItems": false,
+        "pullRequestDeploymentEnabled": false
+      },
+      "demands": [],
+      "conditions": [
+        {
+          "name": "Development",
+          "conditionType": "environmentState",
+          "value": "4",
+          "result": null
+        }
+      ],
+      "executionPolicy": {
+        "concurrencyCount": 1,
+        "queueDepthCount": 0
+      },
+      "schedules": [],
+      "currentRelease": {
+        "id": 37741,
+        "url": "https://vsrm.dev.azure.com/wcbbc/044d2d6a-c021-46b5-8193-fb552055dcb0/_apis/Release/releases/37741",
+        "_links": {}
+      },
+      "retentionPolicy": {
+        "daysToKeep": 30,
+        "releasesToKeep": 3,
+        "retainBuild": true
+      },
+      "processParameters": {},
+      "properties": {
+        "LinkBoardsWorkItems": {
+          "$type": "System.String",
+          "$value": "False"
+        }
+      },
+      "preDeploymentGates": {
+        "id": 0,
+        "gatesOptions": null,
+        "gates": []
+      },
+      "postDeploymentGates": {
+        "id": 0,
+        "gatesOptions": null,
+        "gates": []
+      },
+      "environmentTriggers": [],
+      "badgeUrl": "https://vsrm.dev.azure.com/wcbbc/_apis/public/Release/badge/044d2d6a-c021-46b5-8193-fb552055dcb0/56/123"
+    },
+    {
+      "id": 124,
+      "name": "SystemTest",
+      "rank": 3,
+      "owner": {
+        "displayName": "Sutherland, Aaron",
+        "url": "https://spsprodcca1.vssps.visualstudio.com/A4eba774c-c9f9-4035-b5a2-0076caa7aae7/_apis/Identities/1303d0fb-f5cc-6a4f-ad59-d8ca89ac485c",
+        "_links": {
+          "avatar": {
+            "href": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aad.MTMwM2QwZmItZjVjYy03YTRmLWFkNTktZDhjYTg5YWM0ODVj"
+          }
+        },
+        "id": "1303d0fb-f5cc-6a4f-ad59-d8ca89ac485c",
+        "uniqueName": "AS16073@worksafebc.com",
+        "imageUrl": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aad.MTMwM2QwZmItZjVjYy03YTRmLWFkNTktZDhjYTg5YWM0ODVj",
+        "descriptor": "aad.MTMwM2QwZmItZjVjYy03YTRmLWFkNTktZDhjYTg5YWM0ODVj"
+      },
+      "variables": {
+        "AppPoolIdentityUsername": {
+          "value": "ApplicationPoolIdentity"
+        }
+      },
+      "variableGroups": [],
+      "preDeployApprovals": {
+        "approvals": [
+          {
+            "rank": 1,
+            "isAutomated": false,
+            "isNotificationOn": false,
+            "approver": {
+              "displayName": "[TEAM FOUNDATION]\\AzureDevOps_IT_EDO_ART_Employer_LoEnv_Approvers",
+              "url": "https://spsprodcca1.vssps.visualstudio.com/A4eba774c-c9f9-4035-b5a2-0076caa7aae7/_apis/Identities/0f888fd9-8d0f-4e95-b3ef-e0f7d5c4faa9",
+              "_links": {
+                "avatar": {
+                  "href": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aadgp.Uy0xLTktMTU1MTM3NDI0NS0xMjA0NDAwOTY5LTI0MDI5ODY0MTMtMjE3OTQwODYxNi0zLTM4MjQ2NDU5MC0yNjg2NzgyNzk0LTI3MDk4NDg0NzAtMTYzMTc3ODM2MQ"
+                }
+              },
+              "id": "0f888fd9-8d0f-4e95-b3ef-e0f7d5c4faa9",
+              "uniqueName": "vstfs:///Framework/IdentityDomain/4eba774c-c9f9-4035-b5a2-0076caa7aae7\\AzureDevOps_IT_EDO_ART_Employer_LoEnv_Approvers",
+              "imageUrl": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aadgp.Uy0xLTktMTU1MTM3NDI0NS0xMjA0NDAwOTY5LTI0MDI5ODY0MTMtMjE3OTQwODYxNi0zLTM4MjQ2NDU5MC0yNjg2NzgyNzk0LTI3MDk4NDg0NzAtMTYzMTc3ODM2MQ",
+              "isContainer": true,
+              "descriptor": "aadgp.Uy0xLTktMTU1MTM3NDI0NS0xMjA0NDAwOTY5LTI0MDI5ODY0MTMtMjE3OTQwODYxNi0zLTM4MjQ2NDU5MC0yNjg2NzgyNzk0LTI3MDk4NDg0NzAtMTYzMTc3ODM2MQ"
+            },
+            "id": 621882
+          }
+        ],
+        "approvalOptions": {
+          "requiredApproverCount": null,
+          "releaseCreatorCanBeApprover": true,
+          "autoTriggeredAndPreviousEnvironmentApprovedCanBeSkipped": false,
+          "enforceIdentityRevalidation": false,
+          "timeoutInMinutes": 0,
+          "executionOrder": "beforeGates"
+        }
+      },
+      "deployStep": {
+        "id": 436
+      },
+      "postDeployApprovals": {
+        "approvals": [
+          {
+            "rank": 1,
+            "isAutomated": true,
+            "isNotificationOn": false,
+            "id": 621883
+          }
+        ],
+        "approvalOptions": {
+          "requiredApproverCount": null,
+          "releaseCreatorCanBeApprover": false,
+          "autoTriggeredAndPreviousEnvironmentApprovedCanBeSkipped": false,
+          "enforceIdentityRevalidation": false,
+          "timeoutInMinutes": 0,
+          "executionOrder": "afterSuccessfulGates"
+        }
+      },
+      "deployPhases": [
+        {
+          "deploymentInput": {
+            "parallelExecution": {
+              "parallelExecutionType": "none"
+            },
+            "agentSpecification": null,
+            "skipArtifactsDownload": false,
+            "artifactsDownloadInput": {
+              "downloadInputs": []
+            },
+            "queueId": 696,
+            "demands": [],
+            "enableAccessToken": false,
+            "timeoutInMinutes": 0,
+            "jobCancelTimeoutInMinutes": 1,
+            "condition": "succeeded()",
+            "overrideInputs": {}
+          },
+          "rank": 1,
+          "phaseType": "agentBasedDeployment",
+          "name": "Agent job - WCF (Web Service) Deployment",
+          "refName": null,
+          "workflowTasks": [
+            {
+              "environment": {},
+              "taskId": "1e244d32-2dd4-4165-96fb-b7441ca9331e",
+              "version": "1.*",
+              "name": "Azure Key Vault: AS-SY-ITAppDelivery-KV",
+              "refName": "",
+              "enabled": true,
+              "alwaysRun": false,
+              "continueOnError": false,
+              "timeoutInMinutes": 0,
+              "retryCountOnTaskFailure": 0,
+              "definitionType": "task",
+              "overrideInputs": {},
+              "condition": "succeeded()",
+              "inputs": {
+                "ConnectedServiceName": "7beeac3f-550e-4494-9137-162561852c65",
+                "KeyVaultName": "AS-SY-ITAppDelivery-KV",
+                "SecretsFilter": "*",
+                "RunAsPreJob": "false"
+              }
+            },
+            {
+              "environment": {},
+              "taskId": "99ff138c-7ce6-4d03-98bb-f99794d94afb",
+              "version": "1.*",
+              "name": "Task group: Assessment.wcb.Messaging.IPay.Wcf $(ServerNameSY)",
+              "refName": "",
+              "enabled": true,
+              "alwaysRun": true,
+              "continueOnError": true,
+              "timeoutInMinutes": 0,
+              "retryCountOnTaskFailure": 0,
+              "definitionType": "metaTask",
+              "overrideInputs": {},
+              "condition": "succeededOrFailed()",
+              "inputs": {
+                "ApiServer": "$(ServerNameSY)",
+                "AppRootFolder": "$(AppRootFolder)",
+                "Password": "$(Password)",
+                "ProductFamilyName": "$(ProductFamilyName)",
+                "TempRootFolder": "$(TempRootFolder)",
+                "Username": "$(UsernameSY)",
+                "WebServiceName": "$(WebServiceName)",
+                "WebsiteNameLayer7": "$(WebsiteNameLayer7)"
+              }
+            },
+            {
+              "environment": {},
+              "taskId": "6d61fd6e-e960-4048-828b-d2ce727b7785",
+              "version": "1.*",
+              "name": "Task group: QA - Robot (Install and Execute)",
+              "refName": "",
+              "enabled": true,
+              "alwaysRun": true,
+              "continueOnError": true,
+              "timeoutInMinutes": 0,
+              "retryCountOnTaskFailure": 0,
+              "definitionType": "metaTask",
+              "overrideInputs": {},
+              "condition": "succeededOrFailed()",
+              "inputs": {}
+            }
+          ]
+        }
+      ],
+      "environmentOptions": {
+        "emailNotificationType": "OnlyOnFailure",
+        "emailRecipients": "release.environment.owner;release.creator",
+        "skipArtifactsDownload": false,
+        "timeoutInMinutes": 0,
+        "enableAccessToken": false,
+        "publishDeploymentStatus": true,
+        "badgeEnabled": false,
+        "autoLinkWorkItems": false,
+        "pullRequestDeploymentEnabled": false
+      },
+      "demands": [],
+      "conditions": [
+        {
+          "name": "IntegrationTest",
+          "conditionType": "environmentState",
+          "value": "4",
+          "result": null
+        }
+      ],
+      "executionPolicy": {
+        "concurrencyCount": 1,
+        "queueDepthCount": 0
+      },
+      "schedules": [],
+      "currentRelease": {
+        "id": 37741,
+        "url": "https://vsrm.dev.azure.com/wcbbc/044d2d6a-c021-46b5-8193-fb552055dcb0/_apis/Release/releases/37741",
+        "_links": {}
+      },
+      "retentionPolicy": {
+        "daysToKeep": 30,
+        "releasesToKeep": 3,
+        "retainBuild": true
+      },
+      "processParameters": {},
+      "properties": {
+        "LinkBoardsWorkItems": {
+          "$type": "System.String",
+          "$value": "False"
+        }
+      },
+      "preDeploymentGates": {
+        "id": 0,
+        "gatesOptions": null,
+        "gates": []
+      },
+      "postDeploymentGates": {
+        "id": 0,
+        "gatesOptions": null,
+        "gates": []
+      },
+      "environmentTriggers": [],
+      "badgeUrl": "https://vsrm.dev.azure.com/wcbbc/_apis/public/Release/badge/044d2d6a-c021-46b5-8193-fb552055dcb0/56/124"
+    },
+    {
+      "id": 125,
+      "name": "Staging",
+      "rank": 5,
+      "owner": {
+        "displayName": "Sutherland, Aaron",
+        "url": "https://spsprodcca1.vssps.visualstudio.com/A4eba774c-c9f9-4035-b5a2-0076caa7aae7/_apis/Identities/1303d0fb-f5cc-6a4f-ad59-d8ca89ac485c",
+        "_links": {
+          "avatar": {
+            "href": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aad.MTMwM2QwZmItZjVjYy03YTRmLWFkNTktZDhjYTg5YWM0ODVj"
+          }
+        },
+        "id": "1303d0fb-f5cc-6a4f-ad59-d8ca89ac485c",
+        "uniqueName": "AS16073@worksafebc.com",
+        "imageUrl": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aad.MTMwM2QwZmItZjVjYy03YTRmLWFkNTktZDhjYTg5YWM0ODVj",
+        "descriptor": "aad.MTMwM2QwZmItZjVjYy03YTRmLWFkNTktZDhjYTg5YWM0ODVj"
+      },
+      "variables": {
+        "AppPoolIdentityUsername": {
+          "value": "ApplicationPoolIdentity"
+        }
+      },
+      "variableGroups": [],
+      "preDeployApprovals": {
+        "approvals": [
+          {
+            "rank": 1,
+            "isAutomated": false,
+            "isNotificationOn": false,
+            "approver": {
+              "displayName": "[TEAM FOUNDATION]\\AzureDevOps_IT_EDO_ART_Employer_HiEnv_Approvers",
+              "url": "https://spsprodcca1.vssps.visualstudio.com/A4eba774c-c9f9-4035-b5a2-0076caa7aae7/_apis/Identities/ffcd548b-3f4b-4daf-8960-4319a2629b37",
+              "_links": {
+                "avatar": {
+                  "href": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aadgp.Uy0xLTktMTU1MTM3NDI0NS0xMjA0NDAwOTY5LTI0MDI5ODY0MTMtMjE3OTQwODYxNi0zLTIwMjk5Mjg4MDEtMzE0OTA2NzMzNy0yODQ1NDY0NjYxLTY3Mjg5NjQwOQ"
+                }
+              },
+              "id": "ffcd548b-3f4b-4daf-8960-4319a2629b37",
+              "uniqueName": "vstfs:///Framework/IdentityDomain/4eba774c-c9f9-4035-b5a2-0076caa7aae7\\AzureDevOps_IT_EDO_ART_Employer_HiEnv_Approvers",
+              "imageUrl": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aadgp.Uy0xLTktMTU1MTM3NDI0NS0xMjA0NDAwOTY5LTI0MDI5ODY0MTMtMjE3OTQwODYxNi0zLTIwMjk5Mjg4MDEtMzE0OTA2NzMzNy0yODQ1NDY0NjYxLTY3Mjg5NjQwOQ",
+              "isContainer": true,
+              "descriptor": "aadgp.Uy0xLTktMTU1MTM3NDI0NS0xMjA0NDAwOTY5LTI0MDI5ODY0MTMtMjE3OTQwODYxNi0zLTIwMjk5Mjg4MDEtMzE0OTA2NzMzNy0yODQ1NDY0NjYxLTY3Mjg5NjQwOQ"
+            },
+            "id": 621886
+          }
+        ],
+        "approvalOptions": {
+          "requiredApproverCount": null,
+          "releaseCreatorCanBeApprover": true,
+          "autoTriggeredAndPreviousEnvironmentApprovedCanBeSkipped": false,
+          "enforceIdentityRevalidation": false,
+          "timeoutInMinutes": 0,
+          "executionOrder": "beforeGates"
+        }
+      },
+      "deployStep": {
+        "id": 435
+      },
+      "postDeployApprovals": {
+        "approvals": [
+          {
+            "rank": 1,
+            "isAutomated": true,
+            "isNotificationOn": false,
+            "id": 621887
+          }
+        ],
+        "approvalOptions": {
+          "requiredApproverCount": null,
+          "releaseCreatorCanBeApprover": false,
+          "autoTriggeredAndPreviousEnvironmentApprovedCanBeSkipped": false,
+          "enforceIdentityRevalidation": false,
+          "timeoutInMinutes": 0,
+          "executionOrder": "afterSuccessfulGates"
+        }
+      },
+      "deployPhases": [
+        {
+          "deploymentInput": {
+            "parallelExecution": {
+              "parallelExecutionType": "none"
+            },
+            "agentSpecification": null,
+            "skipArtifactsDownload": false,
+            "artifactsDownloadInput": {
+              "downloadInputs": []
+            },
+            "queueId": 696,
+            "demands": [],
+            "enableAccessToken": false,
+            "timeoutInMinutes": 0,
+            "jobCancelTimeoutInMinutes": 1,
+            "condition": "succeeded()",
+            "overrideInputs": {}
+          },
+          "rank": 1,
+          "phaseType": "agentBasedDeployment",
+          "name": "Agent job - WCF (Web Service) Deployment",
+          "refName": null,
+          "workflowTasks": [
+            {
+              "environment": {},
+              "taskId": "1e244d32-2dd4-4165-96fb-b7441ca9331e",
+              "version": "1.*",
+              "name": "Azure Key Vault: AS-ST-ITAppDelivery-KV",
+              "refName": "",
+              "enabled": true,
+              "alwaysRun": false,
+              "continueOnError": false,
+              "timeoutInMinutes": 0,
+              "retryCountOnTaskFailure": 0,
+              "definitionType": "task",
+              "overrideInputs": {},
+              "condition": "succeeded()",
+              "inputs": {
+                "ConnectedServiceName": "6dcfd661-4aad-4540-8123-17e418a899c6",
+                "KeyVaultName": "AS-ST-ITAppDelivery-KV",
+                "SecretsFilter": "*",
+                "RunAsPreJob": "false"
+              }
+            },
+            {
+              "environment": {},
+              "taskId": "99ff138c-7ce6-4d03-98bb-f99794d94afb",
+              "version": "1.*",
+              "name": "Task group: Assessment.wcb.Messaging.IPay.Wcf $(ServerNameST)",
+              "refName": "",
+              "enabled": true,
+              "alwaysRun": true,
+              "continueOnError": true,
+              "timeoutInMinutes": 0,
+              "retryCountOnTaskFailure": 0,
+              "definitionType": "metaTask",
+              "overrideInputs": {},
+              "condition": "succeededOrFailed()",
+              "inputs": {
+                "ApiServer": "$(ServerNameST)",
+                "AppRootFolder": "$(AppRootFolder)",
+                "Password": "$(Password)",
+                "ProductFamilyName": "$(ProductFamilyName)",
+                "TempRootFolder": "$(TempRootFolder)",
+                "Username": "$(UsernameST)",
+                "WebServiceName": "$(WebServiceName)",
+                "WebsiteNameLayer7": "$(WebsiteNameLayer7)"
+              }
+            }
+          ]
+        }
+      ],
+      "environmentOptions": {
+        "emailNotificationType": "OnlyOnFailure",
+        "emailRecipients": "release.environment.owner;release.creator",
+        "skipArtifactsDownload": false,
+        "timeoutInMinutes": 0,
+        "enableAccessToken": false,
+        "publishDeploymentStatus": true,
+        "badgeEnabled": false,
+        "autoLinkWorkItems": false,
+        "pullRequestDeploymentEnabled": false
+      },
+      "demands": [],
+      "conditions": [
+        {
+          "name": "SystemTest",
+          "conditionType": "environmentState",
+          "value": "4",
+          "result": null
+        },
+        {
+          "name": "SecurityReview",
+          "conditionType": "environmentState",
+          "value": "4",
+          "result": null
+        },
+        {
+          "name": "_Assessment.IpayMessage.Api",
+          "conditionType": "artifact",
+          "value": "{\"sourceBranch\":\"release/*\",\"tags\":[],\"useBuildDefinitionBranch\":false,\"createReleaseOnBuildTagging\":false}",
+          "result": null
+        },
+        {
+          "name": "_Assessment.IpayMessage.Api",
+          "conditionType": "artifact",
+          "value": "{\"sourceBranch\":\"hotfix/*\",\"tags\":[],\"useBuildDefinitionBranch\":false,\"createReleaseOnBuildTagging\":false}",
+          "result": null
+        }
+      ],
+      "executionPolicy": {
+        "concurrencyCount": 1,
+        "queueDepthCount": 0
+      },
+      "schedules": [],
+      "currentRelease": {
+        "id": 6590,
+        "url": "https://vsrm.dev.azure.com/wcbbc/044d2d6a-c021-46b5-8193-fb552055dcb0/_apis/Release/releases/6590",
+        "_links": {}
+      },
+      "retentionPolicy": {
+        "daysToKeep": 30,
+        "releasesToKeep": 3,
+        "retainBuild": true
+      },
+      "processParameters": {},
+      "properties": {
+        "LinkBoardsWorkItems": {
+          "$type": "System.String",
+          "$value": "False"
+        }
+      },
+      "preDeploymentGates": {
+        "id": 0,
+        "gatesOptions": null,
+        "gates": []
+      },
+      "postDeploymentGates": {
+        "id": 0,
+        "gatesOptions": null,
+        "gates": []
+      },
+      "environmentTriggers": [],
+      "badgeUrl": "https://vsrm.dev.azure.com/wcbbc/_apis/public/Release/badge/044d2d6a-c021-46b5-8193-fb552055dcb0/56/125"
+    },
+    {
+      "id": 126,
+      "name": "Production",
+      "rank": 6,
+      "owner": {
+        "displayName": "Sutherland, Aaron",
+        "url": "https://spsprodcca1.vssps.visualstudio.com/A4eba774c-c9f9-4035-b5a2-0076caa7aae7/_apis/Identities/1303d0fb-f5cc-6a4f-ad59-d8ca89ac485c",
+        "_links": {
+          "avatar": {
+            "href": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aad.MTMwM2QwZmItZjVjYy03YTRmLWFkNTktZDhjYTg5YWM0ODVj"
+          }
+        },
+        "id": "1303d0fb-f5cc-6a4f-ad59-d8ca89ac485c",
+        "uniqueName": "AS16073@worksafebc.com",
+        "imageUrl": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aad.MTMwM2QwZmItZjVjYy03YTRmLWFkNTktZDhjYTg5YWM0ODVj",
+        "descriptor": "aad.MTMwM2QwZmItZjVjYy03YTRmLWFkNTktZDhjYTg5YWM0ODVj"
+      },
+      "variables": {
+        "AppPoolIdentityUsername": {
+          "value": "ApplicationPoolIdentity"
+        }
+      },
+      "variableGroups": [],
+      "preDeployApprovals": {
+        "approvals": [
+          {
+            "rank": 1,
+            "isAutomated": false,
+            "isNotificationOn": false,
+            "approver": {
+              "displayName": "[TEAM FOUNDATION]\\I&T BSES Secondary Security Engineer Approvers (DL)",
+              "url": "https://spsprodcca1.vssps.visualstudio.com/A4eba774c-c9f9-4035-b5a2-0076caa7aae7/_apis/Identities/7cbea124-d1b2-4144-9209-90d9de365f7d",
+              "_links": {
+                "avatar": {
+                  "href": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aadgp.Uy0xLTktMTU1MTM3NDI0NS0xMjA0NDAwOTY5LTI0MDI5ODY0MTMtMjE3OTQwODYxNi0zLTEzODY1ODA4ODYtMzI3NDMyOTE1My0yMTgxNTcyMDU4LTI3Njk4NzEyMTU"
+                }
+              },
+              "id": "7cbea124-d1b2-4144-9209-90d9de365f7d",
+              "uniqueName": "vstfs:///Framework/IdentityDomain/4eba774c-c9f9-4035-b5a2-0076caa7aae7\\I&T BSES Secondary Security Engineer Approvers (DL)",
+              "imageUrl": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aadgp.Uy0xLTktMTU1MTM3NDI0NS0xMjA0NDAwOTY5LTI0MDI5ODY0MTMtMjE3OTQwODYxNi0zLTEzODY1ODA4ODYtMzI3NDMyOTE1My0yMTgxNTcyMDU4LTI3Njk4NzEyMTU",
+              "isContainer": true,
+              "descriptor": "aadgp.Uy0xLTktMTU1MTM3NDI0NS0xMjA0NDAwOTY5LTI0MDI5ODY0MTMtMjE3OTQwODYxNi0zLTEzODY1ODA4ODYtMzI3NDMyOTE1My0yMTgxNTcyMDU4LTI3Njk4NzEyMTU"
+            },
+            "id": 621888
+          },
+          {
+            "rank": 2,
+            "isAutomated": false,
+            "isNotificationOn": false,
+            "approver": {
+              "displayName": "[TEAM FOUNDATION]\\AzureDevOps_IT_EDO_ART_Employer_HiEnv_Approvers",
+              "url": "https://spsprodcca1.vssps.visualstudio.com/A4eba774c-c9f9-4035-b5a2-0076caa7aae7/_apis/Identities/ffcd548b-3f4b-4daf-8960-4319a2629b37",
+              "_links": {
+                "avatar": {
+                  "href": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aadgp.Uy0xLTktMTU1MTM3NDI0NS0xMjA0NDAwOTY5LTI0MDI5ODY0MTMtMjE3OTQwODYxNi0zLTIwMjk5Mjg4MDEtMzE0OTA2NzMzNy0yODQ1NDY0NjYxLTY3Mjg5NjQwOQ"
+                }
+              },
+              "id": "ffcd548b-3f4b-4daf-8960-4319a2629b37",
+              "uniqueName": "vstfs:///Framework/IdentityDomain/4eba774c-c9f9-4035-b5a2-0076caa7aae7\\AzureDevOps_IT_EDO_ART_Employer_HiEnv_Approvers",
+              "imageUrl": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aadgp.Uy0xLTktMTU1MTM3NDI0NS0xMjA0NDAwOTY5LTI0MDI5ODY0MTMtMjE3OTQwODYxNi0zLTIwMjk5Mjg4MDEtMzE0OTA2NzMzNy0yODQ1NDY0NjYxLTY3Mjg5NjQwOQ",
+              "isContainer": true,
+              "descriptor": "aadgp.Uy0xLTktMTU1MTM3NDI0NS0xMjA0NDAwOTY5LTI0MDI5ODY0MTMtMjE3OTQwODYxNi0zLTIwMjk5Mjg4MDEtMzE0OTA2NzMzNy0yODQ1NDY0NjYxLTY3Mjg5NjQwOQ"
+            },
+            "id": 621889
+          }
+        ],
+        "approvalOptions": {
+          "requiredApproverCount": null,
+          "releaseCreatorCanBeApprover": true,
+          "autoTriggeredAndPreviousEnvironmentApprovedCanBeSkipped": false,
+          "enforceIdentityRevalidation": false,
+          "timeoutInMinutes": 0,
+          "executionOrder": "beforeGates"
+        }
+      },
+      "deployStep": {
+        "id": 434
+      },
+      "postDeployApprovals": {
+        "approvals": [
+          {
+            "rank": 1,
+            "isAutomated": true,
+            "isNotificationOn": false,
+            "id": 621890
+          }
+        ],
+        "approvalOptions": {
+          "requiredApproverCount": null,
+          "releaseCreatorCanBeApprover": false,
+          "autoTriggeredAndPreviousEnvironmentApprovedCanBeSkipped": false,
+          "enforceIdentityRevalidation": false,
+          "timeoutInMinutes": 0,
+          "executionOrder": "afterSuccessfulGates"
+        }
+      },
+      "deployPhases": [
+        {
+          "deploymentInput": {
+            "parallelExecution": {
+              "parallelExecutionType": "none"
+            },
+            "agentSpecification": null,
+            "skipArtifactsDownload": false,
+            "artifactsDownloadInput": {
+              "downloadInputs": []
+            },
+            "queueId": 696,
+            "demands": [],
+            "enableAccessToken": false,
+            "timeoutInMinutes": 0,
+            "jobCancelTimeoutInMinutes": 1,
+            "condition": "succeeded()",
+            "overrideInputs": {}
+          },
+          "rank": 1,
+          "phaseType": "agentBasedDeployment",
+          "name": "Agent job - WCF (Web Service) Deployment",
+          "refName": null,
+          "workflowTasks": [
+            {
+              "environment": {},
+              "taskId": "1e244d32-2dd4-4165-96fb-b7441ca9331e",
+              "version": "1.*",
+              "name": "Azure Key Vault: AS-PR-ITAppDelivery-KV",
+              "refName": "",
+              "enabled": true,
+              "alwaysRun": false,
+              "continueOnError": false,
+              "timeoutInMinutes": 0,
+              "retryCountOnTaskFailure": 0,
+              "definitionType": "task",
+              "overrideInputs": {},
+              "condition": "succeeded()",
+              "inputs": {
+                "ConnectedServiceName": "72f777b9-6a15-4a6b-925c-6ffc0a1aba2b",
+                "KeyVaultName": "AS-PR-ITAppDelivery-KV",
+                "SecretsFilter": "*",
+                "RunAsPreJob": "false"
+              }
+            },
+            {
+              "environment": {},
+              "taskId": "99ff138c-7ce6-4d03-98bb-f99794d94afb",
+              "version": "1.*",
+              "name": "Task group: Assessment.wcb.Messaging.IPay.Wcf $(ServerNamePR)",
+              "refName": "",
+              "enabled": true,
+              "alwaysRun": true,
+              "continueOnError": true,
+              "timeoutInMinutes": 0,
+              "retryCountOnTaskFailure": 0,
+              "definitionType": "metaTask",
+              "overrideInputs": {},
+              "condition": "succeededOrFailed()",
+              "inputs": {
+                "ApiServer": "$(ServerNamePR)",
+                "AppRootFolder": "$(AppRootFolder)",
+                "Password": "$(Password)",
+                "ProductFamilyName": "$(ProductFamilyName)",
+                "TempRootFolder": "$(TempRootFolder)",
+                "Username": "$(UsernamePR)",
+                "WebServiceName": "$(WebServiceName)",
+                "WebsiteNameLayer7": "$(WebsiteNameLayer7)"
+              }
+            },
+            {
+              "environment": {},
+              "taskId": "d96e8c90-0fdd-11e8-a8b1-79ecfcf1be7c",
+              "version": "2.*",
+              "name": "Retain indefinitely current release",
+              "refName": "",
+              "enabled": true,
+              "alwaysRun": false,
+              "continueOnError": false,
+              "timeoutInMinutes": 0,
+              "retryCountOnTaskFailure": 0,
+              "definitionType": "task",
+              "overrideInputs": {},
+              "condition": "succeeded()",
+              "inputs": {
+                "lock": "true"
+              }
+            }
+          ]
+        }
+      ],
+      "environmentOptions": {
+        "emailNotificationType": "OnlyOnFailure",
+        "emailRecipients": "release.environment.owner;release.creator",
+        "skipArtifactsDownload": false,
+        "timeoutInMinutes": 0,
+        "enableAccessToken": false,
+        "publishDeploymentStatus": true,
+        "badgeEnabled": false,
+        "autoLinkWorkItems": false,
+        "pullRequestDeploymentEnabled": false
+      },
+      "demands": [],
+      "conditions": [
+        {
+          "name": "Pre-Prod Automation",
+          "conditionType": "environmentState",
+          "value": "4",
+          "result": null
+        }
+      ],
+      "executionPolicy": {
+        "concurrencyCount": 1,
+        "queueDepthCount": 0
+      },
+      "schedules": [],
+      "currentRelease": {
+        "id": 6590,
+        "url": "https://vsrm.dev.azure.com/wcbbc/044d2d6a-c021-46b5-8193-fb552055dcb0/_apis/Release/releases/6590",
+        "_links": {}
+      },
+      "retentionPolicy": {
+        "daysToKeep": 30,
+        "releasesToKeep": 3,
+        "retainBuild": true
+      },
+      "processParameters": {},
+      "properties": {
+        "LinkBoardsWorkItems": {
+          "$type": "System.String",
+          "$value": "False"
+        }
+      },
+      "preDeploymentGates": {
+        "id": 0,
+        "gatesOptions": null,
+        "gates": []
+      },
+      "postDeploymentGates": {
+        "id": 0,
+        "gatesOptions": null,
+        "gates": []
+      },
+      "environmentTriggers": [],
+      "badgeUrl": "https://vsrm.dev.azure.com/wcbbc/_apis/public/Release/badge/044d2d6a-c021-46b5-8193-fb552055dcb0/56/126"
+    },
+    {
+      "id": 127,
+      "name": "ProdSupport",
+      "rank": 7,
+      "owner": {
+        "displayName": "Sutherland, Aaron",
+        "url": "https://spsprodcca1.vssps.visualstudio.com/A4eba774c-c9f9-4035-b5a2-0076caa7aae7/_apis/Identities/1303d0fb-f5cc-6a4f-ad59-d8ca89ac485c",
+        "_links": {
+          "avatar": {
+            "href": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aad.MTMwM2QwZmItZjVjYy03YTRmLWFkNTktZDhjYTg5YWM0ODVj"
+          }
+        },
+        "id": "1303d0fb-f5cc-6a4f-ad59-d8ca89ac485c",
+        "uniqueName": "AS16073@worksafebc.com",
+        "imageUrl": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aad.MTMwM2QwZmItZjVjYy03YTRmLWFkNTktZDhjYTg5YWM0ODVj",
+        "descriptor": "aad.MTMwM2QwZmItZjVjYy03YTRmLWFkNTktZDhjYTg5YWM0ODVj"
+      },
+      "variables": {
+        "AppPoolIdentityUsername": {
+          "value": "ApplicationPoolIdentity"
+        }
+      },
+      "variableGroups": [],
+      "preDeployApprovals": {
+        "approvals": [
+          {
+            "rank": 1,
+            "isAutomated": false,
+            "isNotificationOn": false,
+            "approver": {
+              "displayName": "[TEAM FOUNDATION]\\AzureDevOps_IT_EDO_ART_Employer_HiEnv_Approvers",
+              "url": "https://spsprodcca1.vssps.visualstudio.com/A4eba774c-c9f9-4035-b5a2-0076caa7aae7/_apis/Identities/ffcd548b-3f4b-4daf-8960-4319a2629b37",
+              "_links": {
+                "avatar": {
+                  "href": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aadgp.Uy0xLTktMTU1MTM3NDI0NS0xMjA0NDAwOTY5LTI0MDI5ODY0MTMtMjE3OTQwODYxNi0zLTIwMjk5Mjg4MDEtMzE0OTA2NzMzNy0yODQ1NDY0NjYxLTY3Mjg5NjQwOQ"
+                }
+              },
+              "id": "ffcd548b-3f4b-4daf-8960-4319a2629b37",
+              "uniqueName": "vstfs:///Framework/IdentityDomain/4eba774c-c9f9-4035-b5a2-0076caa7aae7\\AzureDevOps_IT_EDO_ART_Employer_HiEnv_Approvers",
+              "imageUrl": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aadgp.Uy0xLTktMTU1MTM3NDI0NS0xMjA0NDAwOTY5LTI0MDI5ODY0MTMtMjE3OTQwODYxNi0zLTIwMjk5Mjg4MDEtMzE0OTA2NzMzNy0yODQ1NDY0NjYxLTY3Mjg5NjQwOQ",
+              "isContainer": true,
+              "descriptor": "aadgp.Uy0xLTktMTU1MTM3NDI0NS0xMjA0NDAwOTY5LTI0MDI5ODY0MTMtMjE3OTQwODYxNi0zLTIwMjk5Mjg4MDEtMzE0OTA2NzMzNy0yODQ1NDY0NjYxLTY3Mjg5NjQwOQ"
+            },
+            "id": 621891
+          }
+        ],
+        "approvalOptions": {
+          "requiredApproverCount": null,
+          "releaseCreatorCanBeApprover": true,
+          "autoTriggeredAndPreviousEnvironmentApprovedCanBeSkipped": false,
+          "enforceIdentityRevalidation": false,
+          "timeoutInMinutes": 0,
+          "executionOrder": "beforeGates"
+        }
+      },
+      "deployStep": {
+        "id": 433
+      },
+      "postDeployApprovals": {
+        "approvals": [
+          {
+            "rank": 1,
+            "isAutomated": true,
+            "isNotificationOn": false,
+            "id": 621892
+          }
+        ],
+        "approvalOptions": {
+          "requiredApproverCount": null,
+          "releaseCreatorCanBeApprover": false,
+          "autoTriggeredAndPreviousEnvironmentApprovedCanBeSkipped": false,
+          "enforceIdentityRevalidation": false,
+          "timeoutInMinutes": 0,
+          "executionOrder": "afterSuccessfulGates"
+        }
+      },
+      "deployPhases": [
+        {
+          "deploymentInput": {
+            "parallelExecution": {
+              "parallelExecutionType": "none"
+            },
+            "agentSpecification": null,
+            "skipArtifactsDownload": false,
+            "artifactsDownloadInput": {
+              "downloadInputs": []
+            },
+            "queueId": 696,
+            "demands": [],
+            "enableAccessToken": false,
+            "timeoutInMinutes": 0,
+            "jobCancelTimeoutInMinutes": 1,
+            "condition": "succeeded()",
+            "overrideInputs": {}
+          },
+          "rank": 1,
+          "phaseType": "agentBasedDeployment",
+          "name": "Agent job - WCF (Web Service) Deployment",
+          "refName": null,
+          "workflowTasks": [
+            {
+              "environment": {},
+              "taskId": "1e244d32-2dd4-4165-96fb-b7441ca9331e",
+              "version": "1.*",
+              "name": "Azure Key Vault: AS-PS-ITAppDelivery-KV",
+              "refName": "",
+              "enabled": true,
+              "alwaysRun": false,
+              "continueOnError": false,
+              "timeoutInMinutes": 0,
+              "retryCountOnTaskFailure": 0,
+              "definitionType": "task",
+              "overrideInputs": {},
+              "condition": "succeeded()",
+              "inputs": {
+                "ConnectedServiceName": "e4638f7a-0872-42f7-9717-89da9e218d13",
+                "KeyVaultName": "AS-PS-ITAppDelivery-KV",
+                "SecretsFilter": "*",
+                "RunAsPreJob": "false"
+              }
+            },
+            {
+              "environment": {},
+              "taskId": "99ff138c-7ce6-4d03-98bb-f99794d94afb",
+              "version": "1.*",
+              "name": "Task group: Assessment.wcb.Messaging.IPay.Wcf $(ServerNamePS)",
+              "refName": "",
+              "enabled": true,
+              "alwaysRun": true,
+              "continueOnError": true,
+              "timeoutInMinutes": 0,
+              "retryCountOnTaskFailure": 0,
+              "definitionType": "metaTask",
+              "overrideInputs": {},
+              "condition": "succeededOrFailed()",
+              "inputs": {
+                "ApiServer": "$(ServerNamePS)",
+                "AppRootFolder": "$(AppRootFolder)",
+                "Password": "$(Password)",
+                "ProductFamilyName": "$(ProductFamilyName)",
+                "TempRootFolder": "$(TempRootFolder)",
+                "Username": "$(UsernamePS)",
+                "WebServiceName": "$(WebServiceName)",
+                "WebsiteNameLayer7": "$(WebsiteNameLayer7)"
+              }
+            }
+          ]
+        }
+      ],
+      "environmentOptions": {
+        "emailNotificationType": "OnlyOnFailure",
+        "emailRecipients": "release.environment.owner;release.creator",
+        "skipArtifactsDownload": false,
+        "timeoutInMinutes": 0,
+        "enableAccessToken": false,
+        "publishDeploymentStatus": true,
+        "badgeEnabled": false,
+        "autoLinkWorkItems": false,
+        "pullRequestDeploymentEnabled": false
+      },
+      "demands": [],
+      "conditions": [],
+      "executionPolicy": {
+        "concurrencyCount": 1,
+        "queueDepthCount": 0
+      },
+      "schedules": [],
+      "currentRelease": {
+        "id": 6590,
+        "url": "https://vsrm.dev.azure.com/wcbbc/044d2d6a-c021-46b5-8193-fb552055dcb0/_apis/Release/releases/6590",
+        "_links": {}
+      },
+      "retentionPolicy": {
+        "daysToKeep": 30,
+        "releasesToKeep": 3,
+        "retainBuild": true
+      },
+      "processParameters": {},
+      "properties": {
+        "LinkBoardsWorkItems": {
+          "$type": "System.String",
+          "$value": "False"
+        }
+      },
+      "preDeploymentGates": {
+        "id": 0,
+        "gatesOptions": null,
+        "gates": []
+      },
+      "postDeploymentGates": {
+        "id": 0,
+        "gatesOptions": null,
+        "gates": []
+      },
+      "environmentTriggers": [],
+      "badgeUrl": "https://vsrm.dev.azure.com/wcbbc/_apis/public/Release/badge/044d2d6a-c021-46b5-8193-fb552055dcb0/56/127"
+    },
+    {
+      "id": 30364,
+      "name": "SecurityReview",
+      "rank": 4,
+      "owner": {
+        "displayName": "Alvin de Costa",
+        "url": "https://spsprodcca1.vssps.visualstudio.com/A4eba774c-c9f9-4035-b5a2-0076caa7aae7/_apis/Identities/0755e0cd-6af7-65c1-8c9a-1b2edf775833",
+        "_links": {
+          "avatar": {
+            "href": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aad.MDc1NWUwY2QtNmFmNy03NWMxLThjOWEtMWIyZWRmNzc1ODMz"
+          }
+        },
+        "id": "0755e0cd-6af7-65c1-8c9a-1b2edf775833",
+        "uniqueName": "AD15244@worksafebc.com",
+        "imageUrl": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aad.MDc1NWUwY2QtNmFmNy03NWMxLThjOWEtMWIyZWRmNzc1ODMz",
+        "descriptor": "aad.MDc1NWUwY2QtNmFmNy03NWMxLThjOWEtMWIyZWRmNzc1ODMz"
+      },
+      "variables": {},
+      "variableGroups": [],
+      "preDeployApprovals": {
+        "approvals": [
+          {
+            "rank": 1,
+            "isAutomated": true,
+            "isNotificationOn": false,
+            "id": 621884
+          }
+        ],
+        "approvalOptions": {
+          "requiredApproverCount": null,
+          "releaseCreatorCanBeApprover": true,
+          "autoTriggeredAndPreviousEnvironmentApprovedCanBeSkipped": false,
+          "enforceIdentityRevalidation": false,
+          "timeoutInMinutes": 0,
+          "executionOrder": "beforeGates"
+        }
+      },
+      "deployStep": {
+        "id": 96027
+      },
+      "postDeployApprovals": {
+        "approvals": [
+          {
+            "rank": 1,
+            "isAutomated": false,
+            "isNotificationOn": false,
+            "approver": {
+              "displayName": "[TEAM FOUNDATION]\\I&T BSES Primary Security Engineer Approvers (DL)",
+              "url": "https://spsprodcca1.vssps.visualstudio.com/A4eba774c-c9f9-4035-b5a2-0076caa7aae7/_apis/Identities/31922105-b403-4f89-a05f-2fa973c29356",
+              "_links": {
+                "avatar": {
+                  "href": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aadgp.Uy0xLTktMTU1MTM3NDI0NS0xMjA0NDAwOTY5LTI0MDI5ODY0MTMtMjE3OTQwODYxNi0zLTE2MTk4MDg5MDUtMzkzMzA1NTU2My0yMTY5ODUxMjQ3LTEwMzc1MDkzNDU"
+                }
+              },
+              "id": "31922105-b403-4f89-a05f-2fa973c29356",
+              "uniqueName": "vstfs:///Framework/IdentityDomain/4eba774c-c9f9-4035-b5a2-0076caa7aae7\\I&T BSES Primary Security Engineer Approvers (DL)",
+              "imageUrl": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aadgp.Uy0xLTktMTU1MTM3NDI0NS0xMjA0NDAwOTY5LTI0MDI5ODY0MTMtMjE3OTQwODYxNi0zLTE2MTk4MDg5MDUtMzkzMzA1NTU2My0yMTY5ODUxMjQ3LTEwMzc1MDkzNDU",
+              "isContainer": true,
+              "descriptor": "aadgp.Uy0xLTktMTU1MTM3NDI0NS0xMjA0NDAwOTY5LTI0MDI5ODY0MTMtMjE3OTQwODYxNi0zLTE2MTk4MDg5MDUtMzkzMzA1NTU2My0yMTY5ODUxMjQ3LTEwMzc1MDkzNDU"
+            },
+            "id": 621885
+          }
+        ],
+        "approvalOptions": {
+          "requiredApproverCount": null,
+          "releaseCreatorCanBeApprover": true,
+          "autoTriggeredAndPreviousEnvironmentApprovedCanBeSkipped": false,
+          "enforceIdentityRevalidation": false,
+          "timeoutInMinutes": 0,
+          "executionOrder": "afterSuccessfulGates"
+        }
+      },
+      "deployPhases": [
+        {
+          "deploymentInput": {
+            "parallelExecution": {
+              "parallelExecutionType": "none"
+            },
+            "agentSpecification": {
+              "identifier": "windows-latest"
+            },
+            "skipArtifactsDownload": false,
+            "artifactsDownloadInput": {
+              "downloadInputs": []
+            },
+            "queueId": 778,
+            "demands": [],
+            "enableAccessToken": false,
+            "timeoutInMinutes": 0,
+            "jobCancelTimeoutInMinutes": 1,
+            "condition": "succeeded()",
+            "overrideInputs": {}
+          },
+          "rank": 1,
+          "phaseType": "agentBasedDeployment",
+          "name": "Agent job",
+          "refName": null,
+          "workflowTasks": [
+            {
+              "environment": {},
+              "taskId": "9afe4065-b4ed-4242-9ab4-58b0e12ab659",
+              "version": "1.*",
+              "name": "Security Review",
+              "refName": "",
+              "enabled": true,
+              "alwaysRun": true,
+              "continueOnError": true,
+              "timeoutInMinutes": 0,
+              "retryCountOnTaskFailure": 0,
+              "definitionType": "metaTask",
+              "overrideInputs": {},
+              "condition": "succeededOrFailed()",
+              "inputs": {
+                "SRAutomationPAT": "$(SRAutomationPAT)"
+              }
+            }
+          ]
+        }
+      ],
+      "environmentOptions": {
+        "emailNotificationType": "OnlyOnFailure",
+        "emailRecipients": "release.environment.owner;release.creator",
+        "skipArtifactsDownload": false,
+        "timeoutInMinutes": 0,
+        "enableAccessToken": false,
+        "publishDeploymentStatus": true,
+        "badgeEnabled": false,
+        "autoLinkWorkItems": false,
+        "pullRequestDeploymentEnabled": false
+      },
+      "demands": [],
+      "conditions": [
+        {
+          "name": "SystemTest",
+          "conditionType": "environmentState",
+          "value": "4",
+          "result": null
+        },
+        {
+          "name": "_Assessment.IpayMessage.Api",
+          "conditionType": "artifact",
+          "value": "{\"sourceBranch\":\"release/*\",\"tags\":[],\"useBuildDefinitionBranch\":false,\"createReleaseOnBuildTagging\":false}",
+          "result": null
+        },
+        {
+          "name": "_Assessment.IpayMessage.Api",
+          "conditionType": "artifact",
+          "value": "{\"sourceBranch\":\"hotfix/*\",\"tags\":[],\"useBuildDefinitionBranch\":false,\"createReleaseOnBuildTagging\":false}",
+          "result": null
+        }
+      ],
+      "executionPolicy": {
+        "concurrencyCount": 1,
+        "queueDepthCount": 0
+      },
+      "schedules": [],
+      "currentRelease": {
+        "id": 37741,
+        "url": "https://vsrm.dev.azure.com/wcbbc/044d2d6a-c021-46b5-8193-fb552055dcb0/_apis/Release/releases/37741",
+        "_links": {}
+      },
+      "retentionPolicy": {
+        "daysToKeep": 30,
+        "releasesToKeep": 3,
+        "retainBuild": true
+      },
+      "processParameters": {},
+      "properties": {
+        "LinkBoardsWorkItems": {
+          "$type": "System.String",
+          "$value": "False"
+        },
+        "BoardsEnvironmentType": {
+          "$type": "System.String",
+          "$value": "unmapped"
+        }
+      },
+      "preDeploymentGates": {
+        "id": 0,
+        "gatesOptions": null,
+        "gates": []
+      },
+      "postDeploymentGates": {
+        "id": 0,
+        "gatesOptions": null,
+        "gates": []
+      },
+      "environmentTriggers": [],
+      "badgeUrl": "https://vsrm.dev.azure.com/wcbbc/_apis/public/Release/badge/044d2d6a-c021-46b5-8193-fb552055dcb0/56/30364"
+    },
+    {
+      "id": 34718,
+      "name": "Pre-Prod Automation",
+      "rank": 8,
+      "owner": {
+        "displayName": "Daniel Broderick",
+        "url": "https://spsprodcca1.vssps.visualstudio.com/A4eba774c-c9f9-4035-b5a2-0076caa7aae7/_apis/Identities/0bd03f42-4ab6-6c15-b926-6248d8acb95b",
+        "_links": {
+          "avatar": {
+            "href": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aad.MGJkMDNmNDItNGFiNi03YzE1LWI5MjYtNjI0OGQ4YWNiOTVi"
+          }
+        },
+        "id": "0bd03f42-4ab6-6c15-b926-6248d8acb95b",
+        "uniqueName": "DB57088@worksafebc.com",
+        "imageUrl": "https://dev.azure.com/wcbbc/_apis/GraphProfile/MemberAvatars/aad.MGJkMDNmNDItNGFiNi03YzE1LWI5MjYtNjI0OGQ4YWNiOTVi",
+        "descriptor": "aad.MGJkMDNmNDItNGFiNi03YzE1LWI5MjYtNjI0OGQ4YWNiOTVi"
+      },
+      "variables": {},
+      "variableGroups": [],
+      "preDeployApprovals": {
+        "approvals": [
+          {
+            "rank": 1,
+            "isAutomated": true,
+            "isNotificationOn": false,
+            "id": 564441
+          }
+        ],
+        "approvalOptions": {
+          "requiredApproverCount": null,
+          "releaseCreatorCanBeApprover": false,
+          "autoTriggeredAndPreviousEnvironmentApprovedCanBeSkipped": false,
+          "enforceIdentityRevalidation": false,
+          "timeoutInMinutes": 0,
+          "executionOrder": "beforeGates"
+        }
+      },
+      "deployStep": {
+        "id": 127764
+      },
+      "postDeployApprovals": {
+        "approvals": [
+          {
+            "rank": 1,
+            "isAutomated": true,
+            "isNotificationOn": false,
+            "id": 564442
+          }
+        ],
+        "approvalOptions": {
+          "requiredApproverCount": null,
+          "releaseCreatorCanBeApprover": false,
+          "autoTriggeredAndPreviousEnvironmentApprovedCanBeSkipped": false,
+          "enforceIdentityRevalidation": false,
+          "timeoutInMinutes": 0,
+          "executionOrder": "beforeGates"
+        }
+      },
+      "deployPhases": [
+        {
+          "deploymentInput": {
+            "parallelExecution": {
+              "parallelExecutionType": "none"
+            },
+            "agentSpecification": {
+              "identifier": "windows-latest"
+            },
+            "skipArtifactsDownload": false,
+            "artifactsDownloadInput": {
+              "downloadInputs": []
+            },
+            "queueId": 778,
+            "demands": [],
+            "enableAccessToken": false,
+            "timeoutInMinutes": 0,
+            "jobCancelTimeoutInMinutes": 1,
+            "condition": "succeeded()",
+            "overrideInputs": {}
+          },
+          "rank": 1,
+          "phaseType": "agentBasedDeployment",
+          "name": "Agent job",
+          "refName": null,
+          "workflowTasks": [
+            {
+              "environment": {},
+              "taskId": "3969d3ff-ac31-4bad-b21d-611e9f267436",
+              "version": "1.*",
+              "name": "Security Review Secondary",
+              "refName": "",
+              "enabled": true,
+              "alwaysRun": true,
+              "continueOnError": true,
+              "timeoutInMinutes": 0,
+              "retryCountOnTaskFailure": 0,
+              "definitionType": "metaTask",
+              "overrideInputs": {},
+              "condition": "succeededOrFailed()",
+              "inputs": {}
+            }
+          ]
+        }
+      ],
+      "environmentOptions": {
+        "emailNotificationType": "OnlyOnFailure",
+        "emailRecipients": "release.environment.owner;release.creator",
+        "skipArtifactsDownload": false,
+        "timeoutInMinutes": 0,
+        "enableAccessToken": false,
+        "publishDeploymentStatus": true,
+        "badgeEnabled": false,
+        "autoLinkWorkItems": false,
+        "pullRequestDeploymentEnabled": false
+      },
+      "demands": [],
+      "conditions": [
+        {
+          "name": "Staging",
+          "conditionType": "environmentState",
+          "value": "4",
+          "result": null
+        }
+      ],
+      "executionPolicy": {
+        "concurrencyCount": 1,
+        "queueDepthCount": 0
+      },
+      "schedules": [],
+      "currentRelease": {
+        "id": 0,
+        "url": "https://vsrm.dev.azure.com/wcbbc/044d2d6a-c021-46b5-8193-fb552055dcb0/_apis/Release/releases/0",
+        "_links": {}
+      },
+      "retentionPolicy": {
+        "daysToKeep": 30,
+        "releasesToKeep": 3,
+        "retainBuild": true
+      },
+      "properties": {},
+      "preDeploymentGates": {
+        "id": 0,
+        "gatesOptions": null,
+        "gates": []
+      },
+      "postDeploymentGates": {
+        "id": 0,
+        "gatesOptions": null,
+        "gates": []
+      },
+      "environmentTriggers": [],
+      "badgeUrl": "https://vsrm.dev.azure.com/wcbbc/_apis/public/Release/badge/044d2d6a-c021-46b5-8193-fb552055dcb0/56/34718"
+    }
+  ],
+  "artifacts": [
+    {
+      "sourceId": "044d2d6a-c021-46b5-8193-fb552055dcb0:861",
+      "type": "Build",
+      "alias": "_Assessment.IpayMessage.Api",
+      "definitionReference": {
+        "artifactSourceDefinitionUrl": {
+          "id": "https://dev.azure.com/wcbbc/_permalink/_build/index?collectionId=dc216ba3-25e9-46a8-823a-fb77a81f2a9f&projectId=044d2d6a-c021-46b5-8193-fb552055dcb0&definitionId=861",
+          "name": ""
+        },
+        "defaultVersionBranch": {
+          "id": "",
+          "name": ""
+        },
+        "defaultVersionSpecific": {
+          "id": "",
+          "name": ""
+        },
+        "defaultVersionTags": {
+          "id": "",
+          "name": ""
+        },
+        "defaultVersionType": {
+          "id": "latestType",
+          "name": "Latest"
+        },
+        "definition": {
+          "id": "861",
+          "name": "Assessment.IpayMessage.Api"
+        },
+        "definitions": {
+          "id": "",
+          "name": ""
+        },
+        "IsMultiDefinitionType": {
+          "id": "False",
+          "name": "False"
+        },
+        "project": {
+          "id": "044d2d6a-c021-46b5-8193-fb552055dcb0",
+          "name": "IT-App-Delivery"
+        },
+        "repository": {
+          "id": "",
+          "name": ""
+        }
+      },
+      "isPrimary": true,
+      "isRetained": false
+    },
+    {
+      "sourceId": "044d2d6a-c021-46b5-8193-fb552055dcb0:7c9462b2-3826-4ace-b938-5e72b27a0f56",
+      "type": "Git",
+      "alias": "_SharedDeploymentScripts",
+      "definitionReference": {
+        "branches": {
+          "id": "master",
+          "name": "master"
+        },
+        "checkoutNestedSubmodules": {
+          "id": "True",
+          "name": "Any nested submodules within"
+        },
+        "checkoutSubmodules": {
+          "id": "",
+          "name": ""
+        },
+        "defaultVersionSpecific": {
+          "id": "",
+          "name": ""
+        },
+        "defaultVersionType": {
+          "id": "latestFromBranchType",
+          "name": "Latest from the default branch"
+        },
+        "definition": {
+          "id": "7c9462b2-3826-4ace-b938-5e72b27a0f56",
+          "name": "SharedDeploymentScripts"
+        },
+        "fetchDepth": {
+          "id": "",
+          "name": ""
+        },
+        "gitLfsSupport": {
+          "id": "",
+          "name": ""
+        },
+        "project": {
+          "id": "044d2d6a-c021-46b5-8193-fb552055dcb0",
+          "name": "IT-App-Delivery"
+        }
+      },
+      "isRetained": false
+    }
+  ],
+  "triggers": [],
+  "releaseNameFormat": "$(Build.BuildNumber).r$(rev:r)",
+  "tags": [],
+  "properties": {
+    "DefinitionCreationSource": {
+      "$type": "System.String",
+      "$value": "ReleaseClone"
+    },
+    "IntegrateJiraWorkItems": {
+      "$type": "System.String",
+      "$value": "false"
+    },
+    "IntegrateBoardsWorkItems": {
+      "$type": "System.String",
+      "$value": "False"
+    }
+  },
+  "id": 56,
+  "name": "Assessment.wcb.Messaging.IPay.Wcf-RC-Unified",
+  "path": "\\Assessments",
+  "projectReference": null,
+  "url": "https://vsrm.dev.azure.com/wcbbc/044d2d6a-c021-46b5-8193-fb552055dcb0/_apis/Release/definitions/56",
+  "_links": {
+    "self": {
+      "href": "https://vsrm.dev.azure.com/wcbbc/044d2d6a-c021-46b5-8193-fb552055dcb0/_apis/Release/definitions/56"
+    },
+    "web": {
+      "href": "https://dev.azure.com/wcbbc/044d2d6a-c021-46b5-8193-fb552055dcb0/_release?definitionId=56"
+    }
+  }
+}

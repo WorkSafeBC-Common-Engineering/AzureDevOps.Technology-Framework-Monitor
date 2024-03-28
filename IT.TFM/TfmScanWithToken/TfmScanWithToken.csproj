@@ -21,6 +21,7 @@
     <ProjectReference Include="..\ProjectScannerSaveToSqlServer\ProjectScannerSaveToSqlServer.csproj" />
     <ProjectReference Include="..\RepoScan.Storage.SqlServer\RepoScan.Storage.SqlServer.csproj" />
     <ProjectReference Include="..\VisualStudioFileParser\VisualStudioFileParser.csproj" />
+    <ProjectReference Include="..\YamlFileParser\YamlFileParser.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />

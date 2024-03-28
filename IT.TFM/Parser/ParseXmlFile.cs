@@ -1,5 +1,6 @@
 ﻿using ProjectData;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
@@ -285,7 +286,9 @@ namespace Parser
                 }
 
                 var path = childNode.InnerText;
-                System.Diagnostics.Debug.WriteLine($"\t>>> Using HintPath: {path}");
+#if DEBUG
+                Console.WriteLine($"\t>>> Using HintPath: {path}");
+#endif
 
                 var fields = path.Split(pathSeparator, System.StringSplitOptions.RemoveEmptyEntries | System.StringSplitOptions.TrimEntries);
 
@@ -307,8 +310,9 @@ namespace Parser
         {
             string version = null;
 
-            System.Diagnostics.Debug.WriteLine($"\t>>> Getting Package Version from HintPath segment: {segment}");
-
+#if DEBUG
+            Console.WriteLine($"\t>>> Getting Package Version from HintPath segment: {segment}");
+#endif
             var fields = segment.Split(hintPathVersionSeparator, System.StringSplitOptions.RemoveEmptyEntries | System.StringSplitOptions.TrimEntries);
 
             for (var index = 0; index < fields.Length; index++)
@@ -321,8 +325,9 @@ namespace Parser
                     break;
                 }
             }
-
-            System.Diagnostics.Debug.WriteLine($"\t>>> Getting Package Version from HintPath, version = {version}");
+#if DEBUG
+            Console.WriteLine($"\t>>> Getting Package Version from HintPath, version = {version}");
+#endif
             return version;
         }
 

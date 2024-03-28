@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
+
 using AzureDevOps.Models;
 
-using Microsoft.TeamFoundation.Core.WebApi;
-using Microsoft.TeamFoundation.SourceControl.WebApi;
-using Microsoft.VisualStudio.Services.Client;
 using Microsoft.VisualStudio.Services.Common;
-using Microsoft.VisualStudio.Services.WebApi;
+
 using ProjectData;
 using ProjectData.Interfaces;
+
+using Artifact = ProjectData.Artifact;
+using Project = ProjectData.Project;
+using Repository = ProjectData.Repository;
 
 namespace AzureDevOpsScannerFramework
 {
@@ -160,49 +161,37 @@ namespace AzureDevOpsScannerFramework
             return repoList.AsEnumerable();
         }
 
-        async Task<IEnumerable<Pipeline>> IScanner.Pipelines(Guid projectId)
+        async Task<IEnumerable<Pipeline>> IScanner.Pipelines(Guid projectId, string repositoryId)
         {
             var pipelineList = new List<Pipeline>();
             api.Project = projectId.ToString();
+            api.Repository = repositoryId;
             var azDoPipelines = await api.GetPipelinesAsync();
 
-            foreach (var pipeline in azDoPipelines.Value)
+            foreach (var pipeline in azDoPipelines)
             {
-                var p = new Pipeline
-                {
-                    Id = pipeline.Id ?? 0,
-                    Name = pipeline.Name,
-                    Folder = pipeline.Folder,
-                    Revision = pipeline.Revision ?? 0,
-                    Url = pipeline.Url,
-                    Type = pipeline.Configuration.Type,
-                };
+                var p = GetPipeline(pipeline);
+                p.ProjectId = api.Project;
+                pipelineList.Add(p);
+            }
 
-                switch(pipeline.Configuration.Type)
-                {
-                    case "designerJson":
-                        p.PipelineType = pipeline.Configuration.DesignerJson.Type;
-                        p.Quality = pipeline.Configuration.DesignerJson.Quality;
-                        p.QueueStatus = pipeline.Configuration.DesignerJson.QueueStatus;
-                        p.CreatedBy = pipeline.Configuration.DesignerJson.AuthoredBy.DisplayName;
-                        p.CreatedDate = pipeline.Configuration.DesignerJson.CreatedDate;
-                        p.RepositoryName = pipeline.Configuration.DesignerJson.Repository.Name;
-                        p.RepositoryId = pipeline.Configuration.DesignerJson.Repository.Id;
-                        break;
+            return pipelineList.AsEnumerable();
+        }
 
-                    case "designerHyphenJson":
-                        break;
-
-                    case "justInTime":
-                        break;
-
-                    case "unknown":
-                        break;
-
-                    case "yaml":
-                        break;
-                }
-
+        async Task<IEnumerable<Pipeline>> IScanner.Releases(Guid projectId, string repositoryId)
+        {
+            var pipelineList = new List<Pipeline>();
+            api.Project = projectId.ToString();
+            api.Repository = repositoryId;
+            var azdoReleases = await api.ListReleasesAsync();
+            foreach (var release in azdoReleases.value)
+            {
+#if DEBUG
+                Console.WriteLine($"Release: {release.id} - {release.name}");
+#endif
+                var p = GetPipeline(release);
+                p.ProjectId = api.Project;
+               
                 pipelineList.Add(p);
             }
 
@@ -287,7 +276,7 @@ namespace AzureDevOpsScannerFramework
                 }
 
                 AddPropertyFields(file);
-                hasProperties = file.Properties.Count != 0 || file.References.Count != 0 || file.UrlReferences.Count != 0 || file.PackageReferences.Count != 0;
+                hasProperties = file.Properties.Count != 0 || file.References.Count != 0 || file.UrlReferences.Count != 0 || file.PackageReferences.Count != 0 || file.PipelineProperties.Count != 0;
 
             }
             catch (Exception ex)
@@ -328,7 +317,6 @@ namespace AzureDevOpsScannerFramework
             catch (Exception ex)
             {
                 file.AddProperty("Error", $"Unable to parse file. File: {file.Path}, Error Msg: {ex.Message}");
-                return;
             }
         }
 
@@ -382,6 +370,99 @@ namespace AzureDevOpsScannerFramework
         private static void GetProject(string projectId)
         {
 
+        }
+
+        private static Pipeline GetPipeline(AzDoPipeline pipeline)
+        {
+            var p = new Pipeline
+            {
+                Id = pipeline.Id ?? 0,
+                Name = pipeline.Name,
+                Folder = pipeline.Folder,
+                Revision = pipeline.Revision ?? 0,
+                Url = pipeline.Url,
+                Type = pipeline.Details.Configuration.Type,
+            };
+
+            Console.WriteLine($"Pipeline: {pipeline.Name}, Type: {pipeline.Details.Configuration.Type}");
+
+            switch (pipeline.Details.Configuration.Type)
+            {
+                case "designerJson":
+                    p.PipelineType = pipeline.Details.Configuration.DesignerJson.Type;
+                    p.RepositoryId = pipeline.Details.Configuration.DesignerJson.Repository.Id;
+
+                    var portfolioProduct = pipeline.Details.Configuration?.DesignerJson?.Variables?.PortfolioProductName?.Value;
+                    if (portfolioProduct != null)
+                    {
+                        var index = portfolioProduct.IndexOf('.');
+                        if (index > 0)
+                        {
+                            p.Portfolio = portfolioProduct[..index];
+                            p.Product = portfolioProduct[(index + 1)..];
+                        }
+                    }
+
+                    break;
+
+                case "designerHyphenJson":
+                    break;
+
+                case "justInTime":
+                    break;
+
+                case "unknown":
+                    break;
+
+                case "yaml":
+                    p.RepositoryId = pipeline.Details.Configuration.Repository.Id;
+                    p.Path = pipeline.Details.Configuration.Path;
+                    break;
+            }
+
+            return p;
+        }
+
+        private static Release GetPipeline(AzDoRelease release)
+        {
+            var pipeline = new Release
+            {
+                Id = release.id,
+                Name = release.name,
+                Folder = release.path,
+                Url = release.url,
+                Type = Pipeline.pipelineTypeRelease,
+                PipelineType = Pipeline.pipelineRelease,
+                Revision = release.revision,
+                Source = release.source,
+                CreatedByName = release.createdBy.displayName,
+                CreatedById = release.createdBy.uniqueName,
+                CreatedDateTime = release.createdOn,
+                ModifiedByName = release.modifiedBy?.displayName,
+                ModifiedById = release.modifiedBy?.uniqueName,
+                ModifiedDateTime = release.modifiedOn,
+                IsDeleted = release.isDeleted,
+                IsDisabled = release.isDisabled,
+                LastReleaseId = release.Details?.lastRelease?.id ?? 0,
+                LastReleaseName = release.Details?.lastRelease?.name,
+                Environments = release.Details.environments.Select(e => e.name).ToArray(),
+                Artifacts = release.Details.artifacts.Select(a => new Artifact
+                    {
+                        SourceId = a.sourceId,
+                        Type = a.type,
+                        Alias = a.alias,
+                        Url = a.definitionReference?.artifactSourceDefinitionUrl?.id,
+                        DefaultVersionType = a.definitionReference?.defaultVersionType?.name,
+                        DefinitionId = a.definitionReference?.definition?.id,
+                        DefinitionName = a.definitionReference?.definition?.name,
+                        Project = a.definitionReference?.project?.name,
+                        ProjectId = a.definitionReference?.project?.id,
+                        IsPrimary = a.isPrimary,
+                        IsRetained = a.isRetained
+                    }).ToArray()
+            };
+
+            return pipeline;
         }
 
         #endregion
