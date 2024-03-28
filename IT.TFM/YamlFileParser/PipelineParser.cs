@@ -1,16 +1,6 @@
-﻿using Microsoft.OpenApi;
-using Microsoft.OpenApi.Extensions;
-using Microsoft.OpenApi.Models;
-using Microsoft.OpenApi.Readers;
-using Microsoft.OpenApi.Writers;
-
-using Parser.Interfaces;
+﻿using Parser.Interfaces;
 
 using ProjectData;
-
-using System.Diagnostics.Eventing.Reader;
-using System.Security.Cryptography;
-using System.Text.Json;
 
 namespace YamlFileParser
 {
@@ -19,11 +9,8 @@ namespace YamlFileParser
         #region Private Members
 
         private static readonly char[] variableSeparator = [':'];
-
-        private const string jsonJoinChar = "\n";
-        private const string v1TemplateRepo = "Common-Engineering-System/AzureDevOps.Automation.Pipeline.Templates";
-        private const string v2TemplateRepo = "Common-Engineering-System/AzureDevOps.Automation.Pipeline.Templates.v2";
-        private const string gitRepoType = "git";
+        private const string v1TemplateRepo = "/AzureDevOps.Automation.Pipeline.Templates";
+        private const string v2TemplateRepo = "/AzureDevOps.Automation.Pipeline.Templates.v2";
 
         #endregion
 
@@ -119,11 +106,11 @@ namespace YamlFileParser
                                         templateName = templateName.Replace("\"", string.Empty);
                                     }
 
-                                    if (templateName.Equals(v2TemplateRepo, StringComparison.InvariantCultureIgnoreCase))
+                                    if (templateName.EndsWith(v2TemplateRepo, StringComparison.InvariantCultureIgnoreCase))
                                     {
                                         templateType = PipelineTemplateType.V2;
                                     }
-                                    else if (templateName.Equals(v1TemplateRepo, StringComparison.InvariantCultureIgnoreCase))
+                                    else if (templateName.EndsWith(v1TemplateRepo, StringComparison.InvariantCultureIgnoreCase))
                                     {
                                         templateType = PipelineTemplateType.V1;
                                     }
