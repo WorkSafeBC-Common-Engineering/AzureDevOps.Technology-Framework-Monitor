@@ -10,7 +10,8 @@ namespace ProjectScannerSaveToSqlServer.DataModels
     {
         public Project()
         {
-            Repositories = new HashSet<Repository>();
+            Repositories = [];
+            Pipelines = [];
         }
 
         public int Id { get; set; }
@@ -49,5 +50,7 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         public virtual Organization Organization { get; set; }
 
         public virtual ICollection<Repository> Repositories { get; set; }
+
+        public virtual ICollection<Pipeline> Pipelines { get; set; }
     }
 }

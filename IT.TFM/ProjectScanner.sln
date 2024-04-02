@@ -64,7 +64,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureDevOps", "AzureDevOps\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConfidentialSettings", "ConfidentialSettings\ConfidentialSettings.csproj", "{2CEBFB57-78AF-46FC-977B-626DAF7C3619}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReportsRefresh", "ReportsRefresh\ReportsRefresh.csproj", "{74BF2608-108D-4CD4-9EC8-BE6513F7EDBA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReportsRefresh", "ReportsRefresh\ReportsRefresh.csproj", "{74BF2608-108D-4CD4-9EC8-BE6513F7EDBA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YamlFileParser", "YamlFileParser\YamlFileParser.csproj", "{D3376B60-BE99-42E1-A252-5C10C241AEB0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -166,6 +168,10 @@ Global
 		{74BF2608-108D-4CD4-9EC8-BE6513F7EDBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{74BF2608-108D-4CD4-9EC8-BE6513F7EDBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{74BF2608-108D-4CD4-9EC8-BE6513F7EDBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3376B60-BE99-42E1-A252-5C10C241AEB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3376B60-BE99-42E1-A252-5C10C241AEB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3376B60-BE99-42E1-A252-5C10C241AEB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3376B60-BE99-42E1-A252-5C10C241AEB0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -196,6 +202,7 @@ Global
 		{58D2CEAF-71D0-422E-9FD2-6C702C0320EF} = {10E88914-F313-43A5-9893-24F5D79F51CB}
 		{2CEBFB57-78AF-46FC-977B-626DAF7C3619} = {AE122355-12E2-4890-8041-3B2B307CDDFB}
 		{74BF2608-108D-4CD4-9EC8-BE6513F7EDBA} = {69451FB6-F75A-48D7-A067-0F444AC23E83}
+		{D3376B60-BE99-42E1-A252-5C10C241AEB0} = {DAB4B476-8AFA-4AE7-9737-0FA45B6F55C1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {13E06812-4F34-4E3C-8E19-5A26F31CF9C8}

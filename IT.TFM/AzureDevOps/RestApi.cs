@@ -48,6 +48,8 @@ namespace AzureDevOps
 
         private const string getPipelinesUrl = "https://{baseUrl}/{organization}/{project}/_apis/pipelines?{apiVersion}";
 
+        private const string getReleasesUrl = "https://vsrm.dev.azure.com/{organization}/{project}/_apis/release/definitions?{apiVersion}";
+
         private static readonly Dictionary<string, HttpClient> httpClients = [];
 
         private static readonly Semaphore waitOnApiCall = new(1, 1);
@@ -88,7 +90,7 @@ namespace AzureDevOps
             {
                 BaseUrl = url;
                 Organization = string.Empty;
-                CheckoutDirectory = Path.Combine(Environment.CurrentDirectory, BaseUrl);
+                CheckoutDirectory = Path.Combine(System.Environment.CurrentDirectory, BaseUrl);
             }
             else
             {
@@ -96,7 +98,7 @@ namespace AzureDevOps
 
                 BaseUrl = fields[0];
                 Organization = fields[1];
-                CheckoutDirectory = Path.Combine(Environment.CurrentDirectory, Organization);
+                CheckoutDirectory = Path.Combine(System.Environment.CurrentDirectory, Organization);
             }
 #if DEBUG
             Console.WriteLine($"=> Checkout Directory = {CheckoutDirectory}");
@@ -185,21 +187,22 @@ namespace AzureDevOps
             return await CallApiAsync(GetUrl(downloadRepositoryUrl), mediaType: "application/zip", unzipContent: true);
         }
 
-        async Task<AzDoPipelineList> IRestApi.GetPipelinesAsync()
+        async Task<IEnumerable<AzDoPipeline>> IRestApi.GetPipelinesAsync()
         {
             var content = await CallApiAsync(GetUrl(getPipelinesUrl));
 
             if (content == string.Empty)
             {
-                return new AzDoPipelineList();
+                return [];
             }
 
             var pipelines = JsonConvert.DeserializeObject<AzDoPipelineList>(content);
             if (pipelines == null || pipelines.Value == null)
             {
-                return new AzDoPipelineList();
+                return [];
             }
 
+            var filteredPipelines = new List<AzDoPipeline>();
             foreach (var pipeline in pipelines.Value)
             {
                 if (string.IsNullOrEmpty(pipeline.Url))
@@ -213,17 +216,78 @@ namespace AzureDevOps
                     continue;
                 }
 
-                var pipelineDetails = JsonConvert.DeserializeObject<AzDoPipeline>(pipelineContent);
-                if (pipelineDetails == null)
+                AzDoPipelineDetails? pipelineDetails = null;
+
+                try
+                {
+                    pipelineDetails = JsonConvert.DeserializeObject<AzDoPipelineDetails>(pipelineContent);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                    throw;
+                }
+
+                if (!string.IsNullOrEmpty(Repository) && pipelineDetails?.Configuration?.Repository?.Id != Repository)
                 {
                     continue;
                 }
 
-                pipeline.Configuration = pipelineDetails.Configuration;
+                if (pipelineDetails == null)
+                {
+                    continue;
+                }
+#if DEBUG
+                Console.WriteLine($"Pipeline Type: {pipelineDetails.Configuration.Type}");
+#endif
+                pipeline.Details = pipelineDetails;
+                filteredPipelines.Add(pipeline);
             }
 
 
-            return pipelines ?? new AzDoPipelineList();
+            return filteredPipelines.AsEnumerable();
+        }
+
+        async Task<AzDoReleaseList> IRestApi.ListReleasesAsync()
+        {
+            var content = await CallApiAsync(GetUrl(getReleasesUrl));
+            if (content == string.Empty)
+            {
+                return new AzDoReleaseList();
+            }
+
+            var releases = JsonConvert.DeserializeObject<AzDoReleaseList>(content);
+            if (releases == null)
+            {
+                return new AzDoReleaseList();
+            }
+
+            foreach (var release in releases.value)
+            {
+                if (string.IsNullOrEmpty(release.url))
+                {
+                    continue;
+                }
+
+                var releaseContent = await (CallApiAsync(release.url));
+                if (releaseContent == string.Empty)
+                {
+                    continue;
+                }
+
+                try
+                {
+                    var details = JsonConvert.DeserializeObject<AzDoReleaseDetails>(releaseContent);
+                    release.Details = details;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                    throw;
+                }
+            }
+
+            return releases;
         }
 
         #endregion
@@ -322,8 +386,9 @@ namespace AzureDevOps
                     {
                         var msg = $"\t *** Exception occured with this URL: {url}\n{ex}";
                         Console.WriteLine(msg);
-                        Debug.WriteLine(msg);
-
+#if DEBUG
+                        Console.WriteLine(msg);
+#endif
                         if (retries-- <= 0)
                         {
                             throw;

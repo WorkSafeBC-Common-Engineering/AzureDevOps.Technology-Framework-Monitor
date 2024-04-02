@@ -11,11 +11,20 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 {
     public class Pipeline
     {
+        public Pipeline()
+        {
+            ReleaseArtifacts = [];
+        }
+
         public int Id { get; set; }
 
         public int PipelineId { get; set; }
 
-        public int RepositoryId { get; set; }
+        public int? ProjectId { get; set; }
+        
+        public int? RepositoryId { get; set; }
+
+        public int? FileId { get; set; }
 
         [Required]
         public string Name { get; set; } = string.Empty;
@@ -32,25 +41,45 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         [StringLength(20)]
         public string Type { get; set; } = string.Empty;
 
-        [Required]
         [StringLength(20)]
         public string PipelineType { get; set; } = string.Empty;
 
-        [Required]
-        [StringLength(20)]
-        public string QueueStatus { get; set; } = string.Empty;
+        public string Path { get; set; } = null;
 
-        [Required]
-        [StringLength(20)]
-        public string Quality { get; set; } = string.Empty;
+        public string YamlType { get; set; } = null;
 
-        [Required]
-        [StringLength(100)]
-        public string CreatedBy { get; set; }
+        public string Portfolio { get; set; } = null;
 
-        [Required]
-        public DateTime CreatedDate { get; set; }
+        public string Product { get; set; } = null;
+
+        public string Source { get; set; }
+
+        public string CreatedByName { get; set; }
+
+        public string CreatedById { get; set; }
+
+        public DateTime? CreatedDateTime { get; set; }
+
+        public string ModifiedByName { get; set; }
+
+        public string ModifiedById { get; set; }
+
+        public DateTime? ModifiedDateTime { get; set; }
+
+        public bool IsDeleted { get; set; } = false;
+
+        public bool IsDisabled { get; set; } = false;
+
+        public int? LastReleaseId { get; set; }
+
+        public string LastReleaseName { get; set; }
+
+        public string Environments { get; set; }
 
         public virtual Repository Repository { get; set; }
+
+        public virtual Project Project { get; set; }
+
+        public virtual ICollection<ReleaseArtifact> ReleaseArtifacts { get; set; }
     }
 }

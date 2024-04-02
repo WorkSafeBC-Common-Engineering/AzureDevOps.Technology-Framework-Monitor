@@ -7,8 +7,8 @@ namespace ProjectScannerSaveToSqlServer.DataModels
     {
         public Repository()
         {
-            Files = new HashSet<File>();
-            Pipelines = new HashSet<Pipeline>();
+            Files = [];
+            Pipelines = [];
         }
 
         public int Id { get; set; }

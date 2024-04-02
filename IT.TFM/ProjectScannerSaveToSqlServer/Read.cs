@@ -9,10 +9,11 @@ using System.Linq;
 namespace ProjectScannerSaveToSqlServer
 {
     public class Read : DbCore, IStorageReader
-    {
+    { 
         #region Private Members
 
         private Organization organization = null;
+        private const int yamlFileType = 10;
 
         #endregion
 
@@ -106,6 +107,7 @@ namespace ProjectScannerSaveToSqlServer
                             RemoteUrl = repository.RemoteUrl,
                             Size = repository.Size,
                             FileCount = repository.Files.Count,
+                            PipelineCount = repository.Pipelines.Count,
                             Url = repository.Url,
                             WebUrl = repository.WebUrl,
                             Deleted = repository.Deleted,
@@ -166,6 +168,14 @@ namespace ProjectScannerSaveToSqlServer
             return repository;
         }
 
+        IEnumerable<string> IStorageReader.GetRepositoryIds()
+        {
+            return context.Repositories
+                          .Select(r => r.RepositoryId)
+                          .ToArray()
+                          .AsEnumerable();
+        }
+
         IEnumerable<FileItem> IStorageReader.GetFiles()
         {
             context.Database.CommandTimeout = 300;
@@ -175,7 +185,7 @@ namespace ProjectScannerSaveToSqlServer
 
                 using (var localContext = GetConnection())
                 {
-                    context.Database.CommandTimeout = 300;
+                    localContext.Database.CommandTimeout = 300;
                     var file = localContext.Files.SingleOrDefault(f => f.Id == mainFile.Id);
 
                     var fileType = (FileItemType)Enum.Parse(typeof(FileItemType), file.FileType.Value);
@@ -196,7 +206,7 @@ namespace ProjectScannerSaveToSqlServer
                                       {
                                           Id = pr.Name,
                                           PackageType = pr.PackageType,
-                                          Version = pr.Version,  
+                                          Version = pr.Version,
                                           VersionComparator = pr.VersionComparator,
                                           FrameworkVersion = pr.FrameworkVersion
                                       });
@@ -332,9 +342,104 @@ namespace ProjectScannerSaveToSqlServer
             }
         }
 
-        void IStorageReader.Close()
+        IEnumerable<FileItem> IStorageReader.GetYamlFiles(string id)
         {
-            Close();
+            context.Database.CommandTimeout = 3600;
+            var fileList = context.Files
+                                  .Where(f => f.Repository.RepositoryId == id
+                                           && f.FileTypeId == yamlFileType)
+                                  .ToArray();
+
+            foreach (var mainFile in fileList)
+            {
+                FileItem fileItem;
+
+                fileItem = new FileItem
+                {
+                    Id = mainFile.FileId,
+                    FileType = FileItemType.YamlPipeline,
+                    Path = mainFile.Path,
+                    Url = mainFile.Url,
+                    StorageId = mainFile.Id,
+                    RepositoryId = new Guid(mainFile.Repository.RepositoryId),
+                    CommitId = mainFile.CommitId
+                };
+
+                yield return fileItem;
+            }
+        }
+
+        IEnumerable<Pipeline> IStorageReader.GetPipelines(string pipelineType)
+        {
+            if (pipelineType != Pipeline.pipelineTypeYaml && pipelineType != Pipeline.pipelineTypeClassic)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pipelineType), $"Invalid pipeline type specified ({pipelineType}). Must be one of ({Pipeline.pipelineTypeYaml}, {Pipeline.pipelineTypeClassic}).");
+            }
+
+            context.Database.CommandTimeout = 300;
+            var pipelines = context.Pipelines.Where(p => p.Type == pipelineType);
+            foreach (var dbPipeline in pipelines)
+            {
+                var file = context.Files.SingleOrDefault(f => f.Id == dbPipeline.FileId);
+
+                Pipeline pipeline = new()
+                {
+                    Id = dbPipeline.Id,
+                    ProjectId = dbPipeline?.Project?.ProjectId,
+                    RepositoryId = dbPipeline?.Repository?.RepositoryId,
+                    Name = dbPipeline.Name,
+                    Folder = dbPipeline.Folder,
+                    Revision = dbPipeline.Revision,
+                    Url = dbPipeline.Url,
+                    Type = dbPipeline.Type,
+                    PipelineType = dbPipeline.Type,
+                    Path = dbPipeline.Path,
+                    FileId = file?.FileId
+                };
+
+                yield return pipeline;
+            }
+        }
+
+        public IEnumerable<Pipeline> GetPipelines(string repositoryId, string filePath)
+        {
+            var repository = context.Repositories.Single(r => r.RepositoryId == repositoryId);
+            var file = context.Files.Single(f => f.RepositoryId == repository.Id
+                                              && f.Path.Equals(filePath, StringComparison.InvariantCultureIgnoreCase));
+
+            var pipelines = context.Pipelines.Where(p => p.RepositoryId == repository.Id
+                                                      && p.FileId == file.Id
+                                                      && p.Type != Pipeline.pipelineTypeRelease);
+
+            var projectId = repository.Project.ProjectId;
+
+            return pipelines.Select(p => new Pipeline
+            { 
+                Id = p.PipelineId,
+                ProjectId = projectId,
+                RepositoryId = p.Repository.RepositoryId,
+                FileId = file.FileId,
+                Name = p.Name,
+                Folder = p.Folder,
+                Revision = p.Revision,
+                Url = p.Url,
+                Type = p.Type,
+                PipelineType = p.PipelineType,
+                Path= p.Path,
+                YamlType = p.YamlType,
+                Portfolio = p.Portfolio,
+                Product = p.Product
+            }).AsEnumerable();
+        }
+
+        IEnumerable<int> IStorageReader.GetPipelineIdsForProject(string projectId)
+        {
+            var project = context.Projects.SingleOrDefault(p => p.ProjectId.Equals(projectId, StringComparison.InvariantCultureIgnoreCase));
+
+            return context.Pipelines.Where(p => p.ProjectId == project.Id
+                                             && p.Type != Pipeline.pipelineTypeRelease)
+                                    .Select(p => p.PipelineId)
+                                    .AsEnumerable();
         }
 
         #endregion

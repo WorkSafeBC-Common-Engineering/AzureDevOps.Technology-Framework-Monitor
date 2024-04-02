@@ -12,6 +12,8 @@ namespace RepoScan.DataModels
 
         IEnumerable<FileItem> Read(string repoId);
 
+        IEnumerable<FileItem> YamlRead(string repoId);
+
         IEnumerable<FileItem> ReadDetails();
     }
 }

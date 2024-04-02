@@ -20,5 +20,10 @@ namespace RepoScan.DataModels
         public string Url { get; set; }
 
         public string CommitId { get; set; }
+
+        public override string ToString()
+        {
+            return $"Id: {Id}, Path: {Path}, FileType: {FileType}, RepositoryId: {Repository.RepositoryName}";
+        }
     }
 }

@@ -18,7 +18,7 @@ namespace AzureDevOps.Models
 
         public string? Url { get; set; }
 
-        public AzDoPipelineConfiguration? Configuration { get; set; }
+        public AzDoPipelineDetails? Details { get; set; }
     }
 
     public class AzDoPipelineList

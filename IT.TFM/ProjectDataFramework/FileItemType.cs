@@ -10,6 +10,7 @@
         VB6Project,
         VSConfig,
         NuGetPkgConfig,
-        NpmPackage
+        NpmPackage,
+        YamlPipeline
     }
 }

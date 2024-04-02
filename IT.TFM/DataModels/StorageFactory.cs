@@ -62,6 +62,11 @@ namespace RepoScan.DataModels
             return _container.Resolve<IWriteRepoList>();
         }
 
+        public static IReadPipelines GetPipelineReader()
+        {
+            return _container.Resolve<IReadPipelines>();
+        }
+
         public static IWritePipeline GetPipelineWriter()
         {
             return _container.Resolve<IWritePipeline>();

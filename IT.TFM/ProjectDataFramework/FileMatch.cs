@@ -75,6 +75,12 @@ namespace ProjectData
                     MatchOn = "package.json",
                     Exceptions = []
                 },
+                FileItemType.YamlPipeline => new FileMatch
+                {
+                    MatchType = MatchType.EndsWith,
+                    MatchOn = ".yml",
+                    Exceptions = []
+                },
                 _ => throw new ArgumentException("Invalid parameter - value does not exist", nameof(fileType)),
             };
         }
@@ -91,7 +97,8 @@ namespace ProjectData
             {FileItemType.SqlProject, FileMatch.MatchOnFile(FileItemType.SqlProject) },
             {FileItemType.VSConfig, FileMatch.MatchOnFile(FileItemType.VSConfig) },
             {FileItemType.NuGetPkgConfig, FileMatch.MatchOnFile(FileItemType.NuGetPkgConfig) },
-            {FileItemType.NpmPackage, FileMatch.MatchOnFile(FileItemType.NpmPackage) }
+            {FileItemType.NpmPackage, FileMatch.MatchOnFile(FileItemType.NpmPackage) },
+            {FileItemType.YamlPipeline, FileMatch.MatchOnFile(FileItemType.YamlPipeline) }
         };
 
         public static FileItemType GetMatchedFileType(this string filename)
