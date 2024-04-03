@@ -10,7 +10,7 @@ namespace ProjectScannerSaveToSqlServer.DataModels
     {
         public FileType()
         {
-            Files = new HashSet<File>();
+            Files = [];
         }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]

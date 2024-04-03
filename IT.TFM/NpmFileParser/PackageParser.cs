@@ -14,9 +14,13 @@ namespace NpmFileParser
         #region Private Members
 
         private const string jsonJoinChar = " ";
-        private const string dependenciesProperty = "dependencies";
-        private const string npmPackageType = "NPM";
         private static readonly char[] separator = [':'];
+
+        private const string dependenciesProperty = "dependencies";
+        private const string devDependenciesProperty = "devDependencies";
+
+        private const string npmPackageType = "NPM";
+        private const string npmDevPackageType = "NPM-DEV";
 
         #endregion
 
@@ -32,7 +36,18 @@ namespace NpmFileParser
             var fileContents = string.Join(jsonJoinChar, content);
             var root = JObject.Parse(fileContents);
 
-            var dependencies = root[dependenciesProperty];
+            ParseDependencies(file, root, dependenciesProperty, npmPackageType);
+
+            ParseDependencies(file, root, devDependenciesProperty, npmDevPackageType);
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private static void ParseDependencies(FileItem file, JObject root, string dependenceTag, string packageType)
+        {
+            var dependencies = root[dependenceTag];
             if (dependencies == null)
             {
                 return;
@@ -52,10 +67,10 @@ namespace NpmFileParser
                 }
 
                 var id = fields[0].Trim();
-                var version = fields[1].Trim(); ;
-                
+                var version = fields[1].Trim();
+
                 var comparator = version[..1];
-                
+
                 // if we have a ^ or ~ in the version, strip it
                 if (comparator == "^" || comparator == "~")
                 {
@@ -66,7 +81,7 @@ namespace NpmFileParser
                     comparator = string.Empty;
                 }
 
-                file.AddPackageReference(npmPackageType, id, $"{version}", string.Empty, comparator);
+                file.AddPackageReference(packageType, id, $"{version}", string.Empty, comparator);
 
                 dependency = dependency.Next;
             }
