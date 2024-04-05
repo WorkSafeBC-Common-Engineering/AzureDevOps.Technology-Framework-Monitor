@@ -5,8 +5,6 @@ using System.Configuration;
 using System.IO;
 using System.Xml;
 
-using static System.Collections.Specialized.BitVector32;
-
 namespace ConfigurationFileData
 {
     public static class ConfigurationSettings

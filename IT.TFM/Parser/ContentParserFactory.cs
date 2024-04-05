@@ -1,7 +1,9 @@
 ﻿using Microsoft.Practices.Unity.Configuration;
+
 using Parser.Interfaces;
-using ProjectData;
+
 using System.Configuration;
+
 using Unity;
 
 namespace Parser

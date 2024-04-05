@@ -2,7 +2,6 @@
 
 using Newtonsoft.Json;
 
-using System.Diagnostics;
 using System.IO.Compression;
 using System.Text;
 
@@ -368,7 +367,7 @@ namespace AzureDevOps
                 Console.WriteLine($"API Call: {url}");
                 var startTime = DateTime.Now;
 #endif
-                HttpResponseMessage response = null;
+                HttpResponseMessage response;
 
                 int retries = maxRetries;
                 while (true)

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ProjectData
+﻿namespace ProjectData
 {
     public class Pipeline
     {

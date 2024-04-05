@@ -2,14 +2,8 @@
 
 using RepoScan.DataModels;
 using DataStorage = Storage;
-
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using ConfidentialSettings;
 using ProjectData;
 
 namespace RepoScan.Storage.SqlServer

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace AzureDevOps.Models
+﻿namespace AzureDevOps.Models
 {
     public class AzDoProject
     {

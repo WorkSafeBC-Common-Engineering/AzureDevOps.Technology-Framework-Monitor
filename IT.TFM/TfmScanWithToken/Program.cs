@@ -1,8 +1,7 @@
-﻿using Microsoft.VisualStudio.Services.ActivityStatistic;
-
-using System;
+﻿using System;
 using System.Configuration;
 using System.Threading.Tasks;
+
 using RepoFileScan = RepoScan.FileLocator;
 
 namespace TfmScanWithToken
