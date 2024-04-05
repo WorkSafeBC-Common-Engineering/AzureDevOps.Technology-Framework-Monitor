@@ -25,7 +25,7 @@
     public class AzDoReleaseList
     {
         public int count { get; set; }
-        public AzDoRelease[] value { get; set; } = Array.Empty<AzDoRelease>();
+        public AzDoRelease[] value { get; set; } = [];
     }
 
     public class Links1

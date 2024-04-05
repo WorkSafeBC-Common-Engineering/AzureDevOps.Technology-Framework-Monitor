@@ -111,22 +111,22 @@
         public int rank { get; set; }
         public Owner? owner { get; set; }
         public Variables? variables { get; set; }
-        public object[] variableGroups { get; set; } = Array.Empty<object>();
+        public object[] variableGroups { get; set; } = [];
         public Predeployapprovals? preDeployApprovals { get; set; }
         public Deploystep? deployStep { get; set; }
         public Postdeployapprovals? postDeployApprovals { get; set; }
-        public Deployphas[] deployPhases { get; set; } = Array.Empty<Deployphas>();
+        public Deployphas[] deployPhases { get; set; } = [];
         public Environmentoptions? environmentOptions { get; set; }
-        public object[] demands { get; set; } = Array.Empty<object>();
-        public Condition[] conditions { get; set; } = Array.Empty<Condition>();
+        public object[] demands { get; set; } = [];
+        public Condition[] conditions { get; set; } = [];
         public Executionpolicy? executionPolicy { get; set; }
-        public object[] schedules { get; set; } = Array.Empty<object>();
+        public object[] schedules { get; set; } = [];
         public Currentrelease? currentRelease { get; set; }
         public Retentionpolicy? retentionPolicy { get; set; }
         public Properties1? properties { get; set; }
         public Predeploymentgates? preDeploymentGates { get; set; }
         public Postdeploymentgates? postDeploymentGates { get; set; }
-        public object[] environmentTriggers { get; set; } = Array.Empty<object>();
+        public object[] environmentTriggers { get; set; } = [];
         public string? badgeUrl { get; set; }
     }
 
