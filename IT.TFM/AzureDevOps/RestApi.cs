@@ -261,14 +261,14 @@ namespace AzureDevOps
                 return new AzDoReleaseList();
             }
 
-            foreach (var release in releases.value)
+            foreach (var release in releases.Value)
             {
-                if (string.IsNullOrEmpty(release.url))
+                if (string.IsNullOrEmpty(release.Url))
                 {
                     continue;
                 }
 
-                var releaseContent = await (CallApiAsync(release.url));
+                var releaseContent = await (CallApiAsync(release.Url));
                 if (releaseContent == string.Empty)
                 {
                     continue;

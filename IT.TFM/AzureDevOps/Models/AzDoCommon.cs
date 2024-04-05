@@ -20,30 +20,30 @@ namespace AzureDevOps.Models
 
     public class Avatar
     {
-        public string? href { get; set; }
+        public string? Href { get; set; }
     }
 
     public class Createdby
     {
-        public string? displayName { get; set; }
-        public string? url { get; set; }
-        public Links1? _links { get; set; }
-        public string? id { get; set; }
-        public string? uniqueName { get; set; }
-        public string? imageUrl { get; set; }
-        public string? descriptor { get; set; }
-        public bool inactive { get; set; }
+        public string? DisplayName { get; set; }
+        public string? Url { get; set; }
+        public Links1? Links { get; set; }
+        public string? Id { get; set; }
+        public string? UniqueName { get; set; }
+        public string? ImageUrl { get; set; }
+        public string? Descriptor { get; set; }
+        public bool Inactive { get; set; }
     }
 
     public class Modifiedby
     {
-        public string? displayName { get; set; }
-        public string? url { get; set; }
-        public Links1? _links { get; set; }
-        public string? id { get; set; }
-        public string? uniqueName { get; set; }
-        public string? imageUrl { get; set; }
-        public string? descriptor { get; set; }
+        public string? DisplayName { get; set; }
+        public string? Url { get; set; }
+        public Links1? Links { get; set; }
+        public string? Id { get; set; }
+        public string? UniqueName { get; set; }
+        public string? ImageUrl { get; set; }
+        public string? Descriptor { get; set; }
     }
 
     public class SystemDebug
@@ -54,8 +54,8 @@ namespace AzureDevOps.Models
 
     public class Definition
     {
-        public string? id { get; set; }
-        public string? name { get; set; }
+        public string? Id { get; set; }
+        public string? Name { get; set; }
     }
     public class Variables
     {
@@ -66,7 +66,7 @@ namespace AzureDevOps.Models
         public SystemDebug? SystemDebug { get; set; }
         public Approotfolder? AppRootFolder { get; set; }
         public Productfamilyname? ProductFamilyName { get; set; }
-        public SystemDebug? systemdebug { get; set; }
+        public SystemDebug? Systemdebug { get; set; }
         public Temprootfolder? TempRootFolder { get; set; }
         public Webservicename? WebServiceName { get; set; }
         public Websitenamelayer7? WebsiteNameLayer7 { get; set; }

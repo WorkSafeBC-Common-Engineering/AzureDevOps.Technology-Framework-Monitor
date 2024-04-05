@@ -183,10 +183,10 @@ namespace AzureDevOpsScannerFramework
             api.Project = projectId.ToString();
             api.Repository = repositoryId;
             var azdoReleases = await api.ListReleasesAsync();
-            foreach (var release in azdoReleases.value)
+            foreach (var release in azdoReleases.Value)
             {
 #if DEBUG
-                Console.WriteLine($"Release: {release.id} - {release.name}");
+                Console.WriteLine($"Release: {release.Id} - {release.Name}");
 #endif
                 var p = GetPipeline(release);
                 p.ProjectId = api.Project;
@@ -421,38 +421,38 @@ namespace AzureDevOpsScannerFramework
         {
             var pipeline = new Release
             {
-                Id = release.id,
-                Name = release.name,
-                Folder = release.path,
-                Url = release.url,
+                Id = release.Id,
+                Name = release.Name,
+                Folder = release.Path,
+                Url = release.Url,
                 Type = Pipeline.pipelineTypeRelease,
                 PipelineType = Pipeline.pipelineRelease,
-                Revision = release.revision,
-                Source = release.source,
-                CreatedByName = release.createdBy.displayName,
-                CreatedById = release.createdBy.uniqueName,
-                CreatedDateTime = release.createdOn,
-                ModifiedByName = release.modifiedBy?.displayName,
-                ModifiedById = release.modifiedBy?.uniqueName,
-                ModifiedDateTime = release.modifiedOn,
-                IsDeleted = release.isDeleted,
-                IsDisabled = release.isDisabled,
-                LastReleaseId = release.Details?.lastRelease?.id ?? 0,
-                LastReleaseName = release.Details?.lastRelease?.name,
-                Environments = release.Details.environments.Select(e => e.name).ToArray(),
-                Artifacts = release.Details.artifacts.Select(a => new Artifact
+                Revision = release.Revision,
+                Source = release.Source,
+                CreatedByName = release.CreatedBy.DisplayName,
+                CreatedById = release.CreatedBy.UniqueName,
+                CreatedDateTime = release.CreatedOn,
+                ModifiedByName = release.ModifiedBy?.DisplayName,
+                ModifiedById = release.ModifiedBy?.UniqueName,
+                ModifiedDateTime = release.ModifiedOn,
+                IsDeleted = release.IsDeleted,
+                IsDisabled = release.IsDisabled,
+                LastReleaseId = release.Details?.LastRelease?.Id ?? 0,
+                LastReleaseName = release.Details?.LastRelease?.Name,
+                Environments = release.Details.Environments.Select(e => e.Name).ToArray(),
+                Artifacts = release.Details.Artifacts.Select(a => new Artifact
                     {
-                        SourceId = a.sourceId,
-                        Type = a.type,
-                        Alias = a.alias,
-                        Url = a.definitionReference?.artifactSourceDefinitionUrl?.id,
-                        DefaultVersionType = a.definitionReference?.defaultVersionType?.name,
-                        DefinitionId = a.definitionReference?.definition?.id,
-                        DefinitionName = a.definitionReference?.definition?.name,
-                        Project = a.definitionReference?.project?.name,
-                        ProjectId = a.definitionReference?.project?.id,
-                        IsPrimary = a.isPrimary,
-                        IsRetained = a.isRetained
+                        SourceId = a.SourceId,
+                        Type = a.Type,
+                        Alias = a.Alias,
+                        Url = a.DefinitionReference?.ArtifactSourceDefinitionUrl?.Id,
+                        DefaultVersionType = a.DefinitionReference?.DefaultVersionType?.Name,
+                        DefinitionId = a.DefinitionReference?.Definition?.Id,
+                        DefinitionName = a.DefinitionReference?.Definition?.Name,
+                        Project = a.DefinitionReference?.Project?.Name,
+                        ProjectId = a.DefinitionReference?.Project?.Id,
+                        IsPrimary = a.IsPrimary,
+                        IsRetained = a.IsRetained
                     }).ToArray()
             };
 
