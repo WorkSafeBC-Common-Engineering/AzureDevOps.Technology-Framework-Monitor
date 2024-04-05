@@ -104,7 +104,7 @@ namespace RepoScan.FileLocator
 
         #region Private Methods
 
-        public static void LinkYamlPipeline(string repositoryId, string filePath)
+        private static void LinkYamlPipeline(string repositoryId, string filePath)
         {
             lock (pipelineReaderLock)
             {
