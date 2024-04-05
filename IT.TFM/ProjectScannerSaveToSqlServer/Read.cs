@@ -376,6 +376,8 @@ namespace ProjectScannerSaveToSqlServer
                 throw new ArgumentOutOfRangeException(nameof(pipelineType), $"Invalid pipeline type specified ({pipelineType}). Must be one of ({Pipeline.pipelineTypeYaml}, {Pipeline.pipelineTypeClassic}).");
             }
 
+            var pipelineList = new List<Pipeline>();
+
             context.Database.CommandTimeout = 300;
             var pipelines = context.Pipelines.Where(p => p.Type == pipelineType);
             foreach (var dbPipeline in pipelines)
@@ -397,8 +399,10 @@ namespace ProjectScannerSaveToSqlServer
                     FileId = file?.FileId
                 };
 
-                yield return pipeline;
+                pipelineList.Add(pipeline);
             }
+
+            return pipelineList.AsEnumerable();
         }
 
         public IEnumerable<Pipeline> GetPipelines(string repositoryId, string filePath)
