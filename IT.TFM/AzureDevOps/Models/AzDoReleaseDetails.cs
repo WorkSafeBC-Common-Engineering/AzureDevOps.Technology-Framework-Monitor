@@ -52,7 +52,7 @@
     public class Releasedefinition
     {
         public int id { get; set; }
-        public object projectReference { get; set; }
+        public object? projectReference { get; set; }
     }
 
     public class Approotfolder

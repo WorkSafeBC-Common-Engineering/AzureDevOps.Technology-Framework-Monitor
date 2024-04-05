@@ -237,7 +237,7 @@ namespace AzureDevOps
                     continue;
                 }
 #if DEBUG
-                Console.WriteLine($"Pipeline Type: {pipelineDetails.Configuration.Type}");
+                Console.WriteLine($"Pipeline Type: {pipelineDetails?.Configuration?.Type}");
 #endif
                 pipeline.Details = pipelineDetails;
                 filteredPipelines.Add(pipeline);
