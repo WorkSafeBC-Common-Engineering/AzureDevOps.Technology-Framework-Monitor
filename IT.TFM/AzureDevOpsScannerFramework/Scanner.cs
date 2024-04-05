@@ -367,11 +367,6 @@ namespace AzureDevOpsScannerFramework
                 });
         }
 
-        private static void GetProject(string projectId)
-        {
-
-        }
-
         private static Pipeline GetPipeline(AzDoPipeline pipeline)
         {
             var p = new Pipeline

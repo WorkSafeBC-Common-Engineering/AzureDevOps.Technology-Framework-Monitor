@@ -10,8 +10,8 @@ namespace ProjectScannerSaveToSqlServer.DataModels
     {
         public File()
         {
-            FileProperties = new HashSet<FileProperty>();
-            FileReferences = new HashSet<FileReference>();
+            FileProperties = [];
+            FileReferences = [];
         }
 
         public int Id { get; set; }

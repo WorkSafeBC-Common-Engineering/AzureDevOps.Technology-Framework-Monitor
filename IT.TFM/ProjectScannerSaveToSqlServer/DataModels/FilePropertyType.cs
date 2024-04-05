@@ -8,7 +8,7 @@
     {
         public FilePropertyType()
         {
-            FileProperties = new HashSet<FileProperty>();
+            FileProperties = [];
         }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]

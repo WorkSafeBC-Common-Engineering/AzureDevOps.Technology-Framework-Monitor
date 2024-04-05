@@ -201,7 +201,7 @@ namespace Parser
                             }
                         }
                     }
-                    else if (versionAttribute.StartsWith("$"))
+                    else if (versionAttribute.StartsWith('$'))
                     {
                         versionAttribute = versionAttribute.Replace("$(", string.Empty).Replace(")", string.Empty);
                         // find the entry from the Directory.Build.props file - if not found then leave this blank.

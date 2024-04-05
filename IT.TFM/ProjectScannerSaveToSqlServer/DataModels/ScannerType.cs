@@ -10,7 +10,7 @@ namespace ProjectScannerSaveToSqlServer.DataModels
     {
         public ScannerType()
         {
-            Organizations = new HashSet<Organization>();
+            Organizations = [];
         }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]

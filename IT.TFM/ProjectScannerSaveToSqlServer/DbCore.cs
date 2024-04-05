@@ -36,7 +36,6 @@ namespace ProjectScannerSaveToSqlServer
         protected ProjectScannerDB context;
         protected Guid instanceId;
         private static long instanceCount = 0;
-        private bool disposedValue;
 
         #endregion
 

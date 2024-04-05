@@ -254,7 +254,7 @@ namespace YamlFileParser
                 value = variables[parameter[13..^2]];
             }
 
-            if (parameter.StartsWith("$(") && parameter.EndsWith(")"))
+            if (parameter.StartsWith("$(") && parameter.EndsWith(')'))
             {
                 value = variables[parameter[2..^1]];
             }
@@ -279,7 +279,7 @@ namespace YamlFileParser
             return cleanLine;
         }
 
-        private Dictionary<string, string> ParseVariables(string[] content)
+        private static Dictionary<string, string> ParseVariables(string[] content)
         {
             var variables = new Dictionary<string, string>();
             bool inVariables = false;

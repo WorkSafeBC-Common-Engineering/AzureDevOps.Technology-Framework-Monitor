@@ -10,7 +10,7 @@ namespace ProjectScannerSaveToSqlServer.DataModels
     {
         public Organization()
         {
-            Projects = new HashSet<Project>();
+            Projects = [];
         }
 
         public int Id { get; set; }

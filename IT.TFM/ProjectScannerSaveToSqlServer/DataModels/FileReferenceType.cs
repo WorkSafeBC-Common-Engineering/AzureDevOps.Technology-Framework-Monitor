@@ -10,7 +10,7 @@ namespace ProjectScannerSaveToSqlServer.DataModels
     {
         public FileReferenceType()
         {
-            FileReferences = new HashSet<FileReference>();
+            FileReferences = [];
         }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
