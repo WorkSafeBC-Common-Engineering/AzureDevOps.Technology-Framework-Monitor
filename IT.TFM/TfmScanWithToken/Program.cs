@@ -8,18 +8,43 @@ namespace TfmScanWithToken
 {
     static class Program
     {
+        #region Private Members
+
+        private static bool partOne = false;
+        private static bool partTwo = false;
+        private static bool partThree = false;
+        private static bool partFour = false;
+
+        #endregion
+
         static async Task Main(string[] args)
         {
             var threadCount = GetTotalThreads(args);
             var forceDetails = GetForceDetails(args);
+            GetParts(args);
 
             var projectId = GetProjectId(args);
             var repositoryId = GetRepositoryId(args);
 
-            await RepoScanAsync(projectId, repositoryId);
-            await FileScanAsync(threadCount, forceDetails, projectId, repositoryId);
-            PipelineScan(threadCount, repositoryId);
-            await FileDetailsAsync(threadCount, forceDetails, projectId, repositoryId);
+            if (partOne)
+            {
+                await RepoScanAsync(projectId, repositoryId);
+            }
+
+            if (partTwo)
+            {
+                await FileScanAsync(threadCount, forceDetails, projectId, repositoryId);
+            }
+
+            if (partThree)
+            {
+                PipelineScan(threadCount, repositoryId);
+            }
+
+            if (partFour)
+            {
+                await FileDetailsAsync(threadCount, forceDetails, projectId, repositoryId);
+            }
 #if DEBUG
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey();
@@ -93,6 +118,33 @@ namespace TfmScanWithToken
             }
 
             return forceDetails;
+        }
+
+        private static void GetParts(string[] args)
+        {
+            var partsValue = GetCommandLineValue(args, "-p");
+
+            switch (partsValue)
+            {
+                case "1":
+                    partOne = true;
+                    break;
+                case "2":
+                    partTwo = true;
+                    break;
+                case "3":
+                    partThree = true;
+                    break;
+                case "4":
+                    partFour = true;
+                    break;
+                default:
+                    partOne = true;
+                    partTwo = true;
+                    partThree = true;
+                    partFour = true;
+                    break;
+            }
         }
 
         private static string GetProjectId(string[] args)
