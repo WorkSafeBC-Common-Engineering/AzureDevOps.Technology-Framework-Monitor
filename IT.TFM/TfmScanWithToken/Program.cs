@@ -122,7 +122,7 @@ namespace TfmScanWithToken
 
         private static void GetParts(string[] args)
         {
-            var partsValue = GetCommandLineValue(args, "-p");
+            var partsValue = GetCommandLineValue(args, "-s");
 
             switch (partsValue)
             {

@@ -1,10 +1,12 @@
 ﻿using ProjectData;
 using ProjectData.Interfaces;
 
+using DbContext = ProjectScannerSaveToSqlServer.DataModels.ProjectScannerDB;
+
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace ProjectScannerSaveToSqlServer
 {
@@ -71,7 +73,7 @@ namespace ProjectScannerSaveToSqlServer
             else
             {
                 var dbProject = context.Projects
-                                       .SingleOrDefaultAsync(p => p.ProjectId.Equals(projectId, StringComparison.InvariantCultureIgnoreCase)
+                                       .SingleOrDefaultAsync(p => p.ProjectId.Equals(projectId)
                                                                && !p.Deleted)
                                        .Result;
 
@@ -92,7 +94,7 @@ namespace ProjectScannerSaveToSqlServer
 
                 if (repositoryId != string.Empty)
                 {
-                    var repository = context.Repositories.SingleOrDefaultAsync(r => r.RepositoryId.Equals(repositoryId, StringComparison.InvariantCultureIgnoreCase)
+                    var repository = context.Repositories.SingleOrDefaultAsync(r => r.RepositoryId.Equals(repositoryId)
                                                                                  && !r.Deleted)
                                             .Result;
 
@@ -140,9 +142,9 @@ namespace ProjectScannerSaveToSqlServer
             Repository repository = null;
             var repoId = id.ToString("D");
 
-            context.Database.CommandTimeout = 3600;
+            context.Database.SetCommandTimeout(3600);
             var repo = context.Repositories
-                           .SingleOrDefaultAsync(r => r.RepositoryId.Equals(repoId, StringComparison.InvariantCultureIgnoreCase)
+                           .SingleOrDefaultAsync(r => r.RepositoryId.Equals(repoId)
                                                    && !r.Deleted && !r.Project.Deleted)
                            .Result;
 
@@ -178,14 +180,14 @@ namespace ProjectScannerSaveToSqlServer
 
         IEnumerable<FileItem> IStorageReader.GetFiles()
         {
-            context.Database.CommandTimeout = 300;
+            context.Database.SetCommandTimeout(300);
             foreach (var mainFile in context.Files)
             {
                 FileItem fileItem;
 
                 using (var localContext = GetConnection())
                 {
-                    localContext.Database.CommandTimeout = 300;
+                    localContext.Database.SetCommandTimeout(300);
                     var file = localContext.Files.SingleOrDefault(f => f.Id == mainFile.Id);
 
                     var fileType = (FileItemType)Enum.Parse(typeof(FileItemType), file.FileType.Value);
@@ -254,7 +256,7 @@ namespace ProjectScannerSaveToSqlServer
 
         IEnumerable<FileItem> IStorageReader.GetFiles(string id)
         {
-            context.Database.CommandTimeout = 3600;
+            context.Database.SetCommandTimeout(3600);
             var fileList = context.Files
                                   .Where(f => f.Repository.RepositoryId == id)
                                   .ToArray();
@@ -276,7 +278,7 @@ namespace ProjectScannerSaveToSqlServer
                     CommitId = mainFile.CommitId
                 };
 
-                context.Database.CommandTimeout = 3600;
+                context.Database.SetCommandTimeout(3600);
                 var pkgRefs = context.FileReferences
                                           .Where(fr => fr.FileId == mainFile.Id
                                                     && fr.FileReferenceTypeId == RefTypePkg)
@@ -292,7 +294,7 @@ namespace ProjectScannerSaveToSqlServer
 
                 fileItem.PackageReferences.AddRange(pkgRefs);
 
-                context.Database.CommandTimeout = 3600;
+                context.Database.SetCommandTimeout(3600);
                 var refs = context.FileReferences
                                        .Where(fr => fr.FileId == mainFile.Id
                                                  && fr.FileReferenceTypeId == RefTypeFile)
@@ -301,7 +303,7 @@ namespace ProjectScannerSaveToSqlServer
 
                 fileItem.References.AddRange(refs);
 
-                context.Database.CommandTimeout = 3600;
+                context.Database.SetCommandTimeout(3600);
                 var urlRefs = context.FileReferences
                                           .Where(fr => fr.FileId == mainFile.Id
                                                     && fr.FileReferenceTypeId == RefTypeUrl)
@@ -314,7 +316,7 @@ namespace ProjectScannerSaveToSqlServer
 
                 fileItem.UrlReferences.AddRange(urlRefs);
 
-                context.Database.CommandTimeout = 3600;
+                context.Database.SetCommandTimeout(3600);
                 var properties = context.FileProperties
                                              .Where(fp => fp.FileId == mainFile.Id
                                                        && fp.FilePropertyType.Id == PropertyTypeProperty)
@@ -326,7 +328,7 @@ namespace ProjectScannerSaveToSqlServer
                     fileItem.Properties.Add(property.Key, property.Value);
                 }
 
-                context.Database.CommandTimeout = 3600;
+                context.Database.SetCommandTimeout(3600);
                 var filterItems = context.FileProperties
                                               .Where(fp => fp.FileId == mainFile.Id
                                                         && fp.PropertyTypeId == PropertyTypeFilteredItem)
@@ -344,7 +346,7 @@ namespace ProjectScannerSaveToSqlServer
 
         IEnumerable<FileItem> IStorageReader.GetYamlFiles(string id)
         {
-            context.Database.CommandTimeout = 3600;
+            context.Database.SetCommandTimeout(3600);
             var fileList = context.Files
                                   .Where(f => f.Repository.RepositoryId == id
                                            && f.FileTypeId == yamlFileType)
@@ -376,7 +378,7 @@ namespace ProjectScannerSaveToSqlServer
                 throw new ArgumentOutOfRangeException(nameof(pipelineType), $"Invalid pipeline type specified ({pipelineType}). Must be one of ({Pipeline.pipelineTypeYaml}, {Pipeline.pipelineTypeClassic}).");
             }
 
-            context.Database.CommandTimeout = 300;
+            context.Database.SetCommandTimeout(300);
             var pipelines = context.Pipelines.Where(p => p.Type == pipelineType);
             foreach (var dbPipeline in pipelines)
             {
@@ -405,7 +407,7 @@ namespace ProjectScannerSaveToSqlServer
         {
             var repository = context.Repositories.Single(r => r.RepositoryId == repositoryId);
             var file = context.Files.Single(f => f.RepositoryId == repository.Id
-                                              && f.Path.Equals(filePath, StringComparison.InvariantCultureIgnoreCase));
+                                              && f.Path.Equals(filePath));
 
             var pipelines = context.Pipelines.Where(p => p.RepositoryId == repository.Id
                                                       && p.FileId == file.Id
@@ -434,7 +436,7 @@ namespace ProjectScannerSaveToSqlServer
 
         IEnumerable<int> IStorageReader.GetPipelineIdsForProject(string projectId)
         {
-            var project = context.Projects.SingleOrDefault(p => p.ProjectId.Equals(projectId, StringComparison.InvariantCultureIgnoreCase));
+            var project = context.Projects.SingleOrDefault(p => p.ProjectId.Equals(projectId));
 
             return context.Pipelines.Where(p => p.ProjectId == project.Id
                                              && p.Type != Pipeline.pipelineTypeRelease)
@@ -448,7 +450,7 @@ namespace ProjectScannerSaveToSqlServer
 
         private DataModels.Organization GetOrganization()
         {
-            context.Database.CommandTimeout = 300;
+            context.Database.SetCommandTimeout(300);
             var dbOrganization = context.Organizations
                                       .OrderBy(o => o.Id)
                                       .Where(o => o.Id > organizationId)
@@ -482,6 +484,16 @@ namespace ProjectScannerSaveToSqlServer
                 project.AddRepository(repository);
             }
         }
+
+        #endregion
+
+        #region Compiled Link Queries
+
+        //private static readonly Func<DbContext, string, IAsyncEnumerable<Project>> _compiledProjectsQuery
+        //    = EF.CompileAsyncQuery((DbContext context, string projectId) =>
+        //        context.Projects
+        //               .SingleOrDefaultAsync(p => p.ProjectId.Equals(projectId, StringComparison.InvariantCultureIgnoreCase)
+        //                                       && !p.Deleted));
 
         #endregion
     }

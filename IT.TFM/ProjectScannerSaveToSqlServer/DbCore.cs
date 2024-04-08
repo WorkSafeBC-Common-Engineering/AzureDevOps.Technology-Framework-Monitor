@@ -1,4 +1,6 @@
-﻿using ProjectScannerSaveToSqlServer.DataModels;
+﻿using Microsoft.EntityFrameworkCore;
+
+using ProjectScannerSaveToSqlServer.DataModels;
 
 using System;
 using System.Diagnostics;

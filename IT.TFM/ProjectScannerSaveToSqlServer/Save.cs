@@ -4,8 +4,9 @@ using ProjectScannerSaveToSqlServer.DataModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Data.Entity;
 using ProjectData;
+using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace ProjectScannerSaveToSqlServer
 {
@@ -21,8 +22,8 @@ namespace ProjectScannerSaveToSqlServer
         int IStorageWriter.SaveOrganization(ProjData.Organization organization)
         {
             var org = context.Organizations
-                             .SingleOrDefault(o => o.ScannerType.Value.Equals(organization.Source.ToString(), StringComparison.InvariantCultureIgnoreCase)
-                                                && o.Uri.Equals(organization.Url, StringComparison.InvariantCultureIgnoreCase));
+                             .SingleOrDefault(o => o.ScannerType.Value.Equals(organization.Source.ToString())
+                                                && o.Uri.Equals(organization.Url));
 
             if (org == null)
             {
@@ -30,7 +31,7 @@ namespace ProjectScannerSaveToSqlServer
                 {
                     Uri = organization.Url,
                     ScannerType = context.ScannerTypes
-                                         .Single(t => t.Value.Equals(organization.Source.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                                         .Single(t => t.Value.Equals(organization.Source.ToString()))
                 };
 
                 context.Organizations.Add(org);
@@ -56,7 +57,7 @@ namespace ProjectScannerSaveToSqlServer
 
             var dbProject = context.Projects
                                    .SingleOrDefault(p => p.OrganizationId == organizationId
-                                                      && p.ProjectId.Equals(project.Id.ToString(), StringComparison.InvariantCultureIgnoreCase));
+                                                      && p.ProjectId.Equals(project.Id.ToString()));
 
             if (dbProject == null)
             {
@@ -95,7 +96,7 @@ namespace ProjectScannerSaveToSqlServer
 
             var dbRepo = context.Repositories
                                 .SingleOrDefault(r => r.ProjectId == projectId
-                                                   && r.RepositoryId.Equals(repository.Id.ToString(), StringComparison.InvariantCultureIgnoreCase));
+                                                   && r.RepositoryId.Equals(repository.Id.ToString()));
 
             if (dbRepo == null)
             {
@@ -162,14 +163,14 @@ namespace ProjectScannerSaveToSqlServer
                               .Result;
             int repositoryId = repo == null ? 0 : repo.Id;
 
-            context.Database.CommandTimeout = 3600;
+            context.Database.SetCommandTimeout(3600);
             var dbFile = context.Files
                                 .SingleOrDefault(f => f.RepositoryId == repositoryId
-                                                   && f.Path.Equals(file.Path, StringComparison.InvariantCultureIgnoreCase));
+                                                   && f.Path.Equals(file.Path));
 
             if (dbFile != null && !forceDetails
                 && (    (dbFile.CommitId == null && (file.CommitId == null || !saveDetails))
-                     || (dbFile.CommitId != null && dbFile.CommitId.Equals(file.CommitId, StringComparison.InvariantCultureIgnoreCase))
+                     || (dbFile.CommitId != null && dbFile.CommitId.Equals(file.CommitId))
                      ))
             {
                 // file has not been updated since last scan
@@ -177,8 +178,8 @@ namespace ProjectScannerSaveToSqlServer
             }
 
             if (dbFile != null && !saveDetails && !forceDetails
-                && dbFile.FileType.Value.Equals(file.FileType.ToString(), StringComparison.InvariantCultureIgnoreCase)
-                && dbFile.Path.Equals(file.Path, StringComparison.InvariantCultureIgnoreCase))
+                && dbFile.FileType.Value.Equals(file.FileType.ToString())
+                && dbFile.Path.Equals(file.Path))
             {
                 return;
             }
@@ -194,7 +195,7 @@ namespace ProjectScannerSaveToSqlServer
                 context.Files.Add(dbFile);
             }
 
-            dbFile.FileType = context.FileTypes.SingleAsync(ft => ft.Value.Equals(file.FileType.ToString(), StringComparison.InvariantCultureIgnoreCase))
+            dbFile.FileType = context.FileTypes.SingleAsync(ft => ft.Value.Equals(file.FileType.ToString()))
                                                .Result;
             dbFile.FileId = file.Id;
             dbFile.Url = file.Url;
@@ -223,14 +224,14 @@ namespace ProjectScannerSaveToSqlServer
                                    .SingleOrDefault(p => p.ProjectId == pipeline.ProjectId);
 
             var dbRepo = context.Repositories
-                                .SingleOrDefault(r => r.RepositoryId.Equals(pipeline.RepositoryId, StringComparison.InvariantCultureIgnoreCase));
+                                .SingleOrDefault(r => r.RepositoryId.Equals(pipeline.RepositoryId));
 
             var dbPipeline = context.Pipelines
                                     .SingleOrDefault(p => p.PipelineId == pipeline.Id && p.Type != ProjData.Pipeline.pipelineTypeRelease);
 
             var dbFile = dbRepo != null ? context.Files
                                                  .SingleOrDefault(f => f.RepositoryId == dbRepo.Id
-                                                                    && f.Path.Equals(pipeline.Path, StringComparison.InvariantCultureIgnoreCase))
+                                                                    && f.Path.Equals(pipeline.Path))
                                         : null;
 
             if (dbPipeline == null)
@@ -325,8 +326,8 @@ namespace ProjectScannerSaveToSqlServer
             var currentArtifacts = context.ReleaseArtifacts.Where(a => a.PipelineId == dbPipeline.Id);
             foreach (var artifact in release.Artifacts)
             {
-                var dbArtifact = currentArtifacts.SingleOrDefault(a => a.SourceId.Equals(artifact.SourceId, StringComparison.InvariantCultureIgnoreCase)
-                                                                    && a.Alias.Equals(artifact.Alias, StringComparison.InvariantCultureIgnoreCase));
+                var dbArtifact = currentArtifacts.SingleOrDefault(a => a.SourceId.Equals(artifact.SourceId)
+                                                                    && a.Alias.Equals(artifact.Alias));
 
                 if (dbArtifact == null)
                 {
@@ -361,7 +362,7 @@ namespace ProjectScannerSaveToSqlServer
             if (pipeline != null)
             {
                 var file = context.Files.SingleOrDefault(f => f.Repository.RepositoryId == repositoryId
-                                                           && f.Path.Equals(pipeline.Path, StringComparison.InvariantCultureIgnoreCase));
+                                                           && f.Path.Equals(pipeline.Path));
                 
                 pipeline.FileId = file?.Id;
 
@@ -377,10 +378,10 @@ namespace ProjectScannerSaveToSqlServer
                               .Result;
             int repositoryId = repo == null ? 0 : repo.Id;
 
-            context.Database.CommandTimeout = 3600;
+            context.Database.SetCommandTimeout(3600);
             var dbFile = context.Files
                                 .SingleOrDefault(f => f.RepositoryId == repositoryId
-                                                   && f.Path.Equals(file.Path, StringComparison.InvariantCultureIgnoreCase));
+                                                   && f.Path.Equals(file.Path));
             if (dbFile == null)
             {
                 return;
@@ -404,14 +405,16 @@ namespace ProjectScannerSaveToSqlServer
                 }
             }
 
-            var pipelines = context.Pipelines.Where(p => p.Path.Equals(dbFile.Path, StringComparison.InvariantCultureIgnoreCase));
+            var pipelines = context.Pipelines.Where(p => p.FileId == dbFile.Id);
             foreach(var pipeline in pipelines)
             {
+                Debug.WriteLine($"Deleting File {dbFile.Id}, pipeline = {pipeline.PipelineId}");
                 pipeline.FileId = null;
             }
 
-            context.Files.Remove(dbFile);
+            _ = context.SaveChangesAsync().Result;
 
+            context.Files.Remove(dbFile);
             _ = context.SaveChangesAsync().Result;
         }
 
@@ -529,8 +532,8 @@ namespace ProjectScannerSaveToSqlServer
             // First remove any database properties that are not in the new list
             foreach (var dbRef in dbReferences)
             {
-                if (!references.Any(r => r.Url.Equals(dbRef.Name, StringComparison.InvariantCultureIgnoreCase)
-                                      && r.Path.Equals(dbRef.Path, StringComparison.InvariantCultureIgnoreCase)))
+                if (!references.Any(r => r.Url.Equals(dbRef.Name)
+                                      && r.Path.Equals(dbRef.Path)))
                 {
                     context.FileReferences.Remove(dbRef);
                     deletedDbReferences.Add(dbRef);
@@ -570,8 +573,8 @@ namespace ProjectScannerSaveToSqlServer
             // First remove any database properties that are not in the new list
             foreach (var dbReference in dbReferences)
             {
-                if (!references.Any(r => r.PackageType.Equals(dbReference.PackageType, StringComparison.InvariantCultureIgnoreCase)
-                                      && r.Id.Equals(dbReference.Name, StringComparison.InvariantCultureIgnoreCase)))
+                if (!references.Any(r => r.PackageType.Equals(dbReference.PackageType)
+                                      && r.Id.Equals(dbReference.Name)))
                 {
                     context.FileReferences.Remove(dbReference);
                     deletedDbReferences.Add(dbReference);
@@ -588,8 +591,8 @@ namespace ProjectScannerSaveToSqlServer
             // Next update any of the existing database properties that are in the list
             foreach (var dbRef in dbReferences)
             {
-                var reference = references.Where(r => r.PackageType.Equals(dbRef.PackageType, StringComparison.InvariantCultureIgnoreCase)
-                                                   && r.Id.Equals(dbRef.Name, StringComparison.InvariantCultureIgnoreCase))
+                var reference = references.Where(r => r.PackageType.Equals(dbRef.PackageType)
+                                                   && r.Id.Equals(dbRef.Name))
                                           .OrderBy(r => r.Version).Last();
 
                 if (reference != null)
@@ -603,8 +606,8 @@ namespace ProjectScannerSaveToSqlServer
             // Finally add any new properties from the list that are not in the database for this file
             foreach (var reference in references)
             {
-                var dbReference = dbReferences.FirstOrDefault(r => r.PackageType.Equals(reference.PackageType, StringComparison.InvariantCultureIgnoreCase)
-                                                                && r.Name.Equals(reference.Id, StringComparison.InvariantCultureIgnoreCase));
+                var dbReference = dbReferences.FirstOrDefault(r => r.PackageType.Equals(reference.PackageType)
+                                                                && r.Name.Equals(reference.Id));
 
                 if (dbReference == null)
                 {
