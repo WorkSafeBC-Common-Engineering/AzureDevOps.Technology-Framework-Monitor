@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
+using System.Reflection.Metadata;
 
 namespace ProjectScannerSaveToSqlServer
 {
@@ -451,10 +453,8 @@ namespace ProjectScannerSaveToSqlServer
         private DataModels.Organization GetOrganization()
         {
             context.Database.SetCommandTimeout(300);
-            var dbOrganization = context.Organizations
-                                      .OrderBy(o => o.Id)
-                                      .Where(o => o.Id > organizationId)
-                                      .FirstOrDefault();
+
+            var dbOrganization = _compiledOrganizationQuery(context, organizationId).Result;
 
             organizationId = dbOrganization == null ? 0 : dbOrganization.Id;
 
@@ -489,11 +489,11 @@ namespace ProjectScannerSaveToSqlServer
 
         #region Compiled Link Queries
 
-        //private static readonly Func<DbContext, string, IAsyncEnumerable<Project>> _compiledProjectsQuery
-        //    = EF.CompileAsyncQuery((DbContext context, string projectId) =>
-        //        context.Projects
-        //               .SingleOrDefaultAsync(p => p.ProjectId.Equals(projectId, StringComparison.InvariantCultureIgnoreCase)
-        //                                       && !p.Deleted));
+        private static readonly Func<DbContext, int, Task<DataModels.Organization>> _compiledOrganizationQuery
+            = EF.CompileAsyncQuery((DbContext context, int orgId) => context.Organizations
+                                                                            .OrderBy(o => o.Id)
+                                                                            .Where(o => o.Id > orgId)
+                                                                            .FirstOrDefault());
 
         #endregion
     }
