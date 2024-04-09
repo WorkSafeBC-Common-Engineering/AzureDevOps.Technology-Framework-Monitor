@@ -246,7 +246,7 @@ namespace AzureDevOpsScannerFramework
         {
             if (Directory.Exists(api.CheckoutDirectory))
             {
-                Directory.Delete(api.CheckoutDirectory, true);
+                DeleteDirectory(api.CheckoutDirectory);
             }
         }
 
@@ -457,6 +457,36 @@ namespace AzureDevOpsScannerFramework
             };
 
             return pipeline;
+        }
+
+        /// <summary>
+        /// Delete a directory and all its contents
+        /// </summary>
+        /// <remarks>
+        /// Directory.Delete() will fail on files that are flagged as read-only. I found this method on StackOverflow
+        /// (https://stackoverflow.com/questions/1157246/unauthorizedaccessexception-trying-to-delete-a-file-in-a-folder-where-i-can-dele)
+        /// that can overcome this issue.
+        /// </remarks>
+        /// <param name="targetDir">directory to be deleted</param>
+        private static void DeleteDirectory(string targetDir)
+        {
+            File.SetAttributes(targetDir, FileAttributes.Normal);
+
+            string[] files = Directory.GetFiles(targetDir);
+            string[] dirs = Directory.GetDirectories(targetDir);
+
+            foreach (string file in files)
+            {
+                File.SetAttributes(file, FileAttributes.Normal);
+                File.Delete(file);
+            }
+
+            foreach (string dir in dirs)
+            {
+                DeleteDirectory(dir);
+            }
+
+            Directory.Delete(targetDir, false);
         }
 
         #endregion

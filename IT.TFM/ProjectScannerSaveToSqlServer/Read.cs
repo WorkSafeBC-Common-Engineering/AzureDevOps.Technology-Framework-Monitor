@@ -166,13 +166,13 @@ namespace ProjectScannerSaveToSqlServer
 
         IEnumerable<string> IStorageReader.GetRepositoryIds()
         {
-            return _compiledRepositoryIds(context).ToBlockingEnumerable();
+            return _compiledRepositoryIds(context).ToBlockingEnumerable().ToArray();
         }
 
         IEnumerable<FileItem> IStorageReader.GetFiles()
         {
             context.Database.SetCommandTimeout(300);
-            foreach (var mainFile in _compiledFiles(context).ToBlockingEnumerable())
+            foreach (var mainFile in _compiledFiles(context).ToBlockingEnumerable().ToArray())
             {
                 FileItem fileItem;
 
@@ -299,7 +299,7 @@ namespace ProjectScannerSaveToSqlServer
                 context.Database.SetCommandTimeout(3600);
                 var properties = _compiledFilePropertiesByFileId(context, mainFile.Id, PropertyTypeProperty).ToBlockingEnumerable()
                                                                                                             .Select(fp => new { Key = fp.Name, fp.Value })
-                                                                                                           .ToArray();
+                                                                                                            .ToArray();
                 foreach (var property in properties)
                 {
                     fileItem.Properties.Add(property.Key, property.Value);
@@ -321,8 +321,7 @@ namespace ProjectScannerSaveToSqlServer
         IEnumerable<FileItem> IStorageReader.GetYamlFiles(string id)
         {
             context.Database.SetCommandTimeout(3600);
-            var fileList = _compiledGetYamlFilesByRepositoryId(context, id).ToBlockingEnumerable()
-                                                                           .ToArray();
+            var fileList = _compiledGetYamlFilesByRepositoryId(context, id).ToBlockingEnumerable().ToArray();
 
             foreach (var mainFile in fileList)
             {
@@ -351,7 +350,7 @@ namespace ProjectScannerSaveToSqlServer
             }
 
             context.Database.SetCommandTimeout(300);
-            var pipelines = _compiledGetPipelinesByType(context, pipelineType).ToBlockingEnumerable();
+            var pipelines = _compiledGetPipelinesByType(context, pipelineType).ToBlockingEnumerable().ToArray();
 
             foreach (var dbPipeline in pipelines)
             {
@@ -383,7 +382,7 @@ namespace ProjectScannerSaveToSqlServer
 
             var file = _compiledFileByRepositoryAndPath(context, repositoryId, filePath).Result;
 
-            var pipelines = _compiledGetPipelinesByRepositoryAndFile(context, repositoryId, file.Id).ToBlockingEnumerable();
+            var pipelines = _compiledGetPipelinesByRepositoryAndFile(context, repositoryId, file.Id).ToBlockingEnumerable().ToArray();
 
             return pipelines.Select(p => new Pipeline
             { 
@@ -408,7 +407,7 @@ namespace ProjectScannerSaveToSqlServer
         {
             var project = _compiledProjectQueryByProjectId(context, projectId).Result;
 
-            return _compiledGetPipelineIdsByProject(context, project.Id).ToBlockingEnumerable();
+            return _compiledGetPipelineIdsByProject(context, project.Id).ToBlockingEnumerable().ToArray();
         }
 
         #endregion
