@@ -2,6 +2,7 @@
 	AS
 SELECT		O.[Name] AS [Organization],
 			P.[ProjectId] AS [ProjectId],
+			P.[Name] AS [ProjectName],
 			R.[RepositoryId] AS [RepositoryId],
 			R.[Name] AS RepositoryName,
 			FT.[Id] AS [FileTypeId],
