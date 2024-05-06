@@ -239,7 +239,15 @@ namespace AzureDevOpsScannerFramework
             api.Project = projectId.ToString();
             api.Repository = repositoryId.ToString();
             await api.DownloadRepositoryAsync();
-            LoadDirectoryBuildProperties();
+
+            if (Directory.Exists(api.CheckoutDirectory))
+            {
+                LoadDirectoryBuildProperties();
+            }
+            else
+            {
+                Console.WriteLine($"\t >>> Project: {api.Project}, Repository: {api.Repository} - Download directory not found: {api.CheckoutDirectory}");
+            }
         }
 
         void IScanner.DeleteFiles()
