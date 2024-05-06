@@ -349,6 +349,8 @@ namespace ProjectScannerSaveToSqlServer
                 throw new ArgumentOutOfRangeException(nameof(pipelineType), $"Invalid pipeline type specified ({pipelineType}). Must be one of ({Pipeline.pipelineTypeYaml}, {Pipeline.pipelineTypeClassic}).");
             }
 
+            var pipelineList = new List<Pipeline>();
+
             context.Database.SetCommandTimeout(300);
             var pipelines = _compiledGetPipelinesByType(context, pipelineType).ToBlockingEnumerable().ToArray();
 
