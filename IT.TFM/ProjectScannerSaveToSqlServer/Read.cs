@@ -1,4 +1,4 @@
-﻿using ProjectData;
+using ProjectData;
 using ProjectData.Interfaces;
 
 using DbContext = ProjectScannerSaveToSqlServer.DataModels.ProjectScannerDB;
@@ -371,8 +371,10 @@ namespace ProjectScannerSaveToSqlServer
                     FileId = file?.FileId
                 };
 
-                yield return pipeline;
+                pipelineList.Add(pipeline);
             }
+
+            return pipelineList.AsEnumerable();
         }
 
         public IEnumerable<Pipeline> GetPipelines(string repositoryId, string filePath)
