@@ -87,6 +87,7 @@
     <Build Include="dbo\StoredProcedures\CleanupReports.sql" />
     <Build Include="dbo\Tables\ReleaseArtifacts.sql" />
     <Build Include="dbo\Views\ReportScan.sql" />
+    <Build Include="dbo\Views\ProjectList.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\PopulateDotNetEOL.sql" />
