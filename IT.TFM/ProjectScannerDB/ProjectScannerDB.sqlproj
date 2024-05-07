@@ -65,6 +65,7 @@
     <Folder Include="dbo\Views" />
     <Folder Include="PostDeployment" />
     <Folder Include="dbo\StoredProcedures" />
+    <Folder Include="dbo\Indexes" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\ScannerTypes.sql" />
@@ -88,6 +89,7 @@
     <Build Include="dbo\Tables\ReleaseArtifacts.sql" />
     <Build Include="dbo\Views\ReportScan.sql" />
     <Build Include="dbo\Views\ProjectList.sql" />
+    <Build Include="dbo\Indexes\ReportsQueryIndex.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\PopulateDotNetEOL.sql" />
