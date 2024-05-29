@@ -2,7 +2,6 @@
 
 using Newtonsoft.Json;
 
-using System.Diagnostics;
 using System.IO.Compression;
 using System.Text;
 
@@ -238,7 +237,7 @@ namespace AzureDevOps
                     continue;
                 }
 #if DEBUG
-                Console.WriteLine($"Pipeline Type: {pipelineDetails.Configuration.Type}");
+                Console.WriteLine($"Pipeline Type: {pipelineDetails?.Configuration?.Type}");
 #endif
                 pipeline.Details = pipelineDetails;
                 filteredPipelines.Add(pipeline);
@@ -262,14 +261,14 @@ namespace AzureDevOps
                 return new AzDoReleaseList();
             }
 
-            foreach (var release in releases.value)
+            foreach (var release in releases.Value)
             {
-                if (string.IsNullOrEmpty(release.url))
+                if (string.IsNullOrEmpty(release.Url))
                 {
                     continue;
                 }
 
-                var releaseContent = await (CallApiAsync(release.url));
+                var releaseContent = await (CallApiAsync(release.Url));
                 if (releaseContent == string.Empty)
                 {
                     continue;
@@ -368,7 +367,7 @@ namespace AzureDevOps
                 Console.WriteLine($"API Call: {url}");
                 var startTime = DateTime.Now;
 #endif
-                HttpResponseMessage response = null;
+                HttpResponseMessage response;
 
                 int retries = maxRetries;
                 while (true)

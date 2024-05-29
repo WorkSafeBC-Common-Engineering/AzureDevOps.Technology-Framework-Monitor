@@ -1,16 +1,14 @@
 namespace ProjectScannerSaveToSqlServer.DataModels
 {
-    using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    using System.Data.Entity.Spatial;
 
     public partial class ScannerType
     {
         public ScannerType()
         {
-            Organizations = new HashSet<Organization>();
+            Organizations = [];
         }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]

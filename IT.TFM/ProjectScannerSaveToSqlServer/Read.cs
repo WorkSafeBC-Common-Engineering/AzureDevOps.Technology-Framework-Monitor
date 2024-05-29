@@ -1,10 +1,14 @@
-﻿using ProjectData;
+using ProjectData;
 using ProjectData.Interfaces;
+
+using DbContext = ProjectScannerSaveToSqlServer.DataModels.ProjectScannerDB;
 
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
+using System.Reflection.Metadata;
 
 namespace ProjectScannerSaveToSqlServer
 {
@@ -70,10 +74,7 @@ namespace ProjectScannerSaveToSqlServer
 
             else
             {
-                var dbProject = context.Projects
-                                       .SingleOrDefaultAsync(p => p.ProjectId.Equals(projectId, StringComparison.InvariantCultureIgnoreCase)
-                                                               && !p.Deleted)
-                                       .Result;
+                var dbProject = _compiledProjectQueryByProjectId(context, projectId).Result;
 
                 project = new Project
                 {
@@ -92,9 +93,7 @@ namespace ProjectScannerSaveToSqlServer
 
                 if (repositoryId != string.Empty)
                 {
-                    var repository = context.Repositories.SingleOrDefaultAsync(r => r.RepositoryId.Equals(repositoryId, StringComparison.InvariantCultureIgnoreCase)
-                                                                                 && !r.Deleted)
-                                            .Result;
+                    var repository = _compiledRepositoryQueryByRepositoryId(context, repositoryId).Result;
 
                     if (repository != null)
                     {
@@ -140,11 +139,8 @@ namespace ProjectScannerSaveToSqlServer
             Repository repository = null;
             var repoId = id.ToString("D");
 
-            context.Database.CommandTimeout = 3600;
-            var repo = context.Repositories
-                           .SingleOrDefaultAsync(r => r.RepositoryId.Equals(repoId, StringComparison.InvariantCultureIgnoreCase)
-                                                   && !r.Deleted && !r.Project.Deleted)
-                           .Result;
+            context.Database.SetCommandTimeout(3600);
+            var repo = _compiledRepositoryQueryByRepositoryIdNotDeleted(context, repoId).Result;
 
             if (repo != null)
             {
@@ -170,23 +166,20 @@ namespace ProjectScannerSaveToSqlServer
 
         IEnumerable<string> IStorageReader.GetRepositoryIds()
         {
-            return context.Repositories
-                          .Select(r => r.RepositoryId)
-                          .ToArray()
-                          .AsEnumerable();
+            return _compiledRepositoryIds(context).ToBlockingEnumerable().ToArray();
         }
 
         IEnumerable<FileItem> IStorageReader.GetFiles()
         {
-            context.Database.CommandTimeout = 300;
-            foreach (var mainFile in context.Files)
+            context.Database.SetCommandTimeout(300);
+            foreach (var mainFile in _compiledFiles(context).ToBlockingEnumerable().ToArray())
             {
                 FileItem fileItem;
 
                 using (var localContext = GetConnection())
                 {
-                    localContext.Database.CommandTimeout = 300;
-                    var file = localContext.Files.SingleOrDefault(f => f.Id == mainFile.Id);
+                    localContext.Database.SetCommandTimeout(300);
+                    var file = _compiledFilesById(localContext, mainFile.Id).Result;
 
                     var fileType = (FileItemType)Enum.Parse(typeof(FileItemType), file.FileType.Value);
 
@@ -254,10 +247,8 @@ namespace ProjectScannerSaveToSqlServer
 
         IEnumerable<FileItem> IStorageReader.GetFiles(string id)
         {
-            context.Database.CommandTimeout = 3600;
-            var fileList = context.Files
-                                  .Where(f => f.Repository.RepositoryId == id)
-                                  .ToArray();
+            context.Database.SetCommandTimeout(3600);
+            var fileList = _compiledFilesByRepositoryId(context, id).ToBlockingEnumerable().ToArray();
 
             foreach (var mainFile in fileList)
             {
@@ -276,63 +267,48 @@ namespace ProjectScannerSaveToSqlServer
                     CommitId = mainFile.CommitId
                 };
 
-                context.Database.CommandTimeout = 3600;
-                var pkgRefs = context.FileReferences
-                                          .Where(fr => fr.FileId == mainFile.Id
-                                                    && fr.FileReferenceTypeId == RefTypePkg)
-                                          .Select(fr => new PackageReference
-                                          {
-                                              Id = fr.Name,
-                                              PackageType = fr.PackageType,
-                                              Version = fr.Version,
-                                              VersionComparator = fr.VersionComparator,
-                                              FrameworkVersion = fr.FrameworkVersion
-                                          })
-                                          .ToArray();
-
+                context.Database.SetCommandTimeout(3600);
+                var pkgRefs = _compiledFileReferencesByFileId(context, mainFile.Id, RefTypePkg).ToBlockingEnumerable()
+                                                                                   .Select(fr => new PackageReference
+                                                                                        {
+                                                                                            Id = fr.Name,
+                                                                                            PackageType = fr.PackageType,
+                                                                                            Version = fr.Version,
+                                                                                            VersionComparator = fr.VersionComparator,
+                                                                                            FrameworkVersion = fr.FrameworkVersion
+                                                                                        })
+                                                                                   .ToArray();
                 fileItem.PackageReferences.AddRange(pkgRefs);
 
-                context.Database.CommandTimeout = 3600;
-                var refs = context.FileReferences
-                                       .Where(fr => fr.FileId == mainFile.Id
-                                                 && fr.FileReferenceTypeId == RefTypeFile)
-                                       .Select(fr => fr.Name)
-                                       .ToArray();
-
+                context.Database.SetCommandTimeout(3600);
+                var refs = _compiledFileReferencesByFileId(context, mainFile.Id, RefTypeFile).ToBlockingEnumerable()
+                                                                                             .Select(fr => fr.Name)
+                                                                                             .ToArray();
                 fileItem.References.AddRange(refs);
 
-                context.Database.CommandTimeout = 3600;
-                var urlRefs = context.FileReferences
-                                          .Where(fr => fr.FileId == mainFile.Id
-                                                    && fr.FileReferenceTypeId == RefTypeUrl)
-                                          .Select(fr => new UrlReference
-                                          {
-                                              Url = fr.Name,
-                                              Path = fr.Path
-                                          })
-                                          .ToArray();
-
+                context.Database.SetCommandTimeout(3600);
+                var urlRefs = _compiledFileReferencesByFileId(context, mainFile.Id, RefTypeUrl).ToBlockingEnumerable()
+                                                                                               .Select(fr => new UrlReference
+                                                                                                   {
+                                                                                                       Url = fr.Name,
+                                                                                                       Path = fr.Path
+                                                                                                   })
+                                                                                               .ToArray();
                 fileItem.UrlReferences.AddRange(urlRefs);
 
-                context.Database.CommandTimeout = 3600;
-                var properties = context.FileProperties
-                                             .Where(fp => fp.FileId == mainFile.Id
-                                                       && fp.FilePropertyType.Id == PropertyTypeProperty)
-                                             .Select(fp => new { Key = fp.Name, fp.Value })
-                                             .ToArray();
-
+                context.Database.SetCommandTimeout(3600);
+                var properties = _compiledFilePropertiesByFileId(context, mainFile.Id, PropertyTypeProperty).ToBlockingEnumerable()
+                                                                                                            .Select(fp => new { Key = fp.Name, fp.Value })
+                                                                                                            .ToArray();
                 foreach (var property in properties)
                 {
                     fileItem.Properties.Add(property.Key, property.Value);
                 }
 
-                context.Database.CommandTimeout = 3600;
-                var filterItems = context.FileProperties
-                                              .Where(fp => fp.FileId == mainFile.Id
-                                                        && fp.PropertyTypeId == PropertyTypeFilteredItem)
-                                              .Select(fp => new { Key = fp.Name, fp.Value })
-                                              .ToArray();
-
+                context.Database.SetCommandTimeout(3600);
+                var filterItems = _compiledFilePropertiesByFileId(context, mainFile.Id, PropertyTypeFilteredItem).ToBlockingEnumerable()
+                                                                                                                 .Select(fp => new { Key = fp.Name, fp.Value })
+                                                                                                                 .ToArray();
                 foreach (var filterItem in filterItems)
                 {
                     fileItem.FilteredItems.Add(filterItem.Key, filterItem.Value);
@@ -344,11 +320,8 @@ namespace ProjectScannerSaveToSqlServer
 
         IEnumerable<FileItem> IStorageReader.GetYamlFiles(string id)
         {
-            context.Database.CommandTimeout = 3600;
-            var fileList = context.Files
-                                  .Where(f => f.Repository.RepositoryId == id
-                                           && f.FileTypeId == yamlFileType)
-                                  .ToArray();
+            context.Database.SetCommandTimeout(3600);
+            var fileList = _compiledGetYamlFilesByRepositoryId(context, id).ToBlockingEnumerable().ToArray();
 
             foreach (var mainFile in fileList)
             {
@@ -378,8 +351,9 @@ namespace ProjectScannerSaveToSqlServer
 
             var pipelineList = new List<Pipeline>();
 
-            context.Database.CommandTimeout = 300;
-            var pipelines = context.Pipelines.Where(p => p.Type == pipelineType);
+            context.Database.SetCommandTimeout(300);
+            var pipelines = _compiledGetPipelinesByType(context, pipelineType).ToBlockingEnumerable().ToArray();
+
             foreach (var dbPipeline in pipelines)
             {
                 var file = context.Files.SingleOrDefault(f => f.Id == dbPipeline.FileId);
@@ -407,15 +381,12 @@ namespace ProjectScannerSaveToSqlServer
 
         public IEnumerable<Pipeline> GetPipelines(string repositoryId, string filePath)
         {
-            var repository = context.Repositories.Single(r => r.RepositoryId == repositoryId);
-            var file = context.Files.Single(f => f.RepositoryId == repository.Id
-                                              && f.Path.Equals(filePath, StringComparison.InvariantCultureIgnoreCase));
-
-            var pipelines = context.Pipelines.Where(p => p.RepositoryId == repository.Id
-                                                      && p.FileId == file.Id
-                                                      && p.Type != Pipeline.pipelineTypeRelease);
-
+            var repository = _compiledRepositoryQueryByRepositoryId(context, repositoryId).Result;
             var projectId = repository.Project.ProjectId;
+
+            var file = _compiledFileByRepositoryAndPath(context, repositoryId, filePath).Result;
+
+            var pipelines = _compiledGetPipelinesByRepositoryAndFile(context, repositoryId, file.Id).ToBlockingEnumerable().ToArray();
 
             return pipelines.Select(p => new Pipeline
             { 
@@ -438,12 +409,9 @@ namespace ProjectScannerSaveToSqlServer
 
         IEnumerable<int> IStorageReader.GetPipelineIdsForProject(string projectId)
         {
-            var project = context.Projects.SingleOrDefault(p => p.ProjectId.Equals(projectId, StringComparison.InvariantCultureIgnoreCase));
+            var project = _compiledProjectQueryByProjectId(context, projectId).Result;
 
-            return context.Pipelines.Where(p => p.ProjectId == project.Id
-                                             && p.Type != Pipeline.pipelineTypeRelease)
-                                    .Select(p => p.PipelineId)
-                                    .AsEnumerable();
+            return _compiledGetPipelineIdsByProject(context, project.Id).ToBlockingEnumerable().ToArray();
         }
 
         #endregion
@@ -452,11 +420,9 @@ namespace ProjectScannerSaveToSqlServer
 
         private DataModels.Organization GetOrganization()
         {
-            context.Database.CommandTimeout = 300;
-            var dbOrganization = context.Organizations
-                                      .OrderBy(o => o.Id)
-                                      .Where(o => o.Id > organizationId)
-                                      .FirstOrDefault();
+            context.Database.SetCommandTimeout(300);
+
+            var dbOrganization = _compiledOrganizationQuery(context, organizationId).Result;
 
             organizationId = dbOrganization == null ? 0 : dbOrganization.Id;
 
@@ -486,6 +452,80 @@ namespace ProjectScannerSaveToSqlServer
                 project.AddRepository(repository);
             }
         }
+
+        #endregion
+
+        #region Compiled Link Queries
+
+        private static readonly Func<DbContext, int, Task<DataModels.Organization>> _compiledOrganizationQuery
+            = EF.CompileAsyncQuery((DbContext context, int orgId) => context.Organizations
+                                                                            .OrderBy(o => o.Id)
+                                                                            .Where(o => o.Id > orgId)
+                                                                            .FirstOrDefault());
+
+        private static readonly Func<DbContext, string, Task<DataModels.Project>> _compiledProjectQueryByProjectId
+            = EF.CompileAsyncQuery((DbContext context, string projectId) => context.Projects
+                                                                                   .SingleOrDefault(p => p.ProjectId == projectId));
+
+        private static readonly Func<DbContext, string, Task<DataModels.Repository>> _compiledRepositoryQueryByRepositoryId
+            = EF.CompileAsyncQuery((DbContext context, string repositoryId) => context.Repositories
+                                                                                      .SingleOrDefault(r => r.RepositoryId == repositoryId));
+
+        private static readonly Func<DbContext, string, Task<DataModels.Repository>> _compiledRepositoryQueryByRepositoryIdNotDeleted
+            = EF.CompileAsyncQuery((DbContext context, string repositoryId) => context.Repositories
+                                                                                      .SingleOrDefault(r => r.RepositoryId == repositoryId
+                                                                                                         && !r.Deleted && !r.Project.Deleted));
+
+        private static readonly Func<DbContext, IAsyncEnumerable<string>> _compiledRepositoryIds
+            = EF.CompileAsyncQuery((DbContext context) => context.Repositories
+                                                                 .Select(r => r.RepositoryId));
+
+        private static readonly Func<DbContext, IAsyncEnumerable<DataModels.File>> _compiledFiles
+            = EF.CompileAsyncQuery((DbContext context) => context.Files);
+
+        private static readonly Func<DbContext, int, Task<DataModels.File>> _compiledFilesById
+            = EF.CompileAsyncQuery((DbContext context, int fileId) => context.Files
+                                                                             .SingleOrDefault(f => f.Id == fileId));
+
+        private static readonly Func<DbContext, string, IAsyncEnumerable<DataModels.File>> _compiledFilesByRepositoryId
+            = EF.CompileAsyncQuery((DbContext context, string repositoryId) => context.Files
+                                                                                      .Where(f => f.Repository.RepositoryId == repositoryId));
+
+        private static readonly Func<DbContext, string, string, Task<DataModels.File>> _compiledFileByRepositoryAndPath
+            = EF.CompileAsyncQuery((DbContext context, string repositoryId, string filePath) => context.Files
+                                                                                                       .SingleOrDefault(f => f.Repository.RepositoryId == repositoryId
+                                                                                                                          && f.Path == filePath));
+
+        private static readonly Func<DbContext, int, int, IAsyncEnumerable<DataModels.FileReference>> _compiledFileReferencesByFileId
+            = EF.CompileAsyncQuery((DbContext context, int fileId, int fileRefType) => context.FileReferences
+                                                                                              .Where(fr => fr.FileId == fileId
+                                                                                                        && fr.FileReferenceTypeId == fileRefType));
+
+        private static readonly Func<DbContext, int, int, IAsyncEnumerable<DataModels.FileProperty>> _compiledFilePropertiesByFileId
+            = EF.CompileAsyncQuery((DbContext context, int fileId, int filePropertyType) => context.FileProperties
+                                                                                                   .Where(fp => fp.FileId == fileId
+                                                                                                             && fp.PropertyTypeId == filePropertyType));
+
+        private static readonly Func<DbContext, string, IAsyncEnumerable<DataModels.File>> _compiledGetYamlFilesByRepositoryId
+            = EF.CompileAsyncQuery((DbContext context, string repositoryId) => context.Files
+                                                                                      .Where(f => f.Repository.RepositoryId == repositoryId
+                                                                                               && f.FileTypeId == yamlFileType));
+
+        private static readonly Func<DbContext, string, IAsyncEnumerable<DataModels.Pipeline>> _compiledGetPipelinesByType
+            = EF.CompileAsyncQuery((DbContext context, string pipelineType) => context.Pipelines
+                                                                                      .Where(p => p.Type == pipelineType));
+
+        private static readonly Func<DbContext, string, int, IAsyncEnumerable<DataModels.Pipeline>> _compiledGetPipelinesByRepositoryAndFile
+            = EF.CompileAsyncQuery((DbContext context, string repositoryId, int fileId) => context.Pipelines
+                                                                                                       .Where(p => p.Repository.RepositoryId == repositoryId
+                                                                                                                && p.FileId == fileId
+                                                                                                                && p.Type != Pipeline.pipelineTypeRelease));
+
+        private static readonly Func<DbContext, int, IAsyncEnumerable<int>> _compiledGetPipelineIdsByProject
+            = EF.CompileAsyncQuery((DbContext context, int projectId) => context.Pipelines
+                                                                                   .Where(p => p.ProjectId == projectId
+                                                                                            && p.Type != Pipeline.pipelineTypeRelease)
+                                                                                   .Select(p => p.PipelineId));
 
         #endregion
     }

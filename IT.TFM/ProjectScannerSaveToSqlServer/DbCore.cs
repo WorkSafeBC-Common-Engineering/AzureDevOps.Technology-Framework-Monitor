@@ -1,12 +1,10 @@
-﻿using ProjectScannerSaveToSqlServer.DataModels;
+﻿using Microsoft.EntityFrameworkCore;
+
+using ProjectScannerSaveToSqlServer.DataModels;
+
 using System;
-using System.Collections.Generic;
-using System.Data.Common;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace ProjectScannerSaveToSqlServer
 {
@@ -36,7 +34,6 @@ namespace ProjectScannerSaveToSqlServer
         protected ProjectScannerDB context;
         protected Guid instanceId;
         private static long instanceCount = 0;
-        private bool disposedValue;
 
         #endregion
 

@@ -1,11 +1,8 @@
 ﻿using Newtonsoft.Json.Linq;
+
 using Parser.Interfaces;
+
 using ProjectData;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NpmFileParser
 {

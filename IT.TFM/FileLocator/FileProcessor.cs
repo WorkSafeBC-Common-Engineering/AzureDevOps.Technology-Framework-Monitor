@@ -1,13 +1,13 @@
 ﻿using ProjectData;
 using ProjectData.Interfaces;
+
 using ProjectScanner;
+
 using RepoScan.DataModels;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace RepoScan.FileLocator
@@ -99,6 +99,7 @@ namespace RepoScan.FileLocator
                 {
                     if (r.LastCommitId == repoItem.RepositoryLastCommitId)
                     {
+                        Console.WriteLine($"\t>>> Repo {r.Name} - not changed since last commit (Commit ID: {r.LastCommitId})");
                         repoUnchanged = true;
                     }
                     else
@@ -114,17 +115,14 @@ namespace RepoScan.FileLocator
                     // flag repo as deleted.
                     repoItem.IsDeleted = true;
                     dbProjectId = repoWriter.Write(repoItem, dbProjectId, false);
-#if DEBUG
-                    Console.WriteLine($"=> File Scan GetFiles(): repository {repoItem.RepositoryName} was deleted");
-#endif
+
+                    Console.WriteLine($"\t>>> File Scan GetFiles(): repository {repoItem.RepositoryName} was deleted");
                     continue;
                 }
 
                 if (repoUnchanged && !forceDetails)
                 {
-#if DEBUG
-                    Console.WriteLine($"=> File Scan GetFiles(): repository {repoItem.RepositoryName} is unchanged");
-#endif
+                    Console.WriteLine($"\t>>> File Scan GetFiles(): repository {repoItem.RepositoryName} is unchanged");
                     continue;
                 }
 
@@ -138,9 +136,7 @@ namespace RepoScan.FileLocator
 
                 Parallel.ForEach(fileList, options, (file) =>
                 {
-#if DEBUG
-                    Console.WriteLine($"=> File Scan GetFiles(): Getting File: Repository = {repoItem.RepositoryName}, File Path = {file.Path}");
-#endif
+                    Console.WriteLine($"\t>>> File Scan GetFiles(): Getting File: Repository = {repoItem.RepositoryName}, File Path = {file.Path}");
 
                     if (file.FileType != FileItemType.NoMatch || FileFiltering.Filter.CanFilterFile(file))
                     {
@@ -158,9 +154,7 @@ namespace RepoScan.FileLocator
                         // Then each thread could have this created ahead of time without
                         // the cost of creating a fresh DB connection every time.
                         IWriteFileItem writer = StorageFactory.GetFileItemWriter();
-#if DEBUG
-                        Console.WriteLine($"=> File Scan GetFiles(): sending file to writer - ${file.Path}");
-#endif
+                        Console.WriteLine($"\t>>> File Scan GetFiles(): sending file to writer - ${file.Path}");
                         writer.Write(fileItem, false, true);
                     }
                 });

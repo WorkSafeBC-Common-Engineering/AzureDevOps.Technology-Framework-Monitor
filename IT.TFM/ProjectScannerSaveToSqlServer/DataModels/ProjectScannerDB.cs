@@ -1,14 +1,9 @@
 namespace ProjectScannerSaveToSqlServer.DataModels
 {
-    using System.Data.Entity;
+    using Microsoft.EntityFrameworkCore;
 
-    public partial class ProjectScannerDB : DbContext
+    public partial class ProjectScannerDB(string connection) : DbContext()
     {
-        public ProjectScannerDB()
-            : base("name=ProjectScannerDB")
-        {
-        }
-
         public virtual DbSet<FileProperty> FileProperties { get; set; }
         public virtual DbSet<FilePropertyType> FilePropertyTypes { get; set; }
         public virtual DbSet<FileReference> FileReferences { get; set; }
@@ -22,68 +17,77 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         public virtual DbSet<Pipeline> Pipelines { get; set; }
         public virtual DbSet<ReleaseArtifact> ReleaseArtifacts { get; set; }
 
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        private readonly string dbConnection = connection;
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder
+                .UseLazyLoadingProxies()
+                .UseSqlServer(dbConnection);
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<FilePropertyType>()
                 .HasMany(e => e.FileProperties)
-                .WithRequired(e => e.FilePropertyType)
+                .WithOne(e => e.FilePropertyType)
                 .HasForeignKey(e => e.PropertyTypeId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<FileReferenceType>()
                 .HasMany(e => e.FileReferences)
-                .WithRequired(e => e.FileReferenceType)
-                .WillCascadeOnDelete(false);
+                .WithOne(e => e.FileReferenceType)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<File>()
                 .HasMany(e => e.FileProperties)
-                .WithRequired(e => e.File)
-                .WillCascadeOnDelete(false);
+                .WithOne(e => e.File)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<File>()
                 .HasMany(e => e.FileReferences)
-                .WithRequired(e => e.File)
-                .WillCascadeOnDelete(false);
+                .WithOne(e => e.File)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<FileType>()
                 .HasMany(e => e.Files)
-                .WithRequired(e => e.FileType)
-                .WillCascadeOnDelete(false);
+                .WithOne(e => e.FileType)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Organization>()
                 .HasMany(e => e.Projects)
-                .WithRequired(e => e.Organization)
-                .WillCascadeOnDelete(false);
+                .WithOne(e => e.Organization)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Project>()
                 .HasMany(e => e.Repositories)
-                .WithRequired(e => e.Project)
-                .WillCascadeOnDelete(false);
+                .WithOne(e => e.Project)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Project>()
                 .HasMany(e => e.Pipelines)
-                .WithOptional(e => e.Project)
-                .WillCascadeOnDelete (false);
+                .WithOne(e => e.Project)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Repository>()
                 .HasMany(e => e.Files)
-                .WithRequired(e => e.Repository)
-                .WillCascadeOnDelete(false);
+                .WithOne(e => e.Repository)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Repository>()
                 .HasMany(e => e.Pipelines)
-                .WithRequired(e => e.Repository)
-                .WillCascadeOnDelete(false);
+                .WithOne(e => e.Repository)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<ScannerType>()
                 .HasMany(e => e.Organizations)
-                .WithRequired(e => e.ScannerType)
-                .WillCascadeOnDelete(false);
+                .WithOne(e => e.ScannerType)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity <Pipeline>()
                 .HasMany(e => e.ReleaseArtifacts)
-                .WithRequired(e => e.Pipeline)
-                .WillCascadeOnDelete(false);
+                .WithOne(e => e.Pipeline)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
