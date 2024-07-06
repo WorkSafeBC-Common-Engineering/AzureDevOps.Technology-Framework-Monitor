@@ -14,5 +14,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ConfidentialSettings\ConfidentialSettings.csproj" />
+    <ProjectReference Include="..\ParameterSettings\Parameters.csproj" />
   </ItemGroup>
 </Project>

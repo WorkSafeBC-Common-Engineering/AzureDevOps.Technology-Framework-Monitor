@@ -22,6 +22,7 @@ namespace TfmScanWithToken
             var threadCount = GetTotalThreads(args);
             var forceDetails = GetForceDetails(args);
             GetParts(args);
+            GetExtendedLogging(args);
 
             var projectId = GetProjectId(args);
             var repositoryId = GetRepositoryId(args);
@@ -155,6 +156,22 @@ namespace TfmScanWithToken
         private static string GetRepositoryId(string[] args)
         {
             return GetCommandLineValue(args, "-r");
+        }
+
+        private static void GetExtendedLogging(string[] args)
+        {
+            var loggingValue = GetCommandLineValue(args, "-l");
+            if (string.IsNullOrWhiteSpace(loggingValue))
+            {
+                loggingValue = ConfigurationManager.AppSettings["extendedLogging"];
+            }
+
+            if (string.IsNullOrWhiteSpace(loggingValue) || !bool.TryParse(loggingValue, out var logging))
+            {
+                logging = false;
+            }
+
+            Parameters.Settings.ExtendedLogging = logging;
         }
 
         private static string GetCommandLineValue(string[] args, string key)

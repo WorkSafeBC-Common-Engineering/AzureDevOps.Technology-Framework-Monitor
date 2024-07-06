@@ -43,9 +43,10 @@ namespace ProjectScannerSaveToSqlServer
         {
             instanceId = Guid.NewGuid();
             Interlocked.Increment(ref instanceCount);
-#if DEBUG
-            Console.WriteLine($"\t >>> DbCore - Initialize: {instanceId}, count = {Interlocked.Read(ref instanceCount)}");
-#endif
+            if (Parameters.Settings.ExtendedLogging)
+            {
+                Console.WriteLine($"\t >>> DbCore - Initialize: {instanceId}, count = {Interlocked.Read(ref instanceCount)}");
+            }
 
             connection = configuration;
             context = GetConnection();
@@ -60,10 +61,11 @@ namespace ProjectScannerSaveToSqlServer
         {
             var st = new StackTrace();
             var st1 = new StackTrace(new StackFrame(true));
-#if DEBUG
-            Console.WriteLine($"Stack Trace for Main: {st1}");
-            Console.WriteLine(st.ToString());
-#endif
+            if (Parameters.Settings.ExtendedLogging)
+            {
+                Console.WriteLine($"Stack Trace for Main: {st1}");
+                Console.WriteLine(st.ToString());
+            }
 
             context.Dispose();
             organizationId = 0;
@@ -82,9 +84,10 @@ namespace ProjectScannerSaveToSqlServer
             GC.SuppressFinalize(this);
 
             Interlocked.Decrement(ref instanceCount);
-#if DEBUG
-            Console.WriteLine($"\t >>> DbCore - Close: {instanceId}, count = {Interlocked.Read(ref instanceCount)}");
-#endif
+            if (Parameters.Settings.ExtendedLogging)
+            {
+                Console.WriteLine($"\t >>> DbCore - Close: {instanceId}, count = {Interlocked.Read(ref instanceCount)}");
+            }
             instanceId = Guid.Empty;
         }
 

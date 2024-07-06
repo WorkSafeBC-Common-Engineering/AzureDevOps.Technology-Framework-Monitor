@@ -286,9 +286,11 @@ namespace Parser
                 }
 
                 var path = childNode.InnerText;
-#if DEBUG
-                Console.WriteLine($"\t>>> Using HintPath: {path}");
-#endif
+
+                if (Parameters.Settings.ExtendedLogging)
+                {
+                    Console.WriteLine($"\t>>> Using HintPath: {path}");
+                }
 
                 var fields = path.Split(pathSeparator, System.StringSplitOptions.RemoveEmptyEntries | System.StringSplitOptions.TrimEntries);
 
@@ -310,9 +312,11 @@ namespace Parser
         {
             string version = null;
 
-#if DEBUG
-            Console.WriteLine($"\t>>> Getting Package Version from HintPath segment: {segment}");
-#endif
+            if (Parameters.Settings.ExtendedLogging)
+            {
+                Console.WriteLine($"\t>>> Getting Package Version from HintPath segment: {segment}");
+            }
+
             var fields = segment.Split(hintPathVersionSeparator, System.StringSplitOptions.RemoveEmptyEntries | System.StringSplitOptions.TrimEntries);
 
             for (var index = 0; index < fields.Length; index++)
@@ -325,9 +329,11 @@ namespace Parser
                     break;
                 }
             }
-#if DEBUG
-            Console.WriteLine($"\t>>> Getting Package Version from HintPath, version = {version}");
-#endif
+
+            if (Parameters.Settings.ExtendedLogging)
+            {
+                Console.WriteLine($"\t>>> Getting Package Version from HintPath, version = {version}");
+            }
             return version;
         }
 

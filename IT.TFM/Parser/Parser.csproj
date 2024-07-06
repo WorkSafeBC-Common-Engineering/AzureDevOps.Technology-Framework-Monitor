@@ -11,6 +11,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ConfigurationFileData\ConfigurationFileData.csproj" />
+    <ProjectReference Include="..\ParameterSettings\Parameters.csproj" />
     <ProjectReference Include="..\ProjectDataFramework\ProjectData.csproj" />
   </ItemGroup>
   <ItemGroup>

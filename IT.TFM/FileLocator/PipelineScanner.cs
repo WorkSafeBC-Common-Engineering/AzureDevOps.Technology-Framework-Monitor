@@ -113,9 +113,10 @@ namespace RepoScan.FileLocator
                 }
             }
 
-#if DEBUG
-            Console.WriteLine($"Link Yaml Pipeline: Repository ID: {repositoryId}, Path: {filePath}");
-#endif
+            if (Parameters.Settings.ExtendedLogging)
+            {
+                Console.WriteLine($"Link Yaml Pipeline: Repository ID: {repositoryId}, Path: {filePath}");
+            }
 
             // It is possible that multiple pipelines can be created from the same YAML file, so need to process each case
             var pipelines = yamlPipelines.Where(p => p.RepositoryId != null
@@ -124,9 +125,11 @@ namespace RepoScan.FileLocator
 
             foreach (var pipeline in pipelines)
             {
-#if DEBUG
-                Console.WriteLine($"Pipeline to File match: {pipeline}");
-#endif
+                if (Parameters.Settings.ExtendedLogging)
+                {
+                    Console.WriteLine($"Pipeline to File match: {pipeline}");
+                }
+
                 writer.LinkToFile(pipeline.PipelineId, pipeline.RepositoryId, filePath);
             }
         }

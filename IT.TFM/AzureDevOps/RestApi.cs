@@ -99,9 +99,11 @@ namespace AzureDevOps
                 Organization = fields[1];
                 CheckoutDirectory = Path.Combine(System.Environment.CurrentDirectory, Organization);
             }
-#if DEBUG
-            Console.WriteLine($"=> Checkout Directory = {CheckoutDirectory}");
-#endif
+            if (Parameters.Settings.ExtendedLogging)
+            {
+                Console.WriteLine($"=> Checkout Directory = {CheckoutDirectory}");
+            }
+
             Token = ConfidentialSettings.Values.Token;
         }
 
@@ -236,9 +238,12 @@ namespace AzureDevOps
                 {
                     continue;
                 }
-#if DEBUG
-                Console.WriteLine($"Pipeline Type: {pipelineDetails?.Configuration?.Type}");
-#endif
+
+                if (Parameters.Settings.ExtendedLogging)
+                {
+                    Console.WriteLine($"Pipeline Type: {pipelineDetails?.Configuration?.Type}");
+                }
+
                 pipeline.Details = pipelineDetails;
                 filteredPipelines.Add(pipeline);
             }
@@ -352,6 +357,7 @@ namespace AzureDevOps
 
         private async Task<string> CallApiAsync(string url, string mediaType = "application/json", bool unzipContent = false)
         {
+            DateTime startTime = DateTime.Now;
             try
             {
                 var semResult = waitOnApiCall.WaitOne();
@@ -363,10 +369,12 @@ namespace AzureDevOps
 
                 HttpClient httpClient = GetClient(url);
 
-#if DEBUG
-                Console.WriteLine($"API Call: {url}");
-                var startTime = DateTime.Now;
-#endif
+                if (Parameters.Settings.ExtendedLogging)
+                {
+                    Console.WriteLine($"API Call: {url}");
+                    startTime = DateTime.Now;
+                }
+
                 HttpResponseMessage response;
 
                 int retries = maxRetries;
@@ -385,9 +393,7 @@ namespace AzureDevOps
                     {
                         var msg = $"\t *** Exception occured with this URL: {url}\n{ex}";
                         Console.WriteLine(msg);
-#if DEBUG
-                        Console.WriteLine(msg);
-#endif
+
                         if (retries-- <= 0)
                         {
                             throw;
@@ -398,10 +404,13 @@ namespace AzureDevOps
                 }
 
                 ThrottleApi(response);
-#if DEBUG
-                Console.WriteLine($"End API Call, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
-                startTime = DateTime.Now;
-#endif
+
+                if (Parameters.Settings.ExtendedLogging)
+                {
+                    Console.WriteLine($"End API Call, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
+                    startTime = DateTime.Now;
+                }
+
                 if (!response.IsSuccessStatusCode)
                 {
                     if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
@@ -416,9 +425,12 @@ namespace AzureDevOps
                 if (unzipContent)
                 {
                     GetZipContent(response.Content.ReadAsStream());
-#if DEBUG
-                    Console.WriteLine($"Unzip, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
-#endif
+
+                    if (Parameters.Settings.ExtendedLogging)
+                    {
+                        Console.WriteLine($"Unzip, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
+                    }
+
                     return string.Empty;
                 }
 
@@ -471,12 +483,15 @@ namespace AzureDevOps
                 }
 
                 var headerValue = header.Value?.ToString();
-#if DEBUG
-                if (headerName.StartsWith("x-ratelimit") || headerName.Equals("retry-after"))
+
+                if (Parameters.Settings.ExtendedLogging)
                 {
-                    Console.WriteLine($"Azure API Throttling: {headerName} = {headerValue ?? "<null>"}");
+                    if (headerName.StartsWith("x-ratelimit") || headerName.Equals("retry-after"))
+                    {
+                        Console.WriteLine($"Azure API Throttling: {headerName} = {headerValue ?? "<null>"}");
+                    }
                 }
-#endif
+
                 if (headerValue == null)
                 {
                     // invalid value, skip for now

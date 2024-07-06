@@ -18,6 +18,7 @@
     <ProjectReference Include="..\NpmFileParser\NpmFileParser.csproj" />
     <ProjectReference Include="..\NuGetFileParser\NuGetFileParser.csproj" />
     <ProjectReference Include="..\OpenSecretsDetection\OpenSecretsDetection.csproj" />
+    <ProjectReference Include="..\ParameterSettings\Parameters.csproj" />
     <ProjectReference Include="..\ProjectScannerSaveToSqlServer\ProjectScannerSaveToSqlServer.csproj" />
     <ProjectReference Include="..\RepoScan.Storage.SqlServer\RepoScan.Storage.SqlServer.csproj" />
     <ProjectReference Include="..\VisualStudioFileParser\VisualStudioFileParser.csproj" />

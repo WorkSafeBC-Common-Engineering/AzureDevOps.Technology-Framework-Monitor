@@ -185,9 +185,11 @@ namespace AzureDevOpsScannerFramework
             var azdoReleases = await api.ListReleasesAsync();
             foreach (var release in azdoReleases.Value)
             {
-#if DEBUG
-                Console.WriteLine($"Release: {release.Id} - {release.Name}");
-#endif
+                if (Parameters.Settings.ExtendedLogging)
+                {
+                    Console.WriteLine($"Release: {release.Id} - {release.Name}");
+                }
+
                 var p = GetPipeline(release);
                 p.ProjectId = api.Project;
                
