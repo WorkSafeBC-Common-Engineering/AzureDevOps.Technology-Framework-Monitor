@@ -88,6 +88,11 @@ namespace RepoScan.FileLocator
 
                     if (azDoFile == null)
                     {
+                        if (Parameters.Settings.ExtendedLogging)
+                        {
+                            Console.WriteLine($"File Details: deleting file {azDoFile.Path} in Project {repoItem.ProjectName}, Repository {repoItem.RepositoryName}");
+                        }
+
                         DataModels.FileDetails fileDetails = new()
                         {
                             Id = fileItem.Id,
@@ -111,6 +116,7 @@ namespace RepoScan.FileLocator
                     {
                         if (Parameters.Settings.ExtendedLogging)
                         {
+                            Console.WriteLine($"File Details: no change to file {azDoFile.Path} in Project {repoItem.ProjectName}, Repository {repoItem.RepositoryName}");
                             Console.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId}");
                         }
 
@@ -129,6 +135,11 @@ namespace RepoScan.FileLocator
                     var fileData = scanner.FileDetails(repoItem.ProjectId, repoItem.RepositoryId, fileInfo);
                     if (fileData != null)
                     {
+                        if (Parameters.Settings.ExtendedLogging)
+                        {
+                            Console.WriteLine($"File Details: updating details for file {azDoFile.Path} in Project {repoItem.ProjectName}, Repository {repoItem.RepositoryName}");
+                        }
+
                         if (fileData.FileType == ProjectData.FileItemType.YamlPipeline && fileData.PipelineProperties.Count > 0)
                         {
                             fileData.RepositoryId = repoItem.RepositoryId;
