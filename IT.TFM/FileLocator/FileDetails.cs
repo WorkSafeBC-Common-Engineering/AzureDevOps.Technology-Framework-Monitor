@@ -90,7 +90,7 @@ namespace RepoScan.FileLocator
                     {
                         if (Parameters.Settings.ExtendedLogging)
                         {
-                            Console.WriteLine($"File Details: deleting file {azDoFile.Path} in Project {repoItem.ProjectName}, Repository {repoItem.RepositoryName}");
+                            Console.WriteLine($"File Details: deleting file {fileItem.Path} in Project {repoItem.ProjectName}, Repository {repoItem.RepositoryName}");
                         }
 
                         DataModels.FileDetails fileDetails = new()
