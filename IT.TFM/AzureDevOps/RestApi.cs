@@ -552,6 +552,17 @@ namespace AzureDevOps
         private void GetZipContent(Stream zipStream)
         {
             ZipFile.ExtractToDirectory(zipStream, CheckoutDirectory, true);
+
+            if (Parameters.Settings.ExtendedLogging)
+            {
+                var files = Directory.GetFiles(CheckoutDirectory, "*.*", SearchOption.AllDirectories);
+                Console.WriteLine($">>> GetZipContent: List of files, total = {files.Length}");
+                foreach (var file in files)
+                {
+                    Console.WriteLine($"\t>>> File: {file}");
+                }
+                Console.WriteLine($">>> GetZipContent: End of file list");
+            }
         }
 
         private static string? GetWorkingDirectory()
