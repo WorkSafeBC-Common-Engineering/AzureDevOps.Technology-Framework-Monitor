@@ -83,8 +83,13 @@ namespace RepoScan.FileLocator
                     IWriteFileDetails writer = StorageFactory.GetFileDetailsWriter();
                     var pipelineWriter = StorageFactory.GetPipelineWriter();
 
-                    var azDoFiles = fileList.Where(f => f.Id == fileItem.Id);
-                    var azDoFile = azDoFiles.SingleOrDefault(f => f.Path == fileItem.Path);
+                    var azDoFiles = fileList.Where(f => f.Path.Equals(fileItem.Path, StringComparison.InvariantCultureIgnoreCase));
+                    if (Parameters.Settings.ExtendedLogging && azDoFiles.Count() > 1)
+                    {
+                        Console.WriteLine($" >>> FileDetails - GetDetailsAsync(): !!! Multiple files returned for {fileItem.Path} - Url = {fileItem.Url}");
+                    }
+
+                    var azDoFile = azDoFiles.FirstOrDefault();
 
                     if (azDoFile == null)
                     {
