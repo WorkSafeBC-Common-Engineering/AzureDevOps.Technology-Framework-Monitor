@@ -236,10 +236,12 @@ namespace AzureDevOpsScannerFramework
             return fileList;
         }
 
-        async Task IScanner.LoadFiles(Guid projectId, Guid repositoryId)
+        async Task IScanner.LoadFiles(Guid projectId, Guid repositoryId, string branch)
         {
             api.Project = projectId.ToString();
             api.Repository = repositoryId.ToString();
+            api.RepositoryBranch = branch;
+
             await api.DownloadRepositoryAsync();
 
             if (Directory.Exists(api.CheckoutDirectory))

@@ -16,7 +16,7 @@ namespace ProjectData.Interfaces
 
         Task<IEnumerable<FileItem>> Files(Guid projectId, Repository repository);
 
-        Task LoadFiles(Guid projectId, Guid repositoryId);
+        Task LoadFiles(Guid projectId, Guid repositoryId, string branch);
 
         Task<IEnumerable<Pipeline>> Pipelines(Guid projectId, string repositoryId);
 

@@ -51,8 +51,8 @@ namespace RepoScan.FileLocator
                 }
 
                 try
-                {
-                    await scanner.LoadFiles(repoItem.ProjectId, repoItem.RepositoryId);
+                {                    
+                    await scanner.LoadFiles(repoItem.ProjectId, repoItem.RepositoryId, repoItem.RepositoryDefaultBranch);
                 }
                 catch (OutOfMemoryException)
                 {

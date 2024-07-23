@@ -157,6 +157,11 @@ namespace ProjectScannerSaveToSqlServer
 
         void IStorageWriter.SaveFile(FileItem file, Guid repoId, bool saveDetails, bool forceDetails)
         {
+            if (Parameters.Settings.ExtendedLogging)
+            {
+                Console.WriteLine($"StorageWriter.SaveFile: writing file {file.Path}, saveDetails = {saveDetails}, forceDetails = {forceDetails}");
+            }
+
             var id = repoId.ToString("D").ToLower();
             var repo = context.Repositories
                               .SingleOrDefaultAsync(r => r.RepositoryId == id)
@@ -184,6 +189,12 @@ namespace ProjectScannerSaveToSqlServer
                 return;
             }
 
+            if (Parameters.Settings.ExtendedLogging)
+            {
+                Console.WriteLine($"StorageWriter.SaveFile: writing file {file.Path} - file will be processed");
+            }
+
+
             if (dbFile == null)
             {
                 dbFile = new File
@@ -193,6 +204,11 @@ namespace ProjectScannerSaveToSqlServer
                 };
 
                 context.Files.Add(dbFile);
+
+                if (Parameters.Settings.ExtendedLogging)
+                {
+                    Console.WriteLine($"StorageWriter.SaveFile: writing file {file.Path} - adding file");
+                }
             }
 
             dbFile.FileType = context.FileTypes.SingleAsync(ft => ft.Value.Equals(file.FileType.ToString()))
