@@ -280,7 +280,10 @@ namespace AzureDevOpsScannerFramework
             var dir = file.Path.StartsWith('/') ? file.Path[1..] : file.Path;
             var filePath = Path.Combine(api.CheckoutDirectory, dir);
 
-            //file.SHA1 = azureFile.CommitId;
+            if (Parameters.Settings.ExtendedLogging)
+            {
+                Console.WriteLine($">>> IScanner.FileDetails: processing file {filePath}");
+            }
 
             try
             {
@@ -305,11 +308,20 @@ namespace AzureDevOpsScannerFramework
                 if (hasProperties)
                 {
                     file.AddProperty("Error", $"Unable to retrieve file. File: {file.Path}, Error Msg: {ex.Message}");
+                    if (Parameters.Settings.ExtendedLogging)
+                    {
+                        Console.WriteLine($">>> IScanner.FileDetails: Unable to retrieve file. File: {{file.Path}}, Error Msg: {{ex.Message}}");
+                    }
                 }
             }
 
             if (hasProperties)
             {
+                if (Parameters.Settings.ExtendedLogging)
+                {
+                    Console.WriteLine($">>> IScanner.FileDetails: found properties = {hasProperties}");
+                }
+
                 return file;
             }
             else

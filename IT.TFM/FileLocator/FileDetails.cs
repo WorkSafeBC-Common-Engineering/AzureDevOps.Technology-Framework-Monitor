@@ -76,8 +76,7 @@ namespace RepoScan.FileLocator
                 {
                     if (Parameters.Settings.ExtendedLogging)
                     {
-                        Console.WriteLine($"*** Thread Start: {Environment.CurrentManagedThreadId}");
-                        Console.WriteLine($" >>> FileDetails - GetDetailsAsync(): Processing {fileItem.Path}");
+                        Console.WriteLine($"*** Thread Start: {Environment.CurrentManagedThreadId} >>> FileDetails - GetDetailsAsync(): Processing {fileItem.Path}");
                     }
 
                     //TODO: Create a pool of writer items (one per totalThread) to create the necessary DB connections ahead of time.
@@ -91,6 +90,10 @@ namespace RepoScan.FileLocator
                     }
 
                     var azDoFile = azDoFiles.FirstOrDefault();
+                    if (Parameters.Settings.ExtendedLogging && azDoFiles.Count() == 1)
+                    {
+                        Console.WriteLine($" >>> FileDetails - GetDetailsAsync(): Matched AzDo file {fileItem.Path}");
+                    }
 
                     if (azDoFile == null)
                     {
@@ -113,7 +116,7 @@ namespace RepoScan.FileLocator
 
                         if (Parameters.Settings.ExtendedLogging)
                         {
-                            Console.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId}");
+                            Console.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId} >>> FileDetails - GetDetailsAsync(): Processing {fileItem.Path} (delete)");
                         }
 
                         return;
@@ -123,10 +126,15 @@ namespace RepoScan.FileLocator
                         if (Parameters.Settings.ExtendedLogging)
                         {
                             Console.WriteLine($"File Details: no change to file {azDoFile.Path} in Project {repoItem.ProjectName}, Repository {repoItem.RepositoryName}");
-                            Console.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId}");
+                            Console.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId} >>> FileDetails - GetDetailsAsync(): Processing {fileItem.Path}");
                         }
 
                         return;
+                    }
+
+                    if (Parameters.Settings.ExtendedLogging)
+                    {
+                        Console.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId} >>> FileDetails - GetDetailsAsync(): Processing {fileItem.Path} (start of update)");
                     }
 
                     var fileInfo = new ProjectData.FileItem
@@ -170,9 +178,14 @@ namespace RepoScan.FileLocator
                         writer.Write(fileDetails, forceDetails);
                     }
 
+                    if (!Parameters.Settings.ExtendedLogging && fileData == null)
+                    {
+                        Console.WriteLine($"");
+                    }
+
                     if (Parameters.Settings.ExtendedLogging)
                     {
-                        Console.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId}");
+                        Console.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId} >>> FileDetails - GetDetailsAsync(): Processing {fileItem.Path}");
                     }
                 });
 
