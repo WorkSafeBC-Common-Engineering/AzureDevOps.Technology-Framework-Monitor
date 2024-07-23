@@ -245,7 +245,7 @@ namespace AzureDevOpsScannerFramework
         {
             api.Project = projectId.ToString();
             api.Repository = repositoryId.ToString();
-            api.RepositoryBranch = branch;
+            api.RepositoryBranch = string.Empty;
 
             if (Parameters.Settings.ExtendedLogging)
             {

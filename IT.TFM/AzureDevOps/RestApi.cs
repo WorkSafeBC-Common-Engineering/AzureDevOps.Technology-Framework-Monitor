@@ -366,6 +366,11 @@ namespace AzureDevOps
 
         private async Task<string> CallApiAsync(string url, string mediaType = "application/json", bool unzipContent = false)
         {
+            if (Parameters.Settings.ExtendedLogging)
+            {
+                Console.WriteLine($"CallApiAsync: start! Url = {url}, mediaType = {mediaType}, Unzip = {unzipContent}");
+            }
+
             DateTime startTime = DateTime.Now;
             try
             {
@@ -430,6 +435,11 @@ namespace AzureDevOps
                     if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                     {
                         // Repository is empty
+                        if (Parameters.Settings.ExtendedLogging)
+                        {
+                            Console.WriteLine($">>> CallApiAsync: request failed! StatusCode = {response.StatusCode}, Reason = {response.ReasonPhrase},\n\t>>> URL = {url}");
+                        }
+
                         return string.Empty;
                     }
 
