@@ -77,6 +77,7 @@ namespace RepoScan.FileLocator
                     if (Parameters.Settings.ExtendedLogging)
                     {
                         Console.WriteLine($"*** Thread Start: {Environment.CurrentManagedThreadId}");
+                        Console.WriteLine($" >>> FileDetails - GetDetailsAsync(): Processing {fileItem.Path}");
                     }
 
                     //TODO: Create a pool of writer items (one per totalThread) to create the necessary DB connections ahead of time.

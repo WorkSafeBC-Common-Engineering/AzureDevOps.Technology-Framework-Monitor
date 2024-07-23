@@ -48,6 +48,11 @@ namespace AzureDevOpsScannerFramework
             api.Initialize(azureDevOpsOrganizationUrl);
 
             UseFileFilter();
+
+            if (Parameters.Settings.ExtendedLogging)
+            {
+                Console.WriteLine($">>> IScanner.Initialize: org = {organizationName}, orgUrl = {azureDevOpsOrganizationUrl}, useFileFilter = {useFileFilter}");
+            }
         }
 
         Organization IScanner.GetOrganization()
@@ -241,6 +246,11 @@ namespace AzureDevOpsScannerFramework
             api.Project = projectId.ToString();
             api.Repository = repositoryId.ToString();
             api.RepositoryBranch = branch;
+
+            if (Parameters.Settings.ExtendedLogging)
+            {
+                Console.WriteLine($">>> IScanner.LoadFiles: Project ID = {api.Project}, Repo ID = {api.Repository}, Branch = {api.RepositoryBranch}, Checkout Dir = {api.CheckoutDirectory}");
+            }
 
             await api.DownloadRepositoryAsync();
 

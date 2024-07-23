@@ -364,6 +364,11 @@ namespace AzureDevOps
 
                 if (unzipContent && Directory.Exists(CheckoutDirectory))
                 {
+                    if (Parameters.Settings.ExtendedLogging)
+                    {
+                        Console.WriteLine($">>> CallApiAsync - unzipContent: start by deleting the checkout directory {CheckoutDirectory} first.");
+                    }
+
                     Directory.Delete(CheckoutDirectory, true);
                 }
 
@@ -424,6 +429,11 @@ namespace AzureDevOps
 
                 if (unzipContent)
                 {
+                    if (Parameters.Settings.ExtendedLogging)
+                    {
+                        Console.WriteLine($">>> CallApiAsync - unzipContent: extract files to {CheckoutDirectory}");
+                    }
+
                     GetZipContent(response.Content.ReadAsStream());
 
                     if (Parameters.Settings.ExtendedLogging)
