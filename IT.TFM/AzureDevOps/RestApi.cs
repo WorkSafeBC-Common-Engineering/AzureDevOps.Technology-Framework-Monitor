@@ -81,6 +81,14 @@ namespace AzureDevOps
 
         void IRestApi.Initialize(string organizationUrl)
         {
+            var workingDirectory = GetWorkingDirectory();
+            if (workingDirectory == null)
+            {
+                var message = "IRestApi.Initialize: unable to get working directory";
+                Console.WriteLine($">>> {message}");
+                throw new InvalidProgramException(message);
+            }
+
             var url = organizationUrl.EndsWith('/')
                 ? organizationUrl[..^1]
                 : organizationUrl;
@@ -89,7 +97,7 @@ namespace AzureDevOps
             {
                 BaseUrl = url;
                 Organization = string.Empty;
-                CheckoutDirectory = Path.Combine(System.Environment.CurrentDirectory, BaseUrl);
+                CheckoutDirectory = Path.Combine(workingDirectory, BaseUrl);
             }
             else
             {
@@ -99,9 +107,10 @@ namespace AzureDevOps
                 Organization = fields[1];
                 CheckoutDirectory = Path.Combine(System.Environment.CurrentDirectory, Organization);
             }
+
             if (Parameters.Settings.ExtendedLogging)
             {
-                Console.WriteLine($"=> Checkout Directory = {CheckoutDirectory}");
+                Console.WriteLine($"=> Checkout Directory = {CheckoutDirectory}, Working Directory = {workingDirectory}");
             }
 
             Token = ConfidentialSettings.Values.Token;
@@ -543,6 +552,12 @@ namespace AzureDevOps
         private void GetZipContent(Stream zipStream)
         {
             ZipFile.ExtractToDirectory(zipStream, CheckoutDirectory, true);
+        }
+
+        private static string? GetWorkingDirectory()
+        {
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            return Path.GetDirectoryName(assembly.Location);
         }
 
         #endregion
