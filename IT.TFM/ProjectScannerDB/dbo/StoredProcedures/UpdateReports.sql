@@ -48,7 +48,7 @@ AS
 				[File Reference],
 				[URL Reference],
 				[Pkg Type],
-				[Pkg Reference],
+				LEFT([Pkg Reference], 100),
 				[Pkg Version]
 
 	FROM		[dbo].[FullScan]

@@ -28,6 +28,6 @@
     [FileReference] NVARCHAR(MAX) NULL,
     [UrlReference] NVARCHAR(MAX) NULL,
     [PackageType] NVARCHAR(50) NULL,
-    [PackageName] NVARCHAR(MAX) NULL,
+    [PackageName] NVARCHAR(100) NULL,
     [PackageVersion] NVARCHAR(MAX) NULL
 )
