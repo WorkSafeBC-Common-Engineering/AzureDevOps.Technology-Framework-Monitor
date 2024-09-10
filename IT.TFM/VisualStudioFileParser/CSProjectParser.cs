@@ -2,12 +2,28 @@
 using ProjectData;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace VisualStudioFileParser
 {
+    internal enum PackageDetectionType
+    {
+        Outdated,
+        Deprecated,
+        Vulnerable
+    }
+
     class CSProjectParser : Parser.ParseXmlFile, IFileParser
     {
+        #region Private Members
+
+        private readonly static StringBuilder packageIssuesJson = new();
+
+        #endregion
+
         #region IFileParser Implementation
 
         void IFileParser.Initialize(object data)
@@ -50,6 +66,8 @@ namespace VisualStudioFileParser
             WriteVSProjectPackageReference(rootNode, xmlPkgReference, file);
 
             CleanupReferences(file);
+
+            FindPackageIssuesAsync(file).Wait();
         }
 
         #endregion
@@ -83,6 +101,50 @@ namespace VisualStudioFileParser
             }
         }
 
+        private static async Task FindPackageIssuesAsync(FileItem file)
+        {
+            await RunPackageIssuesDetectionAsync(file, PackageDetectionType.Outdated.ToString().ToLower());
+            await RunPackageIssuesDetectionAsync(file, PackageDetectionType.Deprecated.ToString().ToLower());
+            await RunPackageIssuesDetectionAsync(file, PackageDetectionType.Vulnerable.ToString().ToLower());
+        }
+
+        private static async Task RunPackageIssuesDetectionAsync(FileItem file, string action)
+        {
+            ProcessStartInfo startInfo = new()
+            {
+                FileName = "dotnet",
+                Arguments = $"list {file.LocalFilePath} package --{action} --include-transitive --format json",
+                RedirectStandardOutput = true,
+                RedirectStandardError = false,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            packageIssuesJson.Clear();
+
+            using var process = new Process();
+            process.StartInfo = startInfo;
+            process.OutputDataReceived += (sender, args) =>
+            {
+                if (!string.IsNullOrEmpty(args.Data))
+                {
+                    packageIssuesJson.AppendLine(args.Data);
+                }
+            };
+
+
+            if (!process.Start())
+            {
+                throw new InvalidProgramException($"Unable to parse {action} packages in {file.Path}.");
+            }
+
+            process.BeginOutputReadLine();
+            await process.WaitForExitAsync();
+            await process.WaitForExitAsync();
+            process.Close();
+
+            Console.WriteLine(packageIssuesJson.ToString());
+        }
 
         #endregion
     }

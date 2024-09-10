@@ -280,6 +280,8 @@ namespace AzureDevOpsScannerFramework
             var dir = file.Path.StartsWith('/') ? file.Path[1..] : file.Path;
             var filePath = Path.Combine(api.CheckoutDirectory, dir);
 
+            file.LocalFilePath = filePath;
+
             if (Parameters.Settings.ExtendedLogging)
             {
                 Console.WriteLine($">>> IScanner.FileDetails: processing file {filePath}");
