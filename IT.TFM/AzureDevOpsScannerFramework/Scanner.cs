@@ -48,6 +48,11 @@ namespace AzureDevOpsScannerFramework
             api.Initialize(azureDevOpsOrganizationUrl);
 
             UseFileFilter();
+
+            if (Parameters.Settings.ExtendedLogging)
+            {
+                Console.WriteLine($">>> IScanner.Initialize: org = {organizationName}, orgUrl = {azureDevOpsOrganizationUrl}, useFileFilter = {useFileFilter}");
+            }
         }
 
         Organization IScanner.GetOrganization()
@@ -185,9 +190,11 @@ namespace AzureDevOpsScannerFramework
             var azdoReleases = await api.ListReleasesAsync();
             foreach (var release in azdoReleases.Value)
             {
-#if DEBUG
-                Console.WriteLine($"Release: {release.Id} - {release.Name}");
-#endif
+                if (Parameters.Settings.ExtendedLogging)
+                {
+                    Console.WriteLine($"Release: {release.Id} - {release.Name}");
+                }
+
                 var p = GetPipeline(release);
                 p.ProjectId = api.Project;
                
@@ -234,10 +241,17 @@ namespace AzureDevOpsScannerFramework
             return fileList;
         }
 
-        async Task IScanner.LoadFiles(Guid projectId, Guid repositoryId)
+        async Task IScanner.LoadFiles(Guid projectId, Guid repositoryId, string branch)
         {
             api.Project = projectId.ToString();
             api.Repository = repositoryId.ToString();
+            api.RepositoryBranch = string.Empty;
+
+            if (Parameters.Settings.ExtendedLogging)
+            {
+                Console.WriteLine($">>> IScanner.LoadFiles: Project ID = {api.Project}, Repo ID = {api.Repository}, Branch = {api.RepositoryBranch}, Checkout Dir = {api.CheckoutDirectory}");
+            }
+
             await api.DownloadRepositoryAsync();
 
             if (Directory.Exists(api.CheckoutDirectory))
@@ -266,7 +280,10 @@ namespace AzureDevOpsScannerFramework
             var dir = file.Path.StartsWith('/') ? file.Path[1..] : file.Path;
             var filePath = Path.Combine(api.CheckoutDirectory, dir);
 
-            //file.SHA1 = azureFile.CommitId;
+            if (Parameters.Settings.ExtendedLogging)
+            {
+                Console.WriteLine($">>> IScanner.FileDetails: processing file {filePath}");
+            }
 
             try
             {
@@ -291,11 +308,20 @@ namespace AzureDevOpsScannerFramework
                 if (hasProperties)
                 {
                     file.AddProperty("Error", $"Unable to retrieve file. File: {file.Path}, Error Msg: {ex.Message}");
+                    if (Parameters.Settings.ExtendedLogging)
+                    {
+                        Console.WriteLine($">>> IScanner.FileDetails: Unable to retrieve file. File: {{file.Path}}, Error Msg: {{ex.Message}}");
+                    }
                 }
             }
 
             if (hasProperties)
             {
+                if (Parameters.Settings.ExtendedLogging)
+                {
+                    Console.WriteLine($">>> IScanner.FileDetails: found properties = {hasProperties}");
+                }
+
                 return file;
             }
             else

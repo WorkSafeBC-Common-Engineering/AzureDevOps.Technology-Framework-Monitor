@@ -81,6 +81,14 @@ namespace AzureDevOps
 
         void IRestApi.Initialize(string organizationUrl)
         {
+            var workingDirectory = GetWorkingDirectory();
+            if (workingDirectory == null)
+            {
+                var message = "IRestApi.Initialize: unable to get working directory";
+                Console.WriteLine($">>> {message}");
+                throw new InvalidProgramException(message);
+            }
+
             var url = organizationUrl.EndsWith('/')
                 ? organizationUrl[..^1]
                 : organizationUrl;
@@ -89,7 +97,7 @@ namespace AzureDevOps
             {
                 BaseUrl = url;
                 Organization = string.Empty;
-                CheckoutDirectory = Path.Combine(System.Environment.CurrentDirectory, BaseUrl);
+                CheckoutDirectory = Path.Combine(workingDirectory, BaseUrl);
             }
             else
             {
@@ -99,9 +107,12 @@ namespace AzureDevOps
                 Organization = fields[1];
                 CheckoutDirectory = Path.Combine(System.Environment.CurrentDirectory, Organization);
             }
-#if DEBUG
-            Console.WriteLine($"=> Checkout Directory = {CheckoutDirectory}");
-#endif
+
+            if (Parameters.Settings.ExtendedLogging)
+            {
+                Console.WriteLine($"=> Checkout Directory = {CheckoutDirectory}, Working Directory = {workingDirectory}");
+            }
+
             Token = ConfidentialSettings.Values.Token;
         }
 
@@ -236,9 +247,12 @@ namespace AzureDevOps
                 {
                     continue;
                 }
-#if DEBUG
-                Console.WriteLine($"Pipeline Type: {pipelineDetails?.Configuration?.Type}");
-#endif
+
+                if (Parameters.Settings.ExtendedLogging)
+                {
+                    Console.WriteLine($"Pipeline Type: {pipelineDetails?.Configuration?.Type}");
+                }
+
                 pipeline.Details = pipelineDetails;
                 filteredPipelines.Add(pipeline);
             }
@@ -352,21 +366,34 @@ namespace AzureDevOps
 
         private async Task<string> CallApiAsync(string url, string mediaType = "application/json", bool unzipContent = false)
         {
+            if (Parameters.Settings.ExtendedLogging)
+            {
+                Console.WriteLine($"CallApiAsync: start! Url = {url}, mediaType = {mediaType}, Unzip = {unzipContent}");
+            }
+
+            DateTime startTime = DateTime.Now;
             try
             {
                 var semResult = waitOnApiCall.WaitOne();
 
                 if (unzipContent && Directory.Exists(CheckoutDirectory))
                 {
+                    if (Parameters.Settings.ExtendedLogging)
+                    {
+                        Console.WriteLine($">>> CallApiAsync - unzipContent: start by deleting the checkout directory {CheckoutDirectory} first.");
+                    }
+
                     Directory.Delete(CheckoutDirectory, true);
                 }
 
                 HttpClient httpClient = GetClient(url);
 
-#if DEBUG
-                Console.WriteLine($"API Call: {url}");
-                var startTime = DateTime.Now;
-#endif
+                if (Parameters.Settings.ExtendedLogging)
+                {
+                    Console.WriteLine($"API Call: {url}");
+                    startTime = DateTime.Now;
+                }
+
                 HttpResponseMessage response;
 
                 int retries = maxRetries;
@@ -385,9 +412,7 @@ namespace AzureDevOps
                     {
                         var msg = $"\t *** Exception occured with this URL: {url}\n{ex}";
                         Console.WriteLine(msg);
-#if DEBUG
-                        Console.WriteLine(msg);
-#endif
+
                         if (retries-- <= 0)
                         {
                             throw;
@@ -398,15 +423,23 @@ namespace AzureDevOps
                 }
 
                 ThrottleApi(response);
-#if DEBUG
-                Console.WriteLine($"End API Call, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
-                startTime = DateTime.Now;
-#endif
+
+                if (Parameters.Settings.ExtendedLogging)
+                {
+                    Console.WriteLine($"End API Call, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
+                    startTime = DateTime.Now;
+                }
+
                 if (!response.IsSuccessStatusCode)
                 {
                     if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                     {
                         // Repository is empty
+                        if (Parameters.Settings.ExtendedLogging)
+                        {
+                            Console.WriteLine($">>> CallApiAsync: request failed! StatusCode = {response.StatusCode}, Reason = {response.ReasonPhrase},\n\t>>> URL = {url}");
+                        }
+
                         return string.Empty;
                     }
 
@@ -415,10 +448,18 @@ namespace AzureDevOps
 
                 if (unzipContent)
                 {
+                    if (Parameters.Settings.ExtendedLogging)
+                    {
+                        Console.WriteLine($">>> CallApiAsync - unzipContent: extract files to {CheckoutDirectory}");
+                    }
+
                     GetZipContent(response.Content.ReadAsStream());
-#if DEBUG
-                    Console.WriteLine($"Unzip, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
-#endif
+
+                    if (Parameters.Settings.ExtendedLogging)
+                    {
+                        Console.WriteLine($"Unzip, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
+                    }
+
                     return string.Empty;
                 }
 
@@ -471,12 +512,15 @@ namespace AzureDevOps
                 }
 
                 var headerValue = header.Value?.ToString();
-#if DEBUG
-                if (headerName.StartsWith("x-ratelimit") || headerName.Equals("retry-after"))
+
+                if (Parameters.Settings.ExtendedLogging)
                 {
-                    Console.WriteLine($"Azure API Throttling: {headerName} = {headerValue ?? "<null>"}");
+                    if (headerName.StartsWith("x-ratelimit") || headerName.Equals("retry-after"))
+                    {
+                        Console.WriteLine($"Azure API Throttling: {headerName} = {headerValue ?? "<null>"}");
+                    }
                 }
-#endif
+
                 if (headerValue == null)
                 {
                     // invalid value, skip for now
@@ -518,6 +562,23 @@ namespace AzureDevOps
         private void GetZipContent(Stream zipStream)
         {
             ZipFile.ExtractToDirectory(zipStream, CheckoutDirectory, true);
+
+            if (Parameters.Settings.ExtendedLogging)
+            {
+                var files = Directory.GetFiles(CheckoutDirectory, "*.*", SearchOption.AllDirectories);
+                Console.WriteLine($">>> GetZipContent: List of files, total = {files.Length}");
+                foreach (var file in files)
+                {
+                    Console.WriteLine($"\t>>> File: {file}");
+                }
+                Console.WriteLine($">>> GetZipContent: End of file list");
+            }
+        }
+
+        private static string? GetWorkingDirectory()
+        {
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            return Path.GetDirectoryName(assembly.Location);
         }
 
         #endregion

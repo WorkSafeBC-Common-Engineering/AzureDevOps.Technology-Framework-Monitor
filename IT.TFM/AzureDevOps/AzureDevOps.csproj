@@ -9,10 +9,11 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="System.Text.Json" Version="8.0.3" />
+    <PackageReference Include="System.Text.Json" Version="8.0.4" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ConfidentialSettings\ConfidentialSettings.csproj" />
+    <ProjectReference Include="..\ParameterSettings\Parameters.csproj" />
   </ItemGroup>
 </Project>

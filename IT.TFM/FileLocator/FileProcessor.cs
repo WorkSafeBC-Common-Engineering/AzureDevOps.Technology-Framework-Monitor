@@ -42,9 +42,11 @@ namespace RepoScan.FileLocator
                 // Skip any repos that have been flagged as deleted or No Scan
                 if (repoItem.ProjectNoScan || repoItem.ProjectIsDeleted || repoItem.RepositoryNoScan || repoItem.IsDeleted)
                 {
-#if DEBUG
-                    Console.WriteLine($"=> File Scan GetFiles(): Skipping repo {repoItem.RepositoryName} - ProjectNoScan = {repoItem.ProjectNoScan}, ProjectIsDeleted = {repoItem.ProjectIsDeleted}, RepositoryNoScan = {repoItem.RepositoryNoScan}, IsDeleted = {repoItem.IsDeleted}");
-#endif
+                    if (Parameters.Settings.ExtendedLogging)
+                    {
+                        Console.WriteLine($"=> File Scan GetFiles(): Skipping repo {repoItem.RepositoryName} - ProjectNoScan = {repoItem.ProjectNoScan}, ProjectIsDeleted = {repoItem.ProjectIsDeleted}, RepositoryNoScan = {repoItem.RepositoryNoScan}, IsDeleted = {repoItem.IsDeleted}");
+                    }
+
                     continue;
                 }
 
@@ -59,9 +61,11 @@ namespace RepoScan.FileLocator
                         pList.Add(p.Id);
                     }
                     projectList = [.. pList];
-#if DEBUG
-                    Console.WriteLine($"=> File Scan, GetFiles(): Get Project IDs returned {projectList.Count()} items");
-#endif
+
+                    if (Parameters.Settings.ExtendedLogging)
+                    {
+                        Console.WriteLine($"=> File Scan, GetFiles(): Get Project IDs returned {projectList.Count()} items");
+                    }
                 }
 
                 // Check whether the project or repo still exists - it might have been moved or deleted.
@@ -69,9 +73,12 @@ namespace RepoScan.FileLocator
                 {
                     repoItem.ProjectIsDeleted = true;
                     dbProjectId = repoWriter.Write(repoItem, dbProjectId, false);
-#if DEBUG
-                    Console.WriteLine($"=> File Scan GetFiles(): Project {repoItem.ProjectName} was deleted");
-#endif
+
+                    if (Parameters.Settings.ExtendedLogging)
+                    {
+                        Console.WriteLine($"=> File Scan GetFiles(): Project {repoItem.ProjectName} was deleted");
+                    }
+
                     continue;
                 }
 
@@ -85,9 +92,11 @@ namespace RepoScan.FileLocator
 
                     repoList = await scanner.Repositories(project, string.Empty);
                     lastProject = repoItem.ProjectId;
-#if DEBUG
-                    Console.WriteLine($"=> File Scan GetFiles(): Project {repoItem.ProjectName} returned {repoList.Count()} repositories");
-#endif
+
+                    if (Parameters.Settings.ExtendedLogging)
+                    {
+                        Console.WriteLine($"=> File Scan GetFiles(): Project {repoItem.ProjectName} returned {repoList.Count()} repositories");
+                    }
                 }
 
                 bool repoExists = false;

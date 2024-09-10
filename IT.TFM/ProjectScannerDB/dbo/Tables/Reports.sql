@@ -2,7 +2,7 @@
 (
     [Timestamp] DATE NOT NULL,
     [Organization] NVARCHAR(50) NOT NULL, 
-    [Project] NVARCHAR(50) NOT NULL,
+    [Project] NVARCHAR(MAX) NOT NULL,
     [ProjectId] NVARCHAR(50) NOT NULL,
     [ProjectDescription] NVARCHAR(MAX) NOT NULL,
     [ProjectUrl] NVARCHAR(MAX) NOT NULL,
@@ -28,6 +28,6 @@
     [FileReference] NVARCHAR(MAX) NULL,
     [UrlReference] NVARCHAR(MAX) NULL,
     [PackageType] NVARCHAR(50) NULL,
-    [PackageName] NVARCHAR(MAX) NULL,
+    [PackageName] NVARCHAR(100) NULL,
     [PackageVersion] NVARCHAR(MAX) NULL
 )

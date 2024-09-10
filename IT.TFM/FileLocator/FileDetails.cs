@@ -51,8 +51,8 @@ namespace RepoScan.FileLocator
                 }
 
                 try
-                {
-                    await scanner.LoadFiles(repoItem.ProjectId, repoItem.RepositoryId);
+                {                    
+                    await scanner.LoadFiles(repoItem.ProjectId, repoItem.RepositoryId, repoItem.RepositoryDefaultBranch);
                 }
                 catch (OutOfMemoryException)
                 {
@@ -74,19 +74,34 @@ namespace RepoScan.FileLocator
                 var deleteList = new ConcurrentBag<DataModels.FileDetails>();
                 Parallel.ForEach(fileItems, options, (fileItem) =>
                 {
-#if DEBUG
-                    Console.WriteLine($"*** Thread Start: {Environment.CurrentManagedThreadId}");
-#endif
+                    if (Parameters.Settings.ExtendedLogging)
+                    {
+                        Console.WriteLine($"*** Thread Start: {Environment.CurrentManagedThreadId} >>> FileDetails - GetDetailsAsync(): Processing {fileItem.Path}");
+                    }
 
                     //TODO: Create a pool of writer items (one per totalThread) to create the necessary DB connections ahead of time.
                     IWriteFileDetails writer = StorageFactory.GetFileDetailsWriter();
                     var pipelineWriter = StorageFactory.GetPipelineWriter();
 
-                    var azDoFiles = fileList.Where(f => f.Id == fileItem.Id);
-                    var azDoFile = azDoFiles.SingleOrDefault(f => f.Path == fileItem.Path);
+                    var azDoFiles = fileList.Where(f => f.Path.Equals(fileItem.Path, StringComparison.InvariantCultureIgnoreCase));
+                    if (Parameters.Settings.ExtendedLogging && azDoFiles.Count() > 1)
+                    {
+                        Console.WriteLine($" >>> FileDetails - GetDetailsAsync(): !!! Multiple files returned for {fileItem.Path} - Url = {fileItem.Url}");
+                    }
+
+                    var azDoFile = azDoFiles.FirstOrDefault();
+                    if (Parameters.Settings.ExtendedLogging && azDoFiles.Count() == 1)
+                    {
+                        Console.WriteLine($" >>> FileDetails - GetDetailsAsync(): Matched AzDo file {fileItem.Path}");
+                    }
 
                     if (azDoFile == null)
                     {
+                        if (Parameters.Settings.ExtendedLogging)
+                        {
+                            Console.WriteLine($"File Details: deleting file {fileItem.Path} in Project {repoItem.ProjectName}, Repository {repoItem.RepositoryName}");
+                        }
+
                         DataModels.FileDetails fileDetails = new()
                         {
                             Id = fileItem.Id,
@@ -98,17 +113,28 @@ namespace RepoScan.FileLocator
                         }; 
 
                         deleteList.Add(fileDetails );
-#if DEBUG
-                        Console.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId}");
-#endif
+
+                        if (Parameters.Settings.ExtendedLogging)
+                        {
+                            Console.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId} >>> FileDetails - GetDetailsAsync(): Processing {fileItem.Path} (delete)");
+                        }
+
                         return;
                     }
                     if (azDoFile.CommitId == fileItem.CommitId && !forceDetails)
                     {
-#if DEBUG
-                        Console.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId}");
-#endif
+                        if (Parameters.Settings.ExtendedLogging)
+                        {
+                            Console.WriteLine($"File Details: no change to file {azDoFile.Path} in Project {repoItem.ProjectName}, Repository {repoItem.RepositoryName}");
+                            Console.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId} >>> FileDetails - GetDetailsAsync(): Processing {fileItem.Path}");
+                        }
+
                         return;
+                    }
+
+                    if (Parameters.Settings.ExtendedLogging)
+                    {
+                        Console.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId} >>> FileDetails - GetDetailsAsync(): Processing {fileItem.Path} (start of update)");
                     }
 
                     var fileInfo = new ProjectData.FileItem
@@ -123,6 +149,11 @@ namespace RepoScan.FileLocator
                     var fileData = scanner.FileDetails(repoItem.ProjectId, repoItem.RepositoryId, fileInfo);
                     if (fileData != null)
                     {
+                        if (Parameters.Settings.ExtendedLogging)
+                        {
+                            Console.WriteLine($"File Details: updating details for file {azDoFile.Path} in Project {repoItem.ProjectName}, Repository {repoItem.RepositoryName}");
+                        }
+
                         if (fileData.FileType == ProjectData.FileItemType.YamlPipeline && fileData.PipelineProperties.Count > 0)
                         {
                             fileData.RepositoryId = repoItem.RepositoryId;
@@ -146,9 +177,16 @@ namespace RepoScan.FileLocator
 
                         writer.Write(fileDetails, forceDetails);
                     }
-#if DEBUG
-                    Console.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId}");
-#endif
+
+                    if (!Parameters.Settings.ExtendedLogging && fileData == null)
+                    {
+                        Console.WriteLine($"");
+                    }
+
+                    if (Parameters.Settings.ExtendedLogging)
+                    {
+                        Console.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId} >>> FileDetails - GetDetailsAsync(): Processing {fileItem.Path}");
+                    }
                 });
 
                 if (!deleteList.IsEmpty)
