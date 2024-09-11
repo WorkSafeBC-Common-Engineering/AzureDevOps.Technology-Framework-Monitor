@@ -1,10 +1,15 @@
 ﻿using Parser.Interfaces;
+
 using ProjectData;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace VisualStudioFileParser
@@ -20,7 +25,7 @@ namespace VisualStudioFileParser
     {
         #region Private Members
 
-        private readonly static StringBuilder packageIssuesJson = new();
+        private readonly static JsonSerializerOptions serializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
         #endregion
 
@@ -103,24 +108,52 @@ namespace VisualStudioFileParser
 
         private static async Task FindPackageIssuesAsync(FileItem file)
         {
-            await RunPackageIssuesDetectionAsync(file, PackageDetectionType.Outdated.ToString().ToLower());
-            await RunPackageIssuesDetectionAsync(file, PackageDetectionType.Deprecated.ToString().ToLower());
-            await RunPackageIssuesDetectionAsync(file, PackageDetectionType.Vulnerable.ToString().ToLower());
+            await ProcessPackageIssues(file, PackageDetectionType.Outdated);
+            await ProcessPackageIssues(file, PackageDetectionType.Deprecated);
+            await ProcessPackageIssues(file, PackageDetectionType.Vulnerable);
         }
 
-        private static async Task RunPackageIssuesDetectionAsync(FileItem file, string action)
+        private static async Task ProcessPackageIssues(FileItem file, PackageDetectionType actionType)
+        {
+            await RestorePackagesAsync(file);
+            await RunPackageIssuesDetectionAsync(file, PackageDetectionType.Outdated);
+        }
+
+        private static async Task RestorePackagesAsync(FileItem file)
         {
             ProcessStartInfo startInfo = new()
             {
                 FileName = "dotnet",
-                Arguments = $"list {file.LocalFilePath} package --{action} --include-transitive --format json",
+                Arguments = $"restore {file.LocalFilePath}",
+                UseShellExecute = false,
+                CreateNoWindow = false
+            };
+
+            using var process = new Process();
+            process.StartInfo = startInfo;
+
+            if (!process.Start())
+            {
+                throw new InvalidProgramException($"Unable to restore packages in {file.Path}.");
+            }
+
+            await process.WaitForExitAsync();
+            process.Close();
+        }
+
+        private static async Task RunPackageIssuesDetectionAsync(FileItem file, PackageDetectionType actionType)
+        {
+            ProcessStartInfo startInfo = new()
+            {
+                FileName = "dotnet",
+                Arguments = $"list {file.LocalFilePath} package --{actionType.ToString().ToLower()} --include-transitive --format json",
                 RedirectStandardOutput = true,
                 RedirectStandardError = false,
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
 
-            packageIssuesJson.Clear();
+            var packageIssuesJson = new StringBuilder();
 
             using var process = new Process();
             process.StartInfo = startInfo;
@@ -135,7 +168,7 @@ namespace VisualStudioFileParser
 
             if (!process.Start())
             {
-                throw new InvalidProgramException($"Unable to parse {action} packages in {file.Path}.");
+                throw new InvalidProgramException($"Unable to parse {actionType.ToString().ToLower()} packages in {file.Path}.");
             }
 
             process.BeginOutputReadLine();
@@ -144,8 +177,74 @@ namespace VisualStudioFileParser
             process.Close();
 
             Console.WriteLine(packageIssuesJson.ToString());
+            await ProcessPackageIssuesAsync(file, actionType, packageIssuesJson.ToString());
+        }
+
+        private static async Task ProcessPackageIssuesAsync(FileItem file, PackageDetectionType action, string output)
+        {
+            var jsonData = Encoding.UTF8.GetBytes(output);
+            using var stream = new MemoryStream(jsonData);
+            var packageInfo = await JsonSerializer.DeserializeAsync<PackageIssuesInstance>(stream, serializerOptions);
+
+            if ((packageInfo?.Problems?.Length ?? 0) > 0)
+            {
+                var problem = packageInfo.Problems[0];
+                Console.WriteLine($"Problem: Level={problem.Level}, {problem.Text}\n{problem.Project}");
+            }
+            else
+            {
+                Console.WriteLine("Valid {action}");
+            }
         }
 
         #endregion
     }
+
+
+    public class PackageIssuesInstance
+    {
+        public int Version { get; set; }
+        public string Parameters { get; set; }
+        public Problem[] Problems { get; set; }
+        public string[] Sources { get; set; }
+        public Project[] Projects { get; set; }
+    }
+
+    public class Problem
+    {
+        public string Project { get; set; }
+        public string Level { get; set; }
+        public string Text { get; set; }
+    }
+
+    public class Project
+    {
+        public string Path { get; set; }
+
+        public Framework[] Frameworks { get; set; }
+    }
+
+    public class Framework
+    {
+        [JsonPropertyName("framework")]
+        public string FrameworkVersion { get; set; }
+        public Toplevelpackage[] TopLevelPackages { get; set; }
+        public Transitivepackage[] TransitivePackages { get; set; }
+    }
+
+    public class Toplevelpackage
+    {
+        public string Id { get; set; }
+        public string RequestedVersion { get; set; }
+        public string ResolvedVersion { get; set; }
+        public string LatestVersion { get; set; }
+    }
+
+    public class Transitivepackage
+    {
+        public string Id { get; set; }
+        public string ResolvedVersion { get; set; }
+        public string LatestVersion { get; set; }
+    }
+
 }
