@@ -108,15 +108,10 @@ namespace VisualStudioFileParser
 
         private static async Task FindPackageIssuesAsync(FileItem file)
         {
-            await ProcessPackageIssues(file, PackageDetectionType.Outdated);
-            await ProcessPackageIssues(file, PackageDetectionType.Deprecated);
-            await ProcessPackageIssues(file, PackageDetectionType.Vulnerable);
-        }
-
-        private static async Task ProcessPackageIssues(FileItem file, PackageDetectionType actionType)
-        {
             await RestorePackagesAsync(file);
             await RunPackageIssuesDetectionAsync(file, PackageDetectionType.Outdated);
+            await RunPackageIssuesDetectionAsync(file, PackageDetectionType.Deprecated);
+            await RunPackageIssuesDetectionAsync(file, PackageDetectionType.Vulnerable);
         }
 
         private static async Task RestorePackagesAsync(FileItem file)
