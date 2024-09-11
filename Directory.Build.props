@@ -1,0 +1,14 @@
+﻿<Project>
+	<PropertyGroup>
+		<!-- Enable NuGet Audit -->
+		<NuGetAudit>true</NuGetAudit>
+
+		<!-- Set the minimum severity level of vulnerabilities to report -->
+		<NuGetAuditLevel>low</NuGetAuditLevel>
+
+		<!-- Set the audit mode -->
+		<NuGetAuditMode>all</NuGetAuditMode>
+
+		<NuGetAuditSource>https://api.nuget.org/v3/index.json</NuGetAuditSource>
+	</PropertyGroup>
+</Project>
