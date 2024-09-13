@@ -9,6 +9,7 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         {
             FileProperties = [];
             FileReferences = [];
+            PackageIssues = [];
         }
 
         public int Id { get; set; }
@@ -33,6 +34,8 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         public virtual ICollection<FileProperty> FileProperties { get; set; }
 
         public virtual ICollection<FileReference> FileReferences { get; set; }
+
+        public virtual ICollection<PackageIssue> PackageIssues { get; set; }
 
         public virtual FileType FileType { get; set; }
 

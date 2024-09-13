@@ -37,6 +37,8 @@ namespace ProjectData
 
         public Dictionary<string, string> PipelineProperties { get; } = [];
 
+        public List<PackageReferenceIssue> PackageReferencesIssues { get; } = [];
+
         #endregion
 
         #region Public Methods

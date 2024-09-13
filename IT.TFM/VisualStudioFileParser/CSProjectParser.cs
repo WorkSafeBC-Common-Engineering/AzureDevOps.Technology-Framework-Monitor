@@ -7,10 +7,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Xml;
+
+using VisualStudioFileParser.Models;
 
 namespace VisualStudioFileParser
 {
@@ -108,18 +112,133 @@ namespace VisualStudioFileParser
 
         private static async Task FindPackageIssuesAsync(FileItem file)
         {
-            await RestorePackagesAsync(file);
-            await RunPackageIssuesDetectionAsync(file, PackageDetectionType.Outdated);
-            await RunPackageIssuesDetectionAsync(file, PackageDetectionType.Deprecated);
-            await RunPackageIssuesDetectionAsync(file, PackageDetectionType.Vulnerable);
+            var path = await GetProjectPathAsync(file);
+
+            if (await RestorePackagesAsync(file, path))
+            {
+                await RunPackageIssuesDetectionAsync(file, path, PackageDetectionType.Outdated);
+                await RunPackageIssuesDetectionAsync(file, path, PackageDetectionType.Deprecated);
+                await RunPackageIssuesDetectionAsync(file, path, PackageDetectionType.Vulnerable);
+            }
+
+            CleanupTempProject();
         }
 
-        private static async Task RestorePackagesAsync(FileItem file)
+        private static async Task<string> GetProjectPathAsync(FileItem file)
+        {
+            var directory = Path.GetDirectoryName(file.LocalFilePath);
+            var configFile = Path.Combine(directory, "packages.config");
+            if (File.Exists(configFile))
+            {
+                var path = Path.Combine(Environment.CurrentDirectory, "wcbbc/tempProject");
+                await CreateTempProject(path);
+
+                var xmlDoc = new XmlDocument();
+                xmlDoc.Load(configFile);
+
+                var nodes = xmlDoc.SelectNodes("/packages/package");
+                foreach ( XmlNode node in nodes)
+                {
+                    var packageId = node.Attributes["id"].Value;
+                    var packageVersion = node.Attributes["version"].Value;
+                    string framework = node.Attributes["framework"]?.Value ?? string.Empty;
+                    if (framework != string.Empty)
+                    {
+                        framework = $"--framework {framework}";
+                    }
+
+                    await AddPackage(path, packageId, packageVersion, framework);
+                    // dotnet add $path package $packageId --version $packageVersion $framework
+                }
+
+                return Path.Combine(path, "tempProject.csproj");
+            }
+
+            return file.LocalFilePath;
+        }
+
+        private static async Task CreateTempProject(string projectPath)
         {
             ProcessStartInfo startInfo = new()
             {
                 FileName = "dotnet",
-                Arguments = $"restore {file.LocalFilePath}",
+                Arguments = $"new console -o {projectPath}",
+                UseShellExecute = false,
+                CreateNoWindow = false
+            };
+
+            using var process = new Process();
+            process.StartInfo = startInfo;
+
+            if (!process.Start())
+            {
+                throw new InvalidProgramException($"Unable to create console app in {projectPath}.");
+            }
+
+            await process.WaitForExitAsync();
+
+            var returnCode = process.ExitCode;
+            process.Close();
+
+            if (returnCode != 0)
+            {
+                throw new InvalidProgramException("Unable to create temp project for package scanning");
+            }
+        }
+
+        private static async Task AddPackage(string projectPath, string packageId, string packageVersion, string framework)
+        {
+            ProcessStartInfo startInfo = new()
+            {
+                FileName = "dotnet",
+                Arguments = $"add {projectPath} package {packageId} --version {packageVersion} --no-restore {framework}",
+                UseShellExecute = false,
+                CreateNoWindow = false
+            };
+
+            using var process = new Process();
+            process.StartInfo = startInfo;
+
+            if (!process.Start())
+            {
+                throw new InvalidProgramException($"Unable to add package {packageVersion}.{packageVersion} to project in {projectPath}.");
+            }
+
+            await process.WaitForExitAsync();
+
+            var returnCode = process.ExitCode;
+            process.Close();
+
+            if (returnCode != 0)
+            {
+                throw new InvalidProgramException($"Unable to add package {packageVersion}.{packageVersion} to project in {projectPath}.");
+            }
+        }
+
+        private static void CleanupTempProject()
+        {
+            var path = Path.Combine(Environment.CurrentDirectory, "wcbbc/tempProject");
+
+            if (Directory.Exists(path))
+            {
+                Directory.Delete(path, true);
+            }
+        }
+
+        private static async Task<bool> RestorePackagesAsync(FileItem file, string projectPath)
+        {
+            //ProcessStartInfo startInfo = new()
+            //{
+            //    FileName = "dotnet",
+            //    Arguments = $"restore {projectPath} --source \"https://api.nuget.org/v3/index.json\" --source \"https://wcbbc.pkgs.visualstudio.com/_packaging/WSBC_Cloud_NuGet/nuget/v3/index.json\" -v diag",
+            //    UseShellExecute = false,
+            //    CreateNoWindow = false
+            //};
+
+            ProcessStartInfo startInfo = new()
+            {
+                FileName = "nuget",
+                Arguments = $"restore {projectPath} -SolutionDirectory {Path.Combine(Environment.CurrentDirectory, "wcbbc")}",
                 UseShellExecute = false,
                 CreateNoWindow = false
             };
@@ -133,15 +252,33 @@ namespace VisualStudioFileParser
             }
 
             await process.WaitForExitAsync();
+
+            var returnCode = process.ExitCode;
             process.Close();
+
+            if (returnCode != 0)
+            {
+                file.PackageReferencesIssues.Add(new PackageReferenceIssue
+                {
+                    Id = 0,
+                    ScanType = $"Restore Error: {returnCode}",
+                    Framework = string.Empty,
+                    IsTopLevel = true,
+                    PackageName = string.Empty
+                });
+
+                return false;
+            }
+
+            return true;
         }
 
-        private static async Task RunPackageIssuesDetectionAsync(FileItem file, PackageDetectionType actionType)
+        private static async Task RunPackageIssuesDetectionAsync(FileItem file, string projectPath, PackageDetectionType actionType)
         {
             ProcessStartInfo startInfo = new()
             {
                 FileName = "dotnet",
-                Arguments = $"list {file.LocalFilePath} package --{actionType.ToString().ToLower()} --include-transitive --format json",
+                Arguments = $"list {projectPath} package --{actionType.ToString().ToLower()} --include-transitive --source \"https://api.nuget.org/v3/index.json\" --format json",
                 RedirectStandardOutput = true,
                 RedirectStandardError = false,
                 UseShellExecute = false,
@@ -188,58 +325,64 @@ namespace VisualStudioFileParser
             }
             else
             {
-                Console.WriteLine("Valid {action}");
+                if (packageInfo.Projects == null)
+                {
+                    return;
+                }
+
+                foreach (var project in packageInfo.Projects)
+                {
+                    if (project.Frameworks == null)
+                    {
+                        continue;
+                    }
+
+                    foreach (var framework in project.Frameworks)
+                    {
+                        if (framework.TopLevelPackages != null)
+                        {
+                            foreach (var topPackage in  framework.TopLevelPackages)
+                            {
+                                file.PackageReferencesIssues.Add(new PackageReferenceIssue
+                                {
+                                    Id = 0,
+                                    ScanType = action.ToString(),
+                                    Framework = framework.FrameworkVersion,
+                                    IsTopLevel = true,
+                                    PackageName = topPackage.Id,
+                                    RequestedVersion = topPackage.RequestedVersion,
+                                    ResolvedVersion = topPackage.ResolvedVersion,
+                                    LatestVersion = topPackage.LatestVersion,
+                                    Severity = (topPackage.Vulnerabilities == null || topPackage.Vulnerabilities.Length == 0) ? null : topPackage.Vulnerabilities[0].Severity,
+                                    AdvisoryUrl = (topPackage.Vulnerabilities == null || topPackage.Vulnerabilities.Length == 0) ? null : topPackage.Vulnerabilities[0].AdvisoryUrl
+                                });
+                            }
+                        }
+
+                        if (framework.TransitivePackages != null)
+                        {
+                            foreach (var transitivePackage in framework.TransitivePackages)
+                            {
+                                file.PackageReferencesIssues.Add(new PackageReferenceIssue
+                                {
+                                    Id = 0,
+                                    ScanType = action.ToString(),
+                                    Framework = framework.FrameworkVersion,
+                                    IsTopLevel = false,
+                                    PackageName = transitivePackage.Id,
+                                    RequestedVersion = transitivePackage.RequestedVersion,
+                                    ResolvedVersion = transitivePackage.ResolvedVersion,
+                                    LatestVersion = transitivePackage.LatestVersion,
+                                    Severity = (transitivePackage.Vulnerabilities == null || transitivePackage.Vulnerabilities.Length == 0) ? null : transitivePackage.Vulnerabilities[0].Severity,
+                                    AdvisoryUrl = (transitivePackage.Vulnerabilities == null || transitivePackage.Vulnerabilities.Length == 0) ? null : transitivePackage.Vulnerabilities[0].AdvisoryUrl
+                                });
+                            }
+                        }
+                    }
+                }
             }
         }
 
         #endregion
     }
-
-
-    public class PackageIssuesInstance
-    {
-        public int Version { get; set; }
-        public string Parameters { get; set; }
-        public Problem[] Problems { get; set; }
-        public string[] Sources { get; set; }
-        public Project[] Projects { get; set; }
-    }
-
-    public class Problem
-    {
-        public string Project { get; set; }
-        public string Level { get; set; }
-        public string Text { get; set; }
-    }
-
-    public class Project
-    {
-        public string Path { get; set; }
-
-        public Framework[] Frameworks { get; set; }
-    }
-
-    public class Framework
-    {
-        [JsonPropertyName("framework")]
-        public string FrameworkVersion { get; set; }
-        public Toplevelpackage[] TopLevelPackages { get; set; }
-        public Transitivepackage[] TransitivePackages { get; set; }
-    }
-
-    public class Toplevelpackage
-    {
-        public string Id { get; set; }
-        public string RequestedVersion { get; set; }
-        public string ResolvedVersion { get; set; }
-        public string LatestVersion { get; set; }
-    }
-
-    public class Transitivepackage
-    {
-        public string Id { get; set; }
-        public string ResolvedVersion { get; set; }
-        public string LatestVersion { get; set; }
-    }
-
 }

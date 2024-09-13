@@ -26,6 +26,8 @@ namespace RepoScan.DataModels
 
         public List<PackageReference> PackageReferences { get; set; }
 
+        public List<PackageReferenceIssue> PackageReferenceIssues { get; set; }
+
         public SerializableDictionary<string, string> Properties { get; set; } = [];
 
         public SerializableDictionary<string, string> FilteredItems { get; set; } = [];

@@ -16,6 +16,7 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         public virtual DbSet<ScannerType> ScannerTypes { get; set; }
         public virtual DbSet<Pipeline> Pipelines { get; set; }
         public virtual DbSet<ReleaseArtifact> ReleaseArtifacts { get; set; }
+        public virtual DbSet<PackageIssue> PackageIssues { get; set; }
 
         private readonly string dbConnection = connection;
 
@@ -46,6 +47,11 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
             modelBuilder.Entity<File>()
                 .HasMany(e => e.FileReferences)
+                .WithOne(e => e.File)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<File>()
+                .HasMany(e => e.PackageIssues)
                 .WithOne(e => e.File)
                 .OnDelete(DeleteBehavior.Restrict);
 

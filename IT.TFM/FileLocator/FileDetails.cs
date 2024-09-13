@@ -171,6 +171,7 @@ namespace RepoScan.FileLocator
                             References = fileData.References,
                             UrlReferences = fileData.UrlReferences,
                             PackageReferences = fileData.PackageReferences,
+                            PackageReferenceIssues = fileData.PackageReferencesIssues,
                             Properties = new SerializableDictionary<string, string>(fileData.Properties),
                             FilteredItems = new SerializableDictionary<string, string>(fileData.FilteredItems)
                         };

@@ -225,6 +225,7 @@ namespace ProjectScannerSaveToSqlServer
                 SaveFileReferences(dbFile, file.References);
                 SaveUrlReferences(dbFile, file.UrlReferences);
                 SavePkgReferences(dbFile, file.PackageReferences);
+                SavePackageIssues(dbFile, file.PackageReferencesIssues.AsEnumerable());
             }
 
             _ = context.SaveChangesAsync().Result;
@@ -640,6 +641,30 @@ namespace ProjectScannerSaveToSqlServer
                         FrameworkVersion = reference.FrameworkVersion
                     });
                 }
+            }
+        }
+
+        private void SavePackageIssues(File dbFile, IEnumerable<ProjData.PackageReferenceIssue> issues)
+        {
+            var currentIssues = context.PackageIssues.Where(p => p.FileId == dbFile.Id);
+            context.PackageIssues.RemoveRange(currentIssues);
+
+            foreach (var issue in issues)
+            {
+                context.PackageIssues.Add(new PackageIssue
+                {
+                    Id = 0,
+                    ScanType = issue.ScanType,
+                    FileId = dbFile.Id,
+                    Framework = issue.Framework,
+                    IsTopLevel = issue.IsTopLevel,
+                    PackageName = issue.PackageName,
+                    RequestedVersion = issue.RequestedVersion,
+                    ResolvedVersion = issue.ResolvedVersion,
+                    LatestVersion = issue.LatestVersion,
+                    Severity = issue.Severity,
+                    AdvisoryUrl = issue.AdvisoryUrl
+                });
             }
         }
 

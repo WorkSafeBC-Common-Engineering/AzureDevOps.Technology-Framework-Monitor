@@ -47,6 +47,11 @@ namespace RepoScan.Storage.SqlServer
                 fileItem.AddUrlReference(url.Url, url.Path);
             }
 
+            foreach (var issue in item.PackageReferenceIssues)
+            {
+                fileItem.PackageReferencesIssues.Add(issue);
+            }
+
             writer.SaveFile(fileItem, item.Repository.RepositoryId, true, forceDetails);
         }
 
