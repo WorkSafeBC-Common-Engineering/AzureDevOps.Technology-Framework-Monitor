@@ -10,6 +10,7 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         {
             Repositories = [];
             Pipelines = [];
+            NuGetFeeds = [];
         }
 
         public int Id { get; set; }
@@ -50,5 +51,7 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         public virtual ICollection<Repository> Repositories { get; set; }
 
         public virtual ICollection<Pipeline> Pipelines { get; set; }
+
+        public virtual ICollection<NuGetFeed> NuGetFeeds { get; set; }
     }
 }

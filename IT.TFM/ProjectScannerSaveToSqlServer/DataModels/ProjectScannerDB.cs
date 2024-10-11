@@ -10,6 +10,7 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         public virtual DbSet<FileReferenceType> FileReferenceTypes { get; set; }
         public virtual DbSet<File> Files { get; set; }
         public virtual DbSet<FileType> FileTypes { get; set; }
+        public virtual DbSet<NuGetFeed> NuGetFeeds { get; set; }
         public virtual DbSet<Organization> Organizations { get; set; }
         public virtual DbSet<Project> Projects { get; set; }
         public virtual DbSet<Repository> Repositories { get; set; }
@@ -87,6 +88,24 @@ namespace ProjectScannerSaveToSqlServer.DataModels
             modelBuilder.Entity <Pipeline>()
                 .HasMany(e => e.ReleaseArtifacts)
                 .WithOne(e => e.Pipeline)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<NuGetFeed>()
+                .HasOne(nf => nf.Project)
+                .WithMany(p => p.NuGetFeeds)
+                .HasForeignKey(nf => nf.ProjectId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<NuGetPackage>()
+                .HasOne(nf => nf.Repository)
+                .WithMany(r => r.NuGetPackages)
+                .HasForeignKey(nf => nf.RepositoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<NuGetTargetFramework>()
+                .HasOne(t => t.NuGetPackage)
+                .WithMany(n => n.NuGetTargetFrameworks)
+                .HasForeignKey(t => t.NuGetPackageId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
