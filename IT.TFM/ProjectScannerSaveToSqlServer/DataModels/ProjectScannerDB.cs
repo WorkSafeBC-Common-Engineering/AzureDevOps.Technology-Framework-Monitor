@@ -11,6 +11,8 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         public virtual DbSet<File> Files { get; set; }
         public virtual DbSet<FileType> FileTypes { get; set; }
         public virtual DbSet<NuGetFeed> NuGetFeeds { get; set; }
+        public virtual DbSet<NuGetPackage> NuGetPackages { get; set; }
+        public virtual DbSet<NuGetTargetFramework> NuGetTargetFrameworks { get; set; }
         public virtual DbSet<Organization> Organizations { get; set; }
         public virtual DbSet<Project> Projects { get; set; }
         public virtual DbSet<Repository> Repositories { get; set; }

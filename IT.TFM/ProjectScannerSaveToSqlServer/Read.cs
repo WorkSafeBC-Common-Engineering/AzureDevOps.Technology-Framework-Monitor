@@ -414,6 +414,22 @@ namespace ProjectScannerSaveToSqlServer
             return _compiledGetPipelineIdsByProject(context, project.Id).ToBlockingEnumerable().ToArray();
         }
 
+        IEnumerable<Pipeline> IStorageReader.GetPipelines(string repositoryId, string filePath)
+        {
+            throw new NotImplementedException();
+        }
+
+        IEnumerable<NuGetFeed> IStorageReader.GetNuGetFeeds()
+        {
+            var feeds = _compiledGetNuGetFeeds(context).ToBlockingEnumerable();
+            return feeds.Select(f => new NuGetFeed
+            {
+                Name = f.Name,
+                FeedUrl = f.FeedUrl,
+                ProjectId = f.Project?.ProjectId
+            }).AsEnumerable();
+        }
+
         #endregion
 
         #region Private Methods and Properties
@@ -526,6 +542,9 @@ namespace ProjectScannerSaveToSqlServer
                                                                                    .Where(p => p.ProjectId == projectId
                                                                                             && p.Type != Pipeline.pipelineTypeRelease)
                                                                                    .Select(p => p.PipelineId));
+
+        private static readonly Func<DbContext, IAsyncEnumerable<DataModels.NuGetFeed>> _compiledGetNuGetFeeds
+            = EF.CompileAsyncQuery((DbContext context) => context.NuGetFeeds);
 
         #endregion
     }

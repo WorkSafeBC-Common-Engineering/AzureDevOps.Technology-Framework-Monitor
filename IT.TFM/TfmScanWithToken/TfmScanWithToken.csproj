@@ -17,6 +17,7 @@
     <ProjectReference Include="..\FilterConfigurationFromConfigFile\FilterConfigurationFromConfigFile.csproj" />
     <ProjectReference Include="..\NpmFileParser\NpmFileParser.csproj" />
     <ProjectReference Include="..\NuGetFileParser\NuGetFileParser.csproj" />
+    <ProjectReference Include="..\NuGetScanner\NuGetScanner.csproj" />
     <ProjectReference Include="..\OpenSecretsDetection\OpenSecretsDetection.csproj" />
     <ProjectReference Include="..\ParameterSettings\Parameters.csproj" />
     <ProjectReference Include="..\ProjectScannerSaveToSqlServer\ProjectScannerSaveToSqlServer.csproj" />

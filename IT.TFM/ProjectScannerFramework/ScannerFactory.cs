@@ -35,5 +35,12 @@ namespace ProjectScanner
 
             return instance;
         }
+
+        public static INuGetScanner GetNuGetScanner()
+        {
+            var instance = _container.Resolve<INuGetScanner>();
+            instance.Initialize();
+            return instance;
+        }
     }
 }
