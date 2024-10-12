@@ -14,6 +14,7 @@ namespace NuGetScanner
         #region Private Members
 
         private string token = string.Empty;
+        private string organization = string.Empty;
 
         #endregion
 
@@ -22,6 +23,7 @@ namespace NuGetScanner
         void INuGetScanner.Initialize()
         {
             token = ConfidentialSettings.Values.Token;
+            organization = ConfidentialSettings.Values.Organization;
         }
 
         async Task<IEnumerable<NuGetPackage>> INuGetScanner.GetPackagesAsync(NuGetFeed feed)
@@ -127,26 +129,26 @@ namespace NuGetScanner
                 }, NuGet.Protocol.Core.Types.Repository.Provider.GetCoreV3());
         }
 
-        private static string GetRepository(Uri url)
+        private string GetRepository(Uri url)
         {
             if (url == null)
             {
                 return string.Empty;
             }
 
-            return url.Segments[1].Equals("wcbbc/", StringComparison.InvariantCultureIgnoreCase)
+            return url.Segments[1].Equals($"{organization}/", StringComparison.InvariantCultureIgnoreCase)
                 ? url.Segments[4].TrimEnd('/')
                 : string.Empty;
         }
 
-        private static string GetProject(Uri url)
+        private string GetProject(Uri url)
         {
             if (url == null)
             {
                 return string.Empty;
             }
 
-            return url.Segments[1].Equals("wcbbc/", StringComparison.InvariantCultureIgnoreCase)
+            return url.Segments[1].Equals($"{organization}/", StringComparison.InvariantCultureIgnoreCase)
                 ? url.Segments[2].TrimEnd('/')
                 : string.Empty;
 
