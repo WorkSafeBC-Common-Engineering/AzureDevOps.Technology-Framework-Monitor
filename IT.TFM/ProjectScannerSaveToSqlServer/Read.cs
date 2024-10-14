@@ -379,7 +379,7 @@ namespace ProjectScannerSaveToSqlServer
             return pipelineList.AsEnumerable();
         }
 
-        public IEnumerable<Pipeline> GetPipelines(string repositoryId, string filePath)
+        IEnumerable<Pipeline> IStorageReader.GetPipelines(string repositoryId, string filePath)
         {
             var repository = _compiledRepositoryQueryByRepositoryId(context, repositoryId).Result;
             var projectId = repository.Project.ProjectId;
@@ -412,11 +412,6 @@ namespace ProjectScannerSaveToSqlServer
             var project = _compiledProjectQueryByProjectId(context, projectId).Result;
 
             return _compiledGetPipelineIdsByProject(context, project.Id).ToBlockingEnumerable().ToArray();
-        }
-
-        IEnumerable<Pipeline> IStorageReader.GetPipelines(string repositoryId, string filePath)
-        {
-            throw new NotImplementedException();
         }
 
         IEnumerable<NuGetFeed> IStorageReader.GetNuGetFeeds()
