@@ -102,11 +102,11 @@ namespace TfmScanWithToken
 
         private static async Task NuGetFeedScan()
         {
-            Console.WriteLine($"Starting File Details Scan at: {DateTime.Now.ToLongTimeString()}");
+            Console.WriteLine($"Starting NuGet Feed Scan at: {DateTime.Now.ToLongTimeString()}");
 
             await NuGetScan.Run();
 
-            Console.WriteLine($"File Details Scan complete at: {DateTime.Now.ToLongTimeString()}");
+            Console.WriteLine($"NuGet Feed Scan complete at: {DateTime.Now.ToLongTimeString()}");
         }
 
         private static int GetTotalThreads(string[] args)
