@@ -28,5 +28,7 @@ namespace ProjectData.Interfaces
         IEnumerable<Pipeline> GetPipelines(string pipelineType);
 
         IEnumerable<int> GetPipelineIdsForProject(string projectId);
+
+        IEnumerable<NuGetFeed> GetNuGetFeeds();
     }
 }

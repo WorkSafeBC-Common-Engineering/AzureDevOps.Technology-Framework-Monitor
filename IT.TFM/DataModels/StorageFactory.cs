@@ -68,5 +68,15 @@ namespace RepoScan.DataModels
         {
             return _container.Resolve<IWritePipeline>();
         }
+
+        public static IReadNuGet GetNuGetReader()
+        {
+            return _container.Resolve<IReadNuGet>();
+        }
+
+        public static IWriteNuGet GetNuGetWriter()
+        {
+            return _container.Resolve<IWriteNuGet>();
+        }
     }
 }

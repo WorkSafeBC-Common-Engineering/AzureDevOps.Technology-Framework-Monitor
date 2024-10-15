@@ -379,7 +379,7 @@ namespace ProjectScannerSaveToSqlServer
             return pipelineList.AsEnumerable();
         }
 
-        public IEnumerable<Pipeline> GetPipelines(string repositoryId, string filePath)
+        IEnumerable<Pipeline> IStorageReader.GetPipelines(string repositoryId, string filePath)
         {
             var repository = _compiledRepositoryQueryByRepositoryId(context, repositoryId).Result;
             var projectId = repository.Project.ProjectId;
@@ -412,6 +412,17 @@ namespace ProjectScannerSaveToSqlServer
             var project = _compiledProjectQueryByProjectId(context, projectId).Result;
 
             return _compiledGetPipelineIdsByProject(context, project.Id).ToBlockingEnumerable().ToArray();
+        }
+
+        IEnumerable<NuGetFeed> IStorageReader.GetNuGetFeeds()
+        {
+            var feeds = _compiledGetNuGetFeeds(context).ToBlockingEnumerable();
+            return feeds.Select(f => new NuGetFeed
+            {
+                Name = f.Name,
+                FeedUrl = f.FeedUrl,
+                ProjectId = f.Project?.ProjectId
+            }).AsEnumerable();
         }
 
         #endregion
@@ -526,6 +537,9 @@ namespace ProjectScannerSaveToSqlServer
                                                                                    .Where(p => p.ProjectId == projectId
                                                                                             && p.Type != Pipeline.pipelineTypeRelease)
                                                                                    .Select(p => p.PipelineId));
+
+        private static readonly Func<DbContext, IAsyncEnumerable<DataModels.NuGetFeed>> _compiledGetNuGetFeeds
+            = EF.CompileAsyncQuery((DbContext context) => context.NuGetFeeds);
 
         #endregion
     }
