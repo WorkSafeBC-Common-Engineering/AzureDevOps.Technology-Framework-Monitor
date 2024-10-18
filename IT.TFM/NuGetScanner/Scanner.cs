@@ -1,5 +1,6 @@
 ﻿using NuGet.Common;
 using NuGet.Configuration;
+using NuGet.Packaging;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
@@ -41,25 +42,7 @@ namespace NuGetScanner
 
         async Task INuGetScanner.GetMetadata(NuGetPackage package)
         {
-            var metadata = await GetAsync(package.Feed.FeedUrl, package.Name, package.Version);
-            if (metadata != null)
-            {
-                package.Description = metadata.Description ?? string.Empty;
-                package.Authors = metadata.Authors ?? string.Empty;
-                package.Published = metadata.Published.HasValue
-                    ? metadata.Published.Value.DateTime
-                    : null;
-                package.ProjectUrl = metadata.ProjectUrl;
-                package.Tags = metadata.Tags ?? string.Empty;
-                package.Project = GetProject(metadata.ProjectUrl);
-                package.Repository = GetRepository(metadata.ProjectUrl);
-                package.Targets = metadata.DependencySets.Select(f => new NuGetTarget
-                {
-                    Framework = f.TargetFramework.Framework,
-                    Version = f.TargetFramework.Version.ToString()
-                }).ToArray();
-                package.DataLoaded = true;
-            }
+            await GetAsync(package);
         }
 
         #endregion
@@ -100,23 +83,58 @@ namespace NuGetScanner
                 skip += take;
             }
 
-            return allResults.AsEnumerable(); ;
+            return allResults.AsEnumerable();
         }
 
-        private async Task<IPackageSearchMetadata> GetAsync(string feedUrl, string packageId, string version)
+        private async Task GetAsync(NuGetPackage package)
         {
             ILogger logger = NullLogger.Instance;
 
             var cache = new SourceCacheContext();
-            var repository = GetSourceRepository(feedUrl);
+            var repository = GetSourceRepository(package.Feed.FeedUrl);
 
-            var packageVersion = new NuGetVersion(version);
+            var packageVersion = new NuGetVersion(package.Version);
             var metadataResource = await repository.GetResourceAsync<PackageMetadataResource>();
 
-            var identity = new NuGet.Packaging.Core.PackageIdentity(packageId, packageVersion);
+            var identity = new NuGet.Packaging.Core.PackageIdentity(package.Name, packageVersion);
             var metadata = await metadataResource.GetMetadataAsync(identity, cache, logger, CancellationToken.None);
 
-            return metadata;
+            if (metadata != null)
+            {
+                package.Description = metadata.Description ?? string.Empty;
+                package.Authors = metadata.Authors ?? string.Empty;
+                package.Published = metadata.Published.HasValue
+                    ? metadata.Published.Value.DateTime
+                    : null;
+                package.Tags = metadata.Tags ?? string.Empty;
+                package.Targets = metadata.DependencySets.Select(f => new NuGetTarget
+                {
+                    Framework = f.TargetFramework.Framework,
+                    Version = f.TargetFramework.Version.ToString()
+                }).ToArray();
+                package.DataLoaded = true;
+            }
+
+            var nuspecResource = await repository.GetResourceAsync<FindPackageByIdResource>();
+
+            using var packageStream = new MemoryStream();
+            await nuspecResource.CopyNupkgToStreamAsync(package.Name, packageVersion, packageStream, cache, logger, CancellationToken.None);
+            packageStream.Seek(0, SeekOrigin.Begin);
+
+            using var packageReader = new PackageArchiveReader(packageStream);
+            var nuspecReader = await packageReader.GetNuspecReaderAsync(CancellationToken.None);
+            var repositoryData = nuspecReader.GetRepositoryMetadata();
+
+            var url = repositoryData?.Url;
+            if (string.IsNullOrEmpty(url))
+            {
+                return;
+            }
+
+            package.ProjectUrl = new Uri(repositoryData.Url);
+            package.Project = GetProject(package.ProjectUrl);
+            package.Repository = GetRepository(package.ProjectUrl);
+
         }
 
         private SourceRepository GetSourceRepository(string feedUrl)

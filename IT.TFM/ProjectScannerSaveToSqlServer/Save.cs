@@ -453,7 +453,8 @@ namespace ProjectScannerSaveToSqlServer
                                 .SingleOrDefault(f => f.FeedUrl.Equals(package.Feed.FeedUrl)) ?? throw new Exception("Feed not found");
 
             var dbRepository = context.Repositories
-                                     .SingleOrDefault(r => r.Name.Equals(package.Repository));
+                                     .SingleOrDefault(r => r.Name == package.Repository
+                                                        && r.Project.Name == package.Project);
 
             var dbPackage = context.NuGetPackages
                                    .SingleOrDefault(p => p.Name.Equals(package.Name));
