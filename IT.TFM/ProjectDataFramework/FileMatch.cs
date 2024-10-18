@@ -65,6 +65,12 @@ namespace ProjectData
                     MatchOn = "packages.config",
                     Exceptions = []
                 },
+                FileItemType.Nuspec => new FileMatch
+                {
+                    MatchType = MatchType.EndsWith,
+                    MatchOn = ".nuspec",
+                    Exceptions = []
+                },
                 FileItemType.NpmPackage => new FileMatch
                 {
                     MatchType = MatchType.Exact,
@@ -93,6 +99,7 @@ namespace ProjectData
             {FileItemType.SqlProject, FileMatch.MatchOnFile(FileItemType.SqlProject) },
             {FileItemType.VSConfig, FileMatch.MatchOnFile(FileItemType.VSConfig) },
             {FileItemType.NuGetPkgConfig, FileMatch.MatchOnFile(FileItemType.NuGetPkgConfig) },
+            {FileItemType.Nuspec, FileMatch.MatchOnFile(FileItemType.Nuspec) },
             {FileItemType.NpmPackage, FileMatch.MatchOnFile(FileItemType.NpmPackage) },
             {FileItemType.YamlPipeline, FileMatch.MatchOnFile(FileItemType.YamlPipeline) }
         };

@@ -1,6 +1,7 @@
 namespace ProjectScannerSaveToSqlServer.DataModels
 {
     using Microsoft.EntityFrameworkCore;
+    using System;
 
     public partial class ProjectScannerDB(string connection) : DbContext()
     {
@@ -26,7 +27,11 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         {
             optionsBuilder
                 .UseLazyLoadingProxies()
-                .UseSqlServer(dbConnection);
+                .UseSqlServer(dbConnection,
+                              sqlServerOptions => sqlServerOptions.EnableRetryOnFailure(
+                                                                      maxRetryCount: 5,
+                                                                      maxRetryDelay: TimeSpan.FromSeconds(30),
+                                                                      errorNumbersToAdd: null));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

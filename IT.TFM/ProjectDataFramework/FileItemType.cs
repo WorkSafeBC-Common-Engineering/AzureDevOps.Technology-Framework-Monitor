@@ -11,6 +11,7 @@
         VSConfig,
         NuGetPkgConfig,
         NpmPackage,
-        YamlPipeline
+        YamlPipeline,
+        Nuspec
     }
 }
