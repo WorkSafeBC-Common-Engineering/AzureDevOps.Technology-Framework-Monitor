@@ -131,10 +131,9 @@ namespace NuGetScanner
                 return;
             }
 
-            package.ProjectUrl = new Uri(repositoryData.Url);
+            package.ProjectUrl = new Uri(url);
             package.Project = GetProject(package.ProjectUrl);
             package.Repository = GetRepository(package.ProjectUrl);
-
         }
 
         private SourceRepository GetSourceRepository(string feedUrl)
