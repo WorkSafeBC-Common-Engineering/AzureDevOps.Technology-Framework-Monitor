@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using ProjectData;
+
+using System.Collections.Generic;
 
 namespace RepoScan.DataModels
 {
@@ -11,5 +13,7 @@ namespace RepoScan.DataModels
         IEnumerable<FileItem> YamlRead(string repoId);
 
         IEnumerable<FileItem> ReadDetails();
+
+        IEnumerable<FileItem> ReadPropertiesForFileType(FileItemType fileType, string property = null, string value = null);
     }
 }

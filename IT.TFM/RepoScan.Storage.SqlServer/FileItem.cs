@@ -3,6 +3,9 @@ using RepoScan.DataModels;
 using DataStorage = Storage;
 using System.Collections.Generic;
 using System.Linq;
+using ProjectData;
+using System.Reflection.PortableExecutable;
+using System;
 
 namespace RepoScan.Storage.SqlServer
 {
@@ -87,6 +90,27 @@ namespace RepoScan.Storage.SqlServer
                 Url = f.Url,
                 CommitId = f.CommitId
             });
+        }
+
+        IEnumerable<DataModels.FileItem> IReadFileItem.ReadPropertiesForFileType(FileItemType fileType, string property, string value)
+        {
+            var reader = GetReader();
+            var files = reader.GetFilesWithProperties(fileType, property, value);
+
+            var dataFiles = files.Select(f => new DataModels.FileItem
+            {
+                Id = f.Id,
+                FileType = fileType,
+                Path = f.Path,
+                Url = f.Url,
+                Repository = new RepositoryItem
+                {
+                    RepositoryId = f.RepositoryId
+                },                
+                CommitId = f.CommitId
+            });
+
+            return dataFiles;           
         }
 
         #endregion

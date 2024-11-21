@@ -30,5 +30,7 @@ namespace ProjectData.Interfaces
         IEnumerable<int> GetPipelineIdsForProject(string projectId);
 
         IEnumerable<NuGetFeed> GetNuGetFeeds();
+
+        IEnumerable<FileItem> GetFilesWithProperties(FileItemType fileType, string propertyId, string propertyValue);
     }
 }

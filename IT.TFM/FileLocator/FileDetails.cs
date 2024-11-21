@@ -72,16 +72,13 @@ namespace RepoScan.FileLocator
                                                                                 DefaultBranch = repoItem.RepositoryDefaultBranch });
 
                 var deleteList = new ConcurrentBag<DataModels.FileDetails>();
+
                 Parallel.ForEach(fileItems, options, (fileItem) =>
                 {
                     if (Parameters.Settings.ExtendedLogging)
                     {
                         Console.WriteLine($"*** Thread Start: {Environment.CurrentManagedThreadId} >>> FileDetails - GetDetailsAsync(): Processing {fileItem.Path}");
                     }
-
-                    //TODO: Create a pool of writer items (one per totalThread) to create the necessary DB connections ahead of time.
-                    IWriteFileDetails writer = StorageFactory.GetFileDetailsWriter();
-                    var pipelineWriter = StorageFactory.GetPipelineWriter();
 
                     var azDoFiles = fileList.Where(f => f.Path.Equals(fileItem.Path, StringComparison.InvariantCultureIgnoreCase));
                     if (Parameters.Settings.ExtendedLogging && azDoFiles.Count() > 1)
@@ -108,11 +105,11 @@ namespace RepoScan.FileLocator
                             Url = fileItem.Url,
                             FileType = fileItem.FileType,
                             Path = fileItem.Path,
-                            CommitId = fileItem.CommitId, 
+                            CommitId = fileItem.CommitId,
                             Repository = new RepositoryItem { RepositoryId = repoItem.RepositoryId }
-                        }; 
+                        };
 
-                        deleteList.Add(fileDetails );
+                        deleteList.Add(fileDetails);
 
                         if (Parameters.Settings.ExtendedLogging)
                         {
@@ -157,6 +154,8 @@ namespace RepoScan.FileLocator
                         if (fileData.FileType == ProjectData.FileItemType.YamlPipeline && fileData.PipelineProperties.Count > 0)
                         {
                             fileData.RepositoryId = repoItem.RepositoryId;
+
+                            var pipelineWriter = StorageFactory.GetPipelineWriter();
                             pipelineWriter.AddProperties(fileData);
                         }
 
@@ -175,6 +174,7 @@ namespace RepoScan.FileLocator
                             FilteredItems = new SerializableDictionary<string, string>(fileData.FilteredItems)
                         };
 
+                        IWriteFileDetails writer = StorageFactory.GetFileDetailsWriter();
                         writer.Write(fileDetails, forceDetails);
                     }
 
@@ -188,6 +188,7 @@ namespace RepoScan.FileLocator
                         Console.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId} >>> FileDetails - GetDetailsAsync(): Processing {fileItem.Path}");
                     }
                 });
+
 
                 if (!deleteList.IsEmpty)
                 {

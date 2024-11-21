@@ -13,12 +13,14 @@ namespace RepoScan.Storage.SqlServer
 
         IEnumerable<RepositoryItem> IReadRepoList.Read(string projectId, string repositoryId)
         {
+            var list = new List<RepositoryItem>();
+
             using var reader = GetReader();
             var org = reader.GetOrganization(projectId, repositoryId);
 
             if (org == null)
             {
-                yield break;
+                return list.AsEnumerable();
             }
 
             while (org != null && org.Projects != null && org.Projects.Any())
@@ -65,12 +67,14 @@ namespace RepoScan.Storage.SqlServer
                             RepositoryNoScan = repo.NoScan
                         };
 
-                        yield return item;
+                        list.Add(item);
                     }
                 }
 
                 org = reader.GetOrganization(projectId, repositoryId);
             }
+
+            return list.AsEnumerable();
         }
 
         IEnumerable<string> IReadRepoList.GetRepositoryIds()

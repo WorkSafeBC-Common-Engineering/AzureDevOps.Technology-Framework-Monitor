@@ -30,6 +30,8 @@ namespace ProjectData
 
         public string Repository { get; set; }
 
+        public string RepositoryId { get; set; }
+
         public NuGetTarget[] Targets { get; set; }
     }
 }
