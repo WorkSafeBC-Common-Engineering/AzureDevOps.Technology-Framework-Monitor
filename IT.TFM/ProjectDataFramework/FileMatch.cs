@@ -83,6 +83,12 @@ namespace ProjectData
                     MatchOn = ".yml",
                     Exceptions = []
                 },
+                FileItemType.Dll => new FileMatch
+                {
+                    MatchType = MatchType.EndsWith,
+                    MatchOn = ".dll",
+                    Exceptions = []
+                },
                 _ => throw new ArgumentException("Invalid parameter - value does not exist", nameof(fileType)),
             };
         }
@@ -101,7 +107,8 @@ namespace ProjectData
             {FileItemType.NuGetPkgConfig, FileMatch.MatchOnFile(FileItemType.NuGetPkgConfig) },
             {FileItemType.Nuspec, FileMatch.MatchOnFile(FileItemType.Nuspec) },
             {FileItemType.NpmPackage, FileMatch.MatchOnFile(FileItemType.NpmPackage) },
-            {FileItemType.YamlPipeline, FileMatch.MatchOnFile(FileItemType.YamlPipeline) }
+            {FileItemType.YamlPipeline, FileMatch.MatchOnFile(FileItemType.YamlPipeline) },
+            {FileItemType.Dll, FileMatch.MatchOnFile(FileItemType.Dll)  }
         };
 
         public static FileItemType GetMatchedFileType(this string filename)

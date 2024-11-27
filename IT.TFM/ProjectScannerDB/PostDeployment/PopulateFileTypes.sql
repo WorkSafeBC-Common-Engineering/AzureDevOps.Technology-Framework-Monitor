@@ -14,4 +14,5 @@ BEGIN
 	INSERT INTO [dbo].[FileTypes] ([Id], [Value]) VALUES ( 9, N'NpmPackage')
 	INSERT INTO [dbo].[FileTypes] ([Id], [Value]) VALUES (10, N'YamlPipeline')
 	INSERT INTO [dbo].[FileTypes] ([Id], [Value]) VALUES (11, N'Nuspec')
+	INSERT INTO [dbo].[FileTypes] ([Id], [Value]) VALUES (12, N'Dll')
 END

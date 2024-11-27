@@ -274,6 +274,11 @@ namespace AzureDevOpsScannerFramework
 
         FileItem IScanner.FileDetails(Guid projectId, Guid repositoryId, FileItem file)
         {
+            if (file.FileType == FileItemType.Dll)
+            {
+                return file;
+            }
+
             string[] content;
             bool hasProperties = false;
 
