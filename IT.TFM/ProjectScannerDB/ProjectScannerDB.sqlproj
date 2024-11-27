@@ -90,6 +90,7 @@
     <Build Include="dbo\Views\ReportScan.sql" />
     <Build Include="dbo\Views\ProjectList.sql" />
     <Build Include="dbo\Indexes\ReportsQueryIndex.sql" />
+    <Build Include="dbo\Tables\FrameworkProducts.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\PopulateDotNetEOL.sql" />
