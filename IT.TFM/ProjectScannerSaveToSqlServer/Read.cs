@@ -249,7 +249,6 @@ namespace ProjectScannerSaveToSqlServer
         {
             var files = new List<FileItem>();
             context.Database.SetCommandTimeout(3600);
-            //var fileList = _compiledFilesByRepositoryId(context, id).ToBlockingEnumerable().ToArray();
             var fileList = context.Files.Where(f => f.Repository.RepositoryId == id).ToArray();
 
             foreach (var mainFile in fileList)
