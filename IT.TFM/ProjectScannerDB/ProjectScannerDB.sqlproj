@@ -93,6 +93,7 @@
     <Build Include="dbo\Tables\NuGetPackages.sql" />
     <Build Include="dbo\Tables\NuGetFeeds.sql" />
     <Build Include="dbo\Tables\NugetTargetFrameworks.sql" />
+    <Build Include="dbo\Tables\FrameworkProducts.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\PopulateDotNetEOL.sql" />
