@@ -27,6 +27,11 @@
     [LastReleaseId] INT NULL,
     [LastReleaseName] NVARCHAR(MAX) NULL,
     [Environments] NVARCHAR(MAX) NULL,
+    [State] NVARCHAR(20) NULL,
+    [Result] NVARCHAR(20) NULL,
+    [LastRunUrl] NVARCHAR(MAX) NULL,
+    [LastRunStart] DATETIME NULL,
+    [LastRunEnd] DATETIME NULL,
     CONSTRAINT [FK_Pipelines_ToRepository] FOREIGN KEY ([RepositoryId]) REFERENCES Repositories([Id]), 
     CONSTRAINT [FK_Pipelines_ToFile] FOREIGN KEY ([FileId]) REFERENCES [Files]([Id])
 )

@@ -34,42 +34,42 @@ namespace RepoScan.FileLocator
                 {
                     bool repoOnly = false;
 
-                    var repos = await scanner.Repositories(project, repositoryId);
+                    //var repos = await scanner.Repositories(project, repositoryId);
                     var dbProjectId = 0;
 
-                    foreach (var repo in repos)
-                    {
-                        var repoItem = new RepositoryItem
-                        {
-                            ScanID = scanId,
-                            ScanTime = scanTime,
-                            Source = organization.Source,
-                            OrgName = organization.Name,
-                            OrgUrl = organization.Url,
-                            ProjectName = project.Name,
-                            ProjectId = project.Id,
-                            ProjectAbbreviation = project.Abbreviation,
-                            ProjectDescription = project.Description,
-                            ProjectLastUpdate = project.LastUpdate,
-                            ProjectRevision = project.Revision,
-                            ProjectState = project.State,
-                            ProjectUrl = project.Url,
-                            ProjectVisibility = project.Visibility,
-                            RepositoryId = repo.Id,
-                            RepositoryName = repo.Name,
-                            RepositoryDefaultBranch = repo.DefaultBranch,
-                            RepositoryIsFork = repo.IsFork,
-                            RepositorySize = repo.Size,
-                            RepositoryUrl = repo.Url,
-                            RepositoryRemoteUrl = repo.RemoteUrl,
-                            RepositoryWebUrl = repo.WebUrl,
-                            RepositoryLastCommitId = repo.LastCommitId
-                        };
+                    //foreach (var repo in repos)
+                    //{
+                    //    var repoItem = new RepositoryItem
+                    //    {
+                    //        ScanID = scanId,
+                    //        ScanTime = scanTime,
+                    //        Source = organization.Source,
+                    //        OrgName = organization.Name,
+                    //        OrgUrl = organization.Url,
+                    //        ProjectName = project.Name,
+                    //        ProjectId = project.Id,
+                    //        ProjectAbbreviation = project.Abbreviation,
+                    //        ProjectDescription = project.Description,
+                    //        ProjectLastUpdate = project.LastUpdate,
+                    //        ProjectRevision = project.Revision,
+                    //        ProjectState = project.State,
+                    //        ProjectUrl = project.Url,
+                    //        ProjectVisibility = project.Visibility,
+                    //        RepositoryId = repo.Id,
+                    //        RepositoryName = repo.Name,
+                    //        RepositoryDefaultBranch = repo.DefaultBranch,
+                    //        RepositoryIsFork = repo.IsFork,
+                    //        RepositorySize = repo.Size,
+                    //        RepositoryUrl = repo.Url,
+                    //        RepositoryRemoteUrl = repo.RemoteUrl,
+                    //        RepositoryWebUrl = repo.WebUrl,
+                    //        RepositoryLastCommitId = repo.LastCommitId
+                    //    };
 
-                        // Write repo item to queue
-                        dbProjectId = writer.Write(repoItem, dbProjectId, repoOnly);
-                        repoOnly = true;
-                    }
+                    //    // Write repo item to queue
+                    //    dbProjectId = writer.Write(repoItem, dbProjectId, repoOnly);
+                    //    repoOnly = true;
+                    //}
 
                     await PipelineScanner.ScanAsync(scanner, project.Id, repositoryId);
 

@@ -1,4 +1,6 @@
-﻿namespace ProjectData
+﻿using System;
+
+namespace ProjectData
 {
     public class Pipeline
     {
@@ -34,5 +36,15 @@
         public string Portfolio { get;set; }
 
         public string Product { get; set; }
+
+        public string State { get; set; } = string.Empty;
+
+        public string Result {  get; set; } = string.Empty;
+
+        public DateTime? LastRunStart {  get; set; }
+
+        public DateTime? LastRunEnd { get; set; }
+
+        public string LastRunUrl { get; set; } = string.Empty;
     }
 }

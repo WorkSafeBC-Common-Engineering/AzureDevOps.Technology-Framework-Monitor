@@ -23,6 +23,8 @@ namespace AzureDevOps
 
         private const string fieldRepositoryBranch = "{branch}";
 
+        private const string fieldPipeline = "{pipeline}";
+
         private const string fieldApiVersion = "{apiVersion}";
 
         private const string fieldPagingTop = "{$top}";
@@ -47,6 +49,8 @@ namespace AzureDevOps
 
         private const string getPipelinesUrl = "https://{baseUrl}/{organization}/{project}/_apis/pipelines?{apiVersion}";
 
+        private const string getPipelineRunsUrl = "https://{baseUrl}/{organization}/{project}/_apis/pipelines/{pipeline}/runs?{apiVersion}";
+
         private const string getReleasesUrl = "https://vsrm.dev.azure.com/{organization}/{project}/_apis/release/definitions?{apiVersion}";
 
         private static readonly Dictionary<string, HttpClient> httpClients = [];
@@ -68,6 +72,8 @@ namespace AzureDevOps
         public string Project { get; set; } = string.Empty;
 
         public string Repository { get; set; } = string.Empty;
+
+        public int Pipeline {  get; set; }
 
         public string RepositoryBranch { get; set; } = string.Empty;
 
@@ -303,6 +309,19 @@ namespace AzureDevOps
             return releases;
         }
 
+        async Task<AzDoPipelineRunList> IRestApi.GetPipelineRunsAsync()
+        {
+            var content = await CallApiAsync(GetUrl(getPipelineRunsUrl));
+
+            if (content == string.Empty)
+            {
+                return new AzDoPipelineRunList();
+            }
+
+            var pipelineRuns = JsonConvert.DeserializeObject<AzDoPipelineRunList>(content);
+            return pipelineRuns ?? new AzDoPipelineRunList();
+        }
+
         #endregion
 
         #region IDisposable Implementation
@@ -355,6 +374,7 @@ namespace AzureDevOps
                               .Replace(fieldProject, Project)
                               .Replace(fieldRepository, Repository)
                               .Replace(fieldRepositoryBranch, RepositoryBranch)
+                              .Replace(fieldPipeline, Pipeline.ToString())
                               .Replace(fieldPagingTop, PagingTop.ToString())
                               .Replace(fieldPagingSkip, PagingSkip.ToString());
         }

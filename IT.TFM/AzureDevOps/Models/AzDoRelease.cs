@@ -17,7 +17,7 @@
         public int Id { get; set; }
         public string? Name { get; set; }
         public string? Path { get; set; }
-        public object? ProjectReference { get; set; }
+        public ProjectReference? ProjectReference { get; set; }
         public string? Url { get; set; }
         public Links? Links { get; set; }
     }
@@ -26,10 +26,5 @@
     {
         public int Count { get; set; }
         public AzDoRelease[] Value { get; set; } = [];
-    }
-
-    public class Links1
-    {
-        public Avatar? Avatar { get; set; }
     }
 }

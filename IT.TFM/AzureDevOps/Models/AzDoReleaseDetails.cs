@@ -23,7 +23,7 @@
         public int Id { get; set; }
         public string? Name { get; set; }
         public string? Path { get; set; }
-        public object? ProjectReference { get; set; }
+        public ProjectReference? ProjectReference { get; set; }
         public string? Url { get; set; }
         public Links? Links { get; set; }
     }
@@ -34,15 +34,9 @@
         public string? Name { get; set; }
         public object[] Artifacts { get; set; } = [];
         public string? Description { get; set; }
-        public Releasedefinition? ReleaseDefinition { get; set; }
+        public ReleaseDefinition? ReleaseDefinition { get; set; }
         public DateTime? CreatedOn { get; set; }
         public Createdby? CreatedBy { get; set; }
-    }
-
-    public class Releasedefinition
-    {
-        public int Id { get; set; }
-        public object? ProjectReference { get; set; }
     }
 
     public class Approotfolder
@@ -124,7 +118,7 @@
     {
         public string? DisplayName { get; set; }
         public string? Url { get; set; }
-        public Links1? Links { get; set; }
+        public Links? Links { get; set; }
         public string? Id { get; set; }
         public string? UniqueName { get; set; }
         public string? ImageUrl { get; set; }
@@ -159,18 +153,6 @@
         public bool IsNotificationOn { get; set; }
         public int Id { get; set; }
         public Approver? Approver { get; set; }
-    }
-
-    public class Approver
-    {
-        public string? DisplayName { get; set; }
-        public string? Url { get; set; }
-        public Links1? Links { get; set; }
-        public string? Id { get; set; }
-        public string? UniqueName { get; set; }
-        public string? ImageUrl { get; set; }
-        public bool IsContainer { get; set; }
-        public string? Descriptor { get; set; }
     }
 
     public class Deploystep
@@ -320,14 +302,6 @@
         public string? WebsiteNameLayer7 { get; set; }
         public string? Lock { get; set; }
         public string? SRAutomationPAT { get; set; }
-    }
-
-    public class Condition
-    {
-        public string? Name { get; set; }
-        public string? ConditionType { get; set; }
-        public string? Value { get; set; }
-        public object? Result { get; set; }
     }
 
     public class Artifact
