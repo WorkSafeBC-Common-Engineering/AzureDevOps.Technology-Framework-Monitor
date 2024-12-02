@@ -25,6 +25,8 @@ namespace AzureDevOps
 
         private const string fieldPipeline = "{pipeline}";
 
+        private const string fieldReleaseDefinitionId = "{definitionId}";
+
         private const string fieldApiVersion = "{apiVersion}";
 
         private const string fieldPagingTop = "{$top}";
@@ -53,6 +55,8 @@ namespace AzureDevOps
 
         private const string getReleasesUrl = "https://vsrm.dev.azure.com/{organization}/{project}/_apis/release/definitions?{apiVersion}";
 
+        private const string getReleaseRunsUrl = "https://vsrm.dev.azure.com/{organization}/{project}/_apis/release/releases?definitionId={definitionId}&{apiVersion}";
+
         private static readonly Dictionary<string, HttpClient> httpClients = [];
 
         private static readonly Semaphore waitOnApiCall = new(1, 1);
@@ -74,6 +78,8 @@ namespace AzureDevOps
         public string Repository { get; set; } = string.Empty;
 
         public int Pipeline {  get; set; }
+
+        public int ReleaseDefinition { get; set; }
 
         public string RepositoryBranch { get; set; } = string.Empty;
 
@@ -283,6 +289,23 @@ namespace AzureDevOps
 
             foreach (var release in releases.Value)
             {
+                ReleaseDefinition = release.Id;
+                var runs = await GetReleaseRunsAsync();
+                if (runs != null && runs.Count > 0 && runs.Value.Length > 0)
+                {
+                    var run = runs.Value
+                                  .OrderByDescending(r => r.CreatedOn)
+                                  .FirstOrDefault();
+                    if (run != null)
+                    {
+                        release.LastRunStart = run.CreatedOn;
+                        release.LastRunEnd = null;
+                        release.LastRunUrl = run.Url;
+                        release.State = run.Status;
+                        release.Result = null;
+                   }
+                }                
+
                 if (string.IsNullOrEmpty(release.Url))
                 {
                     continue;
@@ -375,6 +398,7 @@ namespace AzureDevOps
                               .Replace(fieldRepository, Repository)
                               .Replace(fieldRepositoryBranch, RepositoryBranch)
                               .Replace(fieldPipeline, Pipeline.ToString())
+                              .Replace(fieldReleaseDefinitionId, ReleaseDefinition.ToString())
                               .Replace(fieldPagingTop, PagingTop.ToString())
                               .Replace(fieldPagingSkip, PagingSkip.ToString());
         }
@@ -599,6 +623,19 @@ namespace AzureDevOps
         {
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
             return Path.GetDirectoryName(assembly.Location);
+        }
+
+        private async Task<AzDoReleaseRunsList> GetReleaseRunsAsync()
+        {
+            var content = await CallApiAsync(GetUrl(getReleaseRunsUrl));
+
+            if (content == string.Empty)
+            {
+                return new AzDoReleaseRunsList();
+            }
+
+            var runs = JsonConvert.DeserializeObject<AzDoReleaseRunsList>(content);
+            return runs ?? new AzDoReleaseRunsList();
         }
 
         #endregion

@@ -342,6 +342,11 @@ namespace ProjectScannerSaveToSqlServer
             dbPipeline.IsDisabled = release.IsDisabled;
             dbPipeline.LastReleaseId = release.LastReleaseId;
             dbPipeline.LastReleaseName = release.LastReleaseName;
+            dbPipeline.LastRunStart = release.LastRunStart;
+            dbPipeline.LastRunEnd = release.LastRunEnd;
+            dbPipeline.LastRunUrl = release.LastRunUrl;
+            dbPipeline.State = release.State;
+            dbPipeline.Result = release.Result;
             dbPipeline.Environments = string.Join('|', release.Environments);
 
             _ = context.SaveChangesAsync().Result;

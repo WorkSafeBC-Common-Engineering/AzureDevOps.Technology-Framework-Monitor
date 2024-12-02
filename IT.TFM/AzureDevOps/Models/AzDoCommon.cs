@@ -37,7 +37,7 @@ namespace AzureDevOps.Models
         public string? Href { get; set; }
     }
 
-    public class Createdby
+    public class UserInfo
     {
         public string? DisplayName { get; set; }
         public string? Url { get; set; }
@@ -46,24 +46,13 @@ namespace AzureDevOps.Models
         public string? UniqueName { get; set; }
         public string? ImageUrl { get; set; }
         public string? Descriptor { get; set; }
-        public bool Inactive { get; set; }
-    }
-
-    public class Modifiedby
-    {
-        public string? DisplayName { get; set; }
-        public string? Url { get; set; }
-        public Links? Links { get; set; }
-        public string? Id { get; set; }
-        public string? UniqueName { get; set; }
-        public string? ImageUrl { get; set; }
-        public string? Descriptor { get; set; }
+        public bool? Inactive { get; set; }
     }
 
     public class SystemDebug
     {
         public string? Value { get; set; }
-        public bool AllowOverride { get; set; }
+        public bool? AllowOverride { get; set; }
     }
 
     public class Definition
@@ -104,7 +93,7 @@ namespace AzureDevOps.Models
         public string? Name { get; set; }
         public string? ConditionType { get; set; }
         public string? Value { get; set; }
-        public bool Result { get; set; }
+        public bool? Result { get; set; }
     }
 
     public class Approver

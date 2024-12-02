@@ -5,12 +5,12 @@
         public string? Source { get; set; }
         public int Revision { get; set; }
         public object? Description { get; set; }
-        public Createdby? CreatedBy { get; set; }
+        public UserInfo? CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
-        public Modifiedby? ModifiedBy { get; set; }
+        public UserInfo? ModifiedBy { get; set; }
         public DateTime ModifiedOn { get; set; }
-        public bool IsDeleted { get; set; }
-        public bool IsDisabled { get; set; }
+        public bool? IsDeleted { get; set; }
+        public bool? IsDisabled { get; set; }
         public LastRelease? LastRelease { get; set; }
         public Variables? Variables { get; set; }
         public int[] VariableGroups { get; set; } = [];
@@ -36,7 +36,7 @@
         public string? Description { get; set; }
         public ReleaseDefinition? ReleaseDefinition { get; set; }
         public DateTime? CreatedOn { get; set; }
-        public Createdby? CreatedBy { get; set; }
+        public UserInfo? CreatedBy { get; set; }
     }
 
     public class Approotfolder
@@ -139,9 +139,9 @@
     public class Approvaloptions
     {
         public object? RequiredApproverCount { get; set; }
-        public bool ReleaseCreatorCanBeApprover { get; set; }
-        public bool AutoTriggeredAndPreviousEnvironmentApprovedCanBeSkipped { get; set; }
-        public bool EnforceIdentityRevalidation { get; set; }
+        public bool? ReleaseCreatorCanBeApprover { get; set; }
+        public bool? AutoTriggeredAndPreviousEnvironmentApprovedCanBeSkipped { get; set; }
+        public bool? EnforceIdentityRevalidation { get; set; }
         public int TimeoutInMinutes { get; set; }
         public string? ExecutionOrder { get; set; }
     }
@@ -170,13 +170,13 @@
     {
         public string? EmailNotificationType { get; set; }
         public string? EmailRecipients { get; set; }
-        public bool SkipArtifactsDownload { get; set; }
+        public bool? SkipArtifactsDownload { get; set; }
         public int TimeoutInMinutes { get; set; }
-        public bool EnableAccessToken { get; set; }
-        public bool PublishDeploymentStatus { get; set; }
-        public bool BadgeEnabled { get; set; }
-        public bool AutoLinkWorkItems { get; set; }
-        public bool PullRequestDeploymentEnabled { get; set; }
+        public bool? EnableAccessToken { get; set; }
+        public bool? PublishDeploymentStatus { get; set; }
+        public bool? BadgeEnabled { get; set; }
+        public bool? AutoLinkWorkItems { get; set; }
+        public bool? PullRequestDeploymentEnabled { get; set; }
     }
 
     public class Executionpolicy
@@ -244,11 +244,11 @@
     {
         public Parallelexecution? ParallelExecution { get; set; }
         public Agentspecification? AgentSpecification { get; set; }
-        public bool SkipArtifactsDownload { get; set; }
+        public bool? SkipArtifactsDownload { get; set; }
         public Artifactsdownloadinput? ArtifactsDownloadInput { get; set; }
         public int QueueId { get; set; }
         public object[] Demands { get; set; } = [];
-        public bool EnableAccessToken { get; set; }
+        public bool? EnableAccessToken { get; set; }
         public int TimeoutInMinutes { get; set; }
         public int JobCancelTimeoutInMinutes { get; set; }
         public string? Condition { get; set; }
@@ -276,9 +276,9 @@
         public string? Version { get; set; }
         public string? Name { get; set; }
         public string? RefName { get; set; }
-        public bool Enabled { get; set; }
-        public bool AlwaysRun { get; set; }
-        public bool ContinueOnError { get; set; }
+        public bool? Enabled { get; set; }
+        public bool? AlwaysRun { get; set; }
+        public bool? ContinueOnError { get; set; }
         public int TimeoutInMinutes { get; set; }
         public int RetryCountOnTaskFailure { get; set; }
         public string? DefinitionType { get; set; }
@@ -310,8 +310,8 @@
         public string? Type { get; set; }
         public string? Alias { get; set; }
         public Definitionreference? DefinitionReference { get; set; }
-        public bool IsPrimary { get; set; }
-        public bool IsRetained { get; set; }
+        public bool? IsPrimary { get; set; }
+        public bool? IsRetained { get; set; }
     }
 
     public class Definitionreference

@@ -2,30 +2,39 @@
 
 namespace AzureDevOps.Models
 {
-    internal class AzDoReleaseRuns
+    public class AzDoReleaseRunsList
+    {
+        public int Count { get; set; }
+
+        public AzDoReleaseRun[] Value { get; set; } = [];
+    }
+
+    public class AzDoReleaseRun
     {
         public int Id { get; set; }
-        public Release? Release { get; set; }
+        public string? Name { get; set; }
+        public string? Status { get; set; }
+        public DateTime? CreatedOn { get; set; }
+        public DateTime? ModifiedOn { get; set; }
+        public UserInfo? ModifiedBy { get; set; }
+        public UserInfo? CreatedBy { get; set; }
+        public UserInfo? CreatedFor { get; set; }
+        public Variables? Variables { get; set; }
+        public object[] VariableGroups { get; set; } = [];
         public ReleaseDefinition? ReleaseDefinition { get; set; }
-        public ReleaseEnvironment? ReleaseEnvironment { get; set; }
-        public ProjectReference? ProjectReference { get; set; }
-        public int DefinitionEnvironmentId { get; set; }
-        public int Attempt { get; set; }
+        public int ReleaseDefinitionRevision { get; set; }
+        public string? Description { get; set; }
         public string? Reason { get; set; }
-        public string? DeploymentStatus { get; set; }
-        public string? OperationStatus { get; set; }
-        public RequestedBy? RequestedBy { get; set; }
-        public RequestedFor? RequestedFor { get; set; }
-        public DateTime? QueuedOn { get; set; }
-        public DateTime? StartedOn { get; set; }
-        public DateTime? CompletedOn { get; set; }
-        public DateTime? LastModifiedOn { get; set; }
-        public LastModifiedBy? LastModifiedBy { get; set; }
-        public Condition[] Conditions { get; set; } = [];
-        public PreDeployApproval[] PreDeployApprovals { get; set; } = [];
-        public PostDeployApproval[] PostDeployApprovals { get; set; } = [];
-        [JsonPropertyName("_links")]
-        public Links? Links { get; set; }
+        public string? ReleaseNameFormat { get; set; }
+        public bool? KeepForever { get; set; }
+        public int DefinitionSnapshotRevision { get; set; }
+        public string? LogsContainerUrl { get; set; }
+        public string? Url { get; set; }
+        public Links? _links { get; set; }
+        public object[] Tags { get; set; } = [];
+        public object? TriggeringArtifactAlias { get; set; }
+        public ProjectReference? ProjectReference { get; set; }
+        public Properties? Properties { get; set; }
     }
 
     public class Release

@@ -216,7 +216,7 @@ namespace AzureDevOpsScannerFramework
 
                 var p = GetPipeline(release);
                 p.ProjectId = api.Project;
-               
+
                 pipelineList.Add(p);
             }
 
@@ -497,6 +497,11 @@ namespace AzureDevOpsScannerFramework
                 IsDisabled = release.IsDisabled,
                 LastReleaseId = release.Details?.LastRelease?.Id ?? 0,
                 LastReleaseName = release.Details?.LastRelease?.Name,
+                LastRunStart = release.LastRunStart,
+                LastRunEnd = release.LastRunEnd,
+                LastRunUrl = release.LastRunUrl,
+                State = release.State,
+                Result = release.Result,
                 Environments = release.Details.Environments.Select(e => e.Name).ToArray(),
                 Artifacts = release.Details.Artifacts.Select(a => new Artifact
                     {
@@ -509,8 +514,8 @@ namespace AzureDevOpsScannerFramework
                         DefinitionName = a.DefinitionReference?.Definition?.Name,
                         Project = a.DefinitionReference?.Project?.Name,
                         ProjectId = a.DefinitionReference?.Project?.Id,
-                        IsPrimary = a.IsPrimary,
-                        IsRetained = a.IsRetained
+                        IsPrimary = a.IsPrimary ?? false,
+                        IsRetained = a.IsRetained ?? false
                     }).ToArray()
             };
 

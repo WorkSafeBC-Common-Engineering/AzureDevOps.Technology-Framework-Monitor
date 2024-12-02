@@ -16,6 +16,8 @@ namespace AzureDevOps
 
         int Pipeline {  get; set; }
 
+        int ReleaseDefinition { get; set; }
+        
         string RepositoryBranch { get; set; }
 
         string CheckoutDirectory { get; set; }
