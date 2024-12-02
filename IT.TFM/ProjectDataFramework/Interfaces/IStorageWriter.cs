@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace ProjectData.Interfaces
 {
@@ -23,5 +24,9 @@ namespace ProjectData.Interfaces
         void DeleteFile(FileItem file, Guid repoId);
 
         void DeletePipeline(int pipelineId);
+
+        int SaveNuGetPackage(NuGetPackage package);
+
+        void CleanupNuGetPackages(IEnumerable<int> packageIds);
     }
 }

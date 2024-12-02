@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
   <Operation Name="Rename Refactor" Key="eb14372d-fba5-4776-ad50-3880a6fc314c" ChangeDateTime="06/03/2023 03:06:27">
     <Property Name="ElementName" Value="[dbo].[Files].[SHA1]" />

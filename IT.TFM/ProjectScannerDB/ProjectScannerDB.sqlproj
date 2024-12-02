@@ -90,6 +90,9 @@
     <Build Include="dbo\Views\ReportScan.sql" />
     <Build Include="dbo\Views\ProjectList.sql" />
     <Build Include="dbo\Indexes\ReportsQueryIndex.sql" />
+    <Build Include="dbo\Tables\NuGetPackages.sql" />
+    <Build Include="dbo\Tables\NuGetFeeds.sql" />
+    <Build Include="dbo\Tables\NugetTargetFrameworks.sql" />
     <Build Include="dbo\Tables\FrameworkProducts.sql" />
     <Build Include="dbo\Views\PipelineReport.sql" />
   </ItemGroup>

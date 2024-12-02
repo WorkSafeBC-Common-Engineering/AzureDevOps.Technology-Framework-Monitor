@@ -457,6 +457,101 @@ namespace ProjectScannerSaveToSqlServer
             }
         }
 
+        int IStorageWriter.SaveNuGetPackage(ProjData.NuGetPackage package)
+        {
+            var dbFeed = context.NuGetFeeds
+                                .SingleOrDefault(f => f.FeedUrl.Equals(package.Feed.FeedUrl)) ?? throw new Exception("Feed not found");
+
+            var dbRepository = package.RepositoryId != null
+                ? context.Repositories
+                         .SingleOrDefault(r => r.RepositoryId == package.RepositoryId)
+                : context.Repositories
+                         .SingleOrDefault(r => r.Name == package.Repository
+                                            && r.Project.Name == package.Project);
+
+            var dbPackage = context.NuGetPackages
+                                   .SingleOrDefault(p => p.Name.Equals(package.Name));
+
+            if (dbPackage == null)
+            {
+                dbPackage = new()
+                {
+                    Name = package.Name
+                };
+
+                context.NuGetPackages.Add(dbPackage);
+            }
+
+            dbPackage.Version = package.Version;
+            dbPackage.Description = package.Description;
+            dbPackage.Authors = package.Authors;
+            dbPackage.Published = package.Published ?? DateTime.MinValue;
+            dbPackage.ProjectUrl = package.ProjectUrl?.ToString();
+            dbPackage.Tags = package.Tags;
+            dbPackage.NuGetFeedId = dbFeed.Id;
+            dbPackage.RepositoryId = dbRepository?.Id;
+
+            _ = context.SaveChangesAsync().Result;
+
+            foreach (var target in package.Targets)
+            {
+                var dbTarget = context.NuGetTargetFrameworks
+                                      .SingleOrDefault(t => t.Framework.Equals(target.Framework)
+                                                         && t.NuGetPackageId == dbPackage.Id);
+
+                if (dbTarget == null)
+                {
+                    dbTarget = new()
+                    {
+                        Framework = target.Framework,
+                        NuGetPackageId = dbPackage.Id
+                    };
+
+                    context.NuGetTargetFrameworks.Add(dbTarget);
+                }
+                
+                dbTarget.Version = target.Version;
+            }
+
+            var deletedTargets = context.NuGetTargetFrameworks
+                                        .Where(t => t.NuGetPackageId == dbPackage.Id)
+                                        .AsEnumerable();
+
+            if (deletedTargets != null)
+            {
+                foreach (var target in deletedTargets)
+                {
+                    if (!package.Targets.Any(pt => pt.Framework.Equals(target.Framework)))
+                    {
+                        context.NuGetTargetFrameworks.Remove(target);
+                    }
+                }
+            }
+
+            _ = context.SaveChangesAsync().Result;
+
+            return dbPackage.Id;
+        }
+
+        void IStorageWriter.CleanupNuGetPackages(IEnumerable<int> packageIds)
+        {
+            var packages = context.NuGetPackages
+                                 .Where(p => !packageIds.Contains(p.Id))
+                                 .AsEnumerable();
+
+            foreach (var package in packages)
+            {
+                foreach (var target in package.NuGetTargetFrameworks)
+                {
+                    context.NuGetTargetFrameworks.Remove(target);
+                }
+
+                context.NuGetPackages.Remove(package);
+
+                _ = context.SaveChangesAsync().Result;
+            }
+        }
+
         #endregion
 
         #region Private Methods
