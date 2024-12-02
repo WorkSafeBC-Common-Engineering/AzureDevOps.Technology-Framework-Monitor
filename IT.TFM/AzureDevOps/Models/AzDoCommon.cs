@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 
+using System.Text.Json.Serialization;
+
 namespace AzureDevOps.Models
 {
     public class Self
@@ -85,7 +87,8 @@ namespace AzureDevOps.Models
         public string? Path { get; set; }
         public ProjectReference? ProjectReference { get; set; }
         public string? Url { get; set; }
-        public Links? _links { get; set; }
+        [JsonPropertyName("_links")]
+        public Links? Links { get; set; }
     }
 
     public class Condition

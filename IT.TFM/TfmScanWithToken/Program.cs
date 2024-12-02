@@ -67,7 +67,7 @@ namespace TfmScanWithToken
         {
             Console.WriteLine($"Starting Repo Scan at: {DateTime.Now.ToLongTimeString()}");
 
-            var scanner = new RepoFileScan.Scanner();
+            var scanner = new Scanner();
             await scanner.ScanAsync(projectId, repositoryId);
 
             Console.WriteLine($"Repo Scan complete at: {DateTime.Now.ToLongTimeString()}");

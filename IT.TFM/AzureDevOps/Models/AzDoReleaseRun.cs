@@ -30,7 +30,8 @@ namespace AzureDevOps.Models
         public int DefinitionSnapshotRevision { get; set; }
         public string? LogsContainerUrl { get; set; }
         public string? Url { get; set; }
-        public Links? _links { get; set; }
+        [JsonPropertyName("_links")]
+        public Links? Links { get; set; }
         public object[] Tags { get; set; } = [];
         public object? TriggeringArtifactAlias { get; set; }
         public ProjectReference? ProjectReference { get; set; }
