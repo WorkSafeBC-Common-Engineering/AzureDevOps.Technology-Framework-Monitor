@@ -21,7 +21,7 @@ SELECT		P.Name AS Project,
 			CASE WHEN PI.Result IS NULL THEN ''
 			     ELSE PI.Result END AS Result,
 			CASE WHEN PI.Portfolio IS NULL THEN ''
-			     ELSE PI.PortFolio END AS Portfolio,
+			     ELSE PI.Portfolio END AS Portfolio,
 			CASE WHEN PI.Product IS NULL THEN ''
 			     ELSE PI.Product END AS Product,
 			PI.Folder,
