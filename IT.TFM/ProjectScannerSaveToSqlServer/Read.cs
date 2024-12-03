@@ -13,7 +13,7 @@ using System.Reflection.Metadata;
 namespace ProjectScannerSaveToSqlServer
 {
     public class Read : DbCore, IStorageReader
-    { 
+    {
         #region Private Members
 
         private Organization organization = null;
@@ -247,8 +247,9 @@ namespace ProjectScannerSaveToSqlServer
 
         IEnumerable<FileItem> IStorageReader.GetFiles(string id)
         {
+            var files = new List<FileItem>();
             context.Database.SetCommandTimeout(3600);
-            var fileList = _compiledFilesByRepositoryId(context, id).ToBlockingEnumerable().ToArray();
+            var fileList = context.Files.Where(f => f.Repository.RepositoryId == id).ToArray();
 
             foreach (var mainFile in fileList)
             {
@@ -270,13 +271,13 @@ namespace ProjectScannerSaveToSqlServer
                 context.Database.SetCommandTimeout(3600);
                 var pkgRefs = _compiledFileReferencesByFileId(context, mainFile.Id, RefTypePkg).ToBlockingEnumerable()
                                                                                    .Select(fr => new PackageReference
-                                                                                        {
-                                                                                            Id = fr.Name,
-                                                                                            PackageType = fr.PackageType,
-                                                                                            Version = fr.Version,
-                                                                                            VersionComparator = fr.VersionComparator,
-                                                                                            FrameworkVersion = fr.FrameworkVersion
-                                                                                        })
+                                                                                   {
+                                                                                       Id = fr.Name,
+                                                                                       PackageType = fr.PackageType,
+                                                                                       Version = fr.Version,
+                                                                                       VersionComparator = fr.VersionComparator,
+                                                                                       FrameworkVersion = fr.FrameworkVersion
+                                                                                   })
                                                                                    .ToArray();
                 fileItem.PackageReferences.AddRange(pkgRefs);
 
@@ -289,10 +290,10 @@ namespace ProjectScannerSaveToSqlServer
                 context.Database.SetCommandTimeout(3600);
                 var urlRefs = _compiledFileReferencesByFileId(context, mainFile.Id, RefTypeUrl).ToBlockingEnumerable()
                                                                                                .Select(fr => new UrlReference
-                                                                                                   {
-                                                                                                       Url = fr.Name,
-                                                                                                       Path = fr.Path
-                                                                                                   })
+                                                                                               {
+                                                                                                   Url = fr.Name,
+                                                                                                   Path = fr.Path
+                                                                                               })
                                                                                                .ToArray();
                 fileItem.UrlReferences.AddRange(urlRefs);
 
@@ -314,8 +315,10 @@ namespace ProjectScannerSaveToSqlServer
                     fileItem.FilteredItems.Add(filterItem.Key, filterItem.Value);
                 }
 
-                yield return fileItem;
+                files.Add(fileItem);
+                //yield return fileItem;
             }
+            return files.AsEnumerable();
         }
 
         IEnumerable<FileItem> IStorageReader.GetYamlFiles(string id)
@@ -379,7 +382,7 @@ namespace ProjectScannerSaveToSqlServer
             return pipelineList.AsEnumerable();
         }
 
-        public IEnumerable<Pipeline> GetPipelines(string repositoryId, string filePath)
+        IEnumerable<Pipeline> IStorageReader.GetPipelines(string repositoryId, string filePath)
         {
             var repository = _compiledRepositoryQueryByRepositoryId(context, repositoryId).Result;
             var projectId = repository.Project.ProjectId;
@@ -389,7 +392,7 @@ namespace ProjectScannerSaveToSqlServer
             var pipelines = _compiledGetPipelinesByRepositoryAndFile(context, repositoryId, file.Id).ToBlockingEnumerable().ToArray();
 
             return pipelines.Select(p => new Pipeline
-            { 
+            {
                 Id = p.PipelineId,
                 ProjectId = projectId,
                 RepositoryId = p.Repository.RepositoryId,
@@ -400,7 +403,7 @@ namespace ProjectScannerSaveToSqlServer
                 Url = p.Url,
                 Type = p.Type,
                 PipelineType = p.PipelineType,
-                Path= p.Path,
+                Path = p.Path,
                 YamlType = p.YamlType,
                 Portfolio = p.Portfolio,
                 Product = p.Product
@@ -412,6 +415,49 @@ namespace ProjectScannerSaveToSqlServer
             var project = _compiledProjectQueryByProjectId(context, projectId).Result;
 
             return _compiledGetPipelineIdsByProject(context, project.Id).ToBlockingEnumerable().ToArray();
+        }
+
+        IEnumerable<NuGetFeed> IStorageReader.GetNuGetFeeds()
+        {
+            var feeds = _compiledGetNuGetFeeds(context).ToBlockingEnumerable();
+            return feeds.Select(f => new NuGetFeed
+            {
+                Name = f.Name,
+                FeedUrl = f.FeedUrl,
+                ProjectId = f.Project?.ProjectId
+            }).AsEnumerable();
+        }
+
+        IEnumerable<FileItem> IStorageReader.GetFilesWithProperties(FileItemType fileType, string propertyId, string propertyValue)
+        {
+            var properties = context.FileProperties
+                                    .Where(p => p.File.FileType.Value == fileType.ToString());
+
+            if (!string.IsNullOrEmpty(propertyValue))
+            {
+                properties = properties.Where(p => p.Name == propertyId);
+
+                if (!string.IsNullOrEmpty(propertyValue))
+                { 
+                    properties = properties.Where(p => p.Value == propertyValue);
+                }
+            }
+
+            var files = properties.Select(p => p.File)
+                                  .Distinct()
+                                  .Select(f => new FileItem
+                                  {
+                                      Id = f.FileId,
+                                      FileType = fileType,
+                                      Path = f.Path,
+                                      Url = f.Url,
+                                      StorageId = f.Id,
+                                      RepositoryId = new Guid(f.Repository.RepositoryId),                                      
+                                      CommitId = f.CommitId
+                                  })
+                                  .ToArray();
+
+            return files.AsEnumerable();            
         }
 
         #endregion
@@ -526,6 +572,9 @@ namespace ProjectScannerSaveToSqlServer
                                                                                    .Where(p => p.ProjectId == projectId
                                                                                             && p.Type != Pipeline.pipelineTypeRelease)
                                                                                    .Select(p => p.PipelineId));
+
+        private static readonly Func<DbContext, IAsyncEnumerable<DataModels.NuGetFeed>> _compiledGetNuGetFeeds
+            = EF.CompileAsyncQuery((DbContext context) => context.NuGetFeeds);
 
         #endregion
     }

@@ -1,6 +1,7 @@
 namespace ProjectScannerSaveToSqlServer.DataModels
 {
     using Microsoft.EntityFrameworkCore;
+    using System;
 
     public partial class ProjectScannerDB(string connection) : DbContext()
     {
@@ -10,6 +11,9 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         public virtual DbSet<FileReferenceType> FileReferenceTypes { get; set; }
         public virtual DbSet<File> Files { get; set; }
         public virtual DbSet<FileType> FileTypes { get; set; }
+        public virtual DbSet<NuGetFeed> NuGetFeeds { get; set; }
+        public virtual DbSet<NuGetPackage> NuGetPackages { get; set; }
+        public virtual DbSet<NuGetTargetFramework> NuGetTargetFrameworks { get; set; }
         public virtual DbSet<Organization> Organizations { get; set; }
         public virtual DbSet<Project> Projects { get; set; }
         public virtual DbSet<Repository> Repositories { get; set; }
@@ -23,7 +27,11 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         {
             optionsBuilder
                 .UseLazyLoadingProxies()
-                .UseSqlServer(dbConnection);
+                .UseSqlServer(dbConnection,
+                              sqlServerOptions => sqlServerOptions.EnableRetryOnFailure(
+                                                                      maxRetryCount: 5,
+                                                                      maxRetryDelay: TimeSpan.FromSeconds(30),
+                                                                      errorNumbersToAdd: null));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -87,6 +95,24 @@ namespace ProjectScannerSaveToSqlServer.DataModels
             modelBuilder.Entity <Pipeline>()
                 .HasMany(e => e.ReleaseArtifacts)
                 .WithOne(e => e.Pipeline)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<NuGetFeed>()
+                .HasOne(nf => nf.Project)
+                .WithMany(p => p.NuGetFeeds)
+                .HasForeignKey(nf => nf.ProjectId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<NuGetPackage>()
+                .HasOne(nf => nf.Repository)
+                .WithMany(r => r.NuGetPackages)
+                .HasForeignKey(nf => nf.RepositoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<NuGetTargetFramework>()
+                .HasOne(t => t.NuGetPackage)
+                .WithMany(n => n.NuGetTargetFrameworks)
+                .HasForeignKey(t => t.NuGetPackageId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

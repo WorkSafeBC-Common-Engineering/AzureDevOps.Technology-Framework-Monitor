@@ -17,6 +17,7 @@
     <ProjectReference Include="..\FilterConfigurationFromConfigFile\FilterConfigurationFromConfigFile.csproj" />
     <ProjectReference Include="..\NpmFileParser\NpmFileParser.csproj" />
     <ProjectReference Include="..\NuGetFileParser\NuGetFileParser.csproj" />
+    <ProjectReference Include="..\NuGetScanner\NuGetScanner.csproj" />
     <ProjectReference Include="..\OpenSecretsDetection\OpenSecretsDetection.csproj" />
     <ProjectReference Include="..\ParameterSettings\Parameters.csproj" />
     <ProjectReference Include="..\ProjectScannerSaveToSqlServer\ProjectScannerSaveToSqlServer.csproj" />
@@ -29,8 +30,6 @@
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.0" />
-    <PackageReference Include="System.Text.Json" Version="8.0.5" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.0" />
   </ItemGroup>
 </Project>

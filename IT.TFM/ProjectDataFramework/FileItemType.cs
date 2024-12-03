@@ -12,6 +12,7 @@
         NuGetPkgConfig,
         NpmPackage,
         YamlPipeline,
+        Nuspec,
         Dll
     }
 }

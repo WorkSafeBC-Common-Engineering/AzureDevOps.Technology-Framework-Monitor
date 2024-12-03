@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Microsoft.Identity.Client;
+
+using RepoScan.FileLocator;
+
+using System;
 using System.Configuration;
 using System.Threading.Tasks;
 
@@ -14,6 +18,7 @@ namespace TfmScanWithToken
         private static bool partTwo = false;
         private static bool partThree = false;
         private static bool partFour = false;
+        private static bool partFive = false;
 
         #endregion
 
@@ -46,6 +51,12 @@ namespace TfmScanWithToken
             {
                 await FileDetailsAsync(threadCount, forceDetails, projectId, repositoryId);
             }
+
+            if (partFive)
+            {
+                await NuGetFeedScan();
+            }
+            
 #if DEBUG
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey();
@@ -87,6 +98,15 @@ namespace TfmScanWithToken
             await RepoFileScan.FileDetails.GetDetailsAsync(threadCount, forceDetails, projectId, repositoryId);
 
             Console.WriteLine($"File Details Scan complete at: {DateTime.Now.ToLongTimeString()}");
+        }
+
+        private static async Task NuGetFeedScan()
+        {
+            Console.WriteLine($"Starting NuGet Feed Scan at: {DateTime.Now.ToLongTimeString()}");
+
+            await NuGetScan.Run();
+
+            Console.WriteLine($"NuGet Feed Scan complete at: {DateTime.Now.ToLongTimeString()}");
         }
 
         private static int GetTotalThreads(string[] args)
@@ -139,11 +159,15 @@ namespace TfmScanWithToken
                 case "4":
                     partFour = true;
                     break;
+                case "5":
+                    partFive = true;
+                    break;
                 default:
                     partOne = true;
                     partTwo = true;
                     partThree = true;
                     partFour = true;
+                    partFive = true;
                     break;
             }
         }
