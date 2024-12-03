@@ -271,6 +271,11 @@ namespace ProjectScannerSaveToSqlServer
             dbPipeline.PipelineType = pipeline.PipelineType;
             dbPipeline.Path = pipeline.Path;
             dbPipeline.FileId = dbFile?.Id;
+            dbPipeline.State = pipeline.State;
+            dbPipeline.Result = pipeline.Result;
+            dbPipeline.LastRunUrl = pipeline.LastRunUrl;
+            dbPipeline.LastRunStart = pipeline.LastRunStart;
+            dbPipeline.LastRunEnd = pipeline.LastRunEnd;
 
             // For Classic pipelines we can immediately parse for the Portfolio and Product based on the JSON details.
             // For Yaml pipelines, this happens at a later stage when we parse the actual file, so leave as is in the database.
@@ -337,6 +342,11 @@ namespace ProjectScannerSaveToSqlServer
             dbPipeline.IsDisabled = release.IsDisabled;
             dbPipeline.LastReleaseId = release.LastReleaseId;
             dbPipeline.LastReleaseName = release.LastReleaseName;
+            dbPipeline.LastRunStart = release.LastRunStart;
+            dbPipeline.LastRunEnd = release.LastRunEnd;
+            dbPipeline.LastRunUrl = release.LastRunUrl;
+            dbPipeline.State = release.State;
+            dbPipeline.Result = release.Result;
             dbPipeline.Environments = string.Join('|', release.Environments);
 
             _ = context.SaveChangesAsync().Result;

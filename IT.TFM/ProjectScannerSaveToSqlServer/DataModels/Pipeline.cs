@@ -71,6 +71,16 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
         public string Environments { get; set; }
 
+        public string State { get; set; } = string.Empty;
+
+        public string Result { get; set; } = string.Empty;
+
+        public DateTime? LastRunStart { get; set; }
+
+        public DateTime? LastRunEnd { get; set; }
+
+        public string LastRunUrl { get; set; } = string.Empty;
+
         public virtual Repository Repository { get; set; }
 
         public virtual Project Project { get; set; }

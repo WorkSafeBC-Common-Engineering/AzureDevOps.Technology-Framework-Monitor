@@ -165,9 +165,9 @@ namespace AzureDevOpsScannerFramework
             return repoList.AsEnumerable();
         }
 
-        async Task<IEnumerable<Pipeline>> IScanner.Pipelines(Guid projectId, string repositoryId)
+        async Task<IEnumerable<ProjectData.Pipeline>> IScanner.Pipelines(Guid projectId, string repositoryId)
         {
-            var pipelineList = new List<Pipeline>();
+            var pipelineList = new List<ProjectData.Pipeline>();
             api.Project = projectId.ToString();
             api.Repository = repositoryId;
             var azDoPipelines = await api.GetPipelinesAsync();
@@ -176,15 +176,34 @@ namespace AzureDevOpsScannerFramework
             {
                 var p = GetPipeline(pipeline);
                 p.ProjectId = api.Project;
+
+                api.Pipeline = p.Id;
+                var runs = await api.GetPipelineRunsAsync();
+                if (runs != null && runs.Count > 0 && runs.Value.Length > 0)
+                {
+                    var run = runs.Value
+                                  .OrderByDescending(r => r.CreatedDate)
+                                  .FirstOrDefault();
+
+                    if (run != null)
+                    {
+                        p.LastRunStart = run.CreatedDate;
+                        p.LastRunEnd = run.FinishedDate;
+                        p.State = run.State;
+                        p.Result = run.Result;
+                        p.LastRunUrl = run.Url;
+                    }
+                }
+
                 pipelineList.Add(p);
             }
 
             return pipelineList.AsEnumerable();
         }
 
-        async Task<IEnumerable<Pipeline>> IScanner.Releases(Guid projectId, string repositoryId)
+        async Task<IEnumerable<ProjectData.Pipeline>> IScanner.Releases(Guid projectId, string repositoryId)
         {
-            var pipelineList = new List<Pipeline>();
+            var pipelineList = new List<ProjectData.Pipeline>();
             api.Project = projectId.ToString();
             api.Repository = repositoryId;
             var azdoReleases = await api.ListReleasesAsync();
@@ -197,7 +216,7 @@ namespace AzureDevOpsScannerFramework
 
                 var p = GetPipeline(release);
                 p.ProjectId = api.Project;
-               
+
                 pipelineList.Add(p);
             }
 
@@ -405,9 +424,9 @@ namespace AzureDevOpsScannerFramework
                 });
         }
 
-        private static Pipeline GetPipeline(AzDoPipeline pipeline)
+        private static ProjectData.Pipeline GetPipeline(AzDoPipeline pipeline)
         {
-            var p = new Pipeline
+            var p = new ProjectData.Pipeline
             {
                 Id = pipeline.Id ?? 0,
                 Name = pipeline.Name,
@@ -456,16 +475,16 @@ namespace AzureDevOpsScannerFramework
             return p;
         }
 
-        private static Release GetPipeline(AzDoRelease release)
+        private static ProjectData.Release GetPipeline(AzDoRelease release)
         {
-            var pipeline = new Release
+            var pipeline = new ProjectData.Release
             {
                 Id = release.Id,
                 Name = release.Name,
                 Folder = release.Path,
                 Url = release.Url,
-                Type = Pipeline.pipelineTypeRelease,
-                PipelineType = Pipeline.pipelineRelease,
+                Type = ProjectData.Pipeline.pipelineTypeRelease,
+                PipelineType = ProjectData.Pipeline.pipelineRelease,
                 Revision = release.Revision,
                 Source = release.Source,
                 CreatedByName = release.CreatedBy.DisplayName,
@@ -478,6 +497,11 @@ namespace AzureDevOpsScannerFramework
                 IsDisabled = release.IsDisabled,
                 LastReleaseId = release.Details?.LastRelease?.Id ?? 0,
                 LastReleaseName = release.Details?.LastRelease?.Name,
+                LastRunStart = release.LastRunStart,
+                LastRunEnd = release.LastRunEnd,
+                LastRunUrl = release.LastRunUrl,
+                State = release.State,
+                Result = release.Result,
                 Environments = release.Details.Environments.Select(e => e.Name).ToArray(),
                 Artifacts = release.Details.Artifacts.Select(a => new Artifact
                     {
@@ -490,8 +514,8 @@ namespace AzureDevOpsScannerFramework
                         DefinitionName = a.DefinitionReference?.Definition?.Name,
                         Project = a.DefinitionReference?.Project?.Name,
                         ProjectId = a.DefinitionReference?.Project?.Id,
-                        IsPrimary = a.IsPrimary,
-                        IsRetained = a.IsRetained
+                        IsPrimary = a.IsPrimary ?? false,
+                        IsRetained = a.IsRetained ?? false
                     }).ToArray()
             };
 

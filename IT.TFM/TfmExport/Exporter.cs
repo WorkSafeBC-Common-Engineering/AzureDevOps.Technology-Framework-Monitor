@@ -1,7 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
 
-using System.Text;
-
 namespace TfmExport
 {
     public class Exporter

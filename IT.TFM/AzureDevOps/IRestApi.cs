@@ -14,6 +14,10 @@ namespace AzureDevOps
 
         string Repository { get; set; }
 
+        int Pipeline {  get; set; }
+
+        int ReleaseDefinition { get; set; }
+        
         string RepositoryBranch { get; set; }
 
         string CheckoutDirectory { get; set; }
@@ -33,6 +37,8 @@ namespace AzureDevOps
         Task<AzDoRepository?> GetRepositoryAsync(string repositoryId);
 
         Task<AzDoRepositoryList> GetRepositoriesAsync();
+
+        Task<AzDoPipelineRunList> GetPipelineRunsAsync();
 
         Task<AzDoFileList> GetFilesAsync();
 
