@@ -207,6 +207,7 @@ namespace AzureDevOpsScannerFramework
             api.Project = projectId.ToString();
             api.Repository = repositoryId;
             var azdoReleases = await api.ListReleasesAsync();
+
             foreach (var release in azdoReleases.Value)
             {
                 if (Parameters.Settings.ExtendedLogging)

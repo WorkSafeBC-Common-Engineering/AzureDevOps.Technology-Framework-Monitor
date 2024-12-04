@@ -63,6 +63,8 @@ namespace AzureDevOps
 
         private bool disposedValue;
 
+        private static bool logEnabled = false;
+
         #endregion
 
         #region IRestApi Implementation
@@ -93,6 +95,8 @@ namespace AzureDevOps
 
         void IRestApi.Initialize(string organizationUrl)
         {
+            logEnabled = Parameters.Settings.ExtendedLogging;
+
             var workingDirectory = GetWorkingDirectory();
             if (workingDirectory == null)
             {
@@ -120,7 +124,7 @@ namespace AzureDevOps
                 CheckoutDirectory = Path.Combine(System.Environment.CurrentDirectory, Organization);
             }
 
-            if (Parameters.Settings.ExtendedLogging)
+            if (logEnabled)
             {
                 Console.WriteLine($"=> Checkout Directory = {CheckoutDirectory}, Working Directory = {workingDirectory}");
             }
@@ -260,7 +264,7 @@ namespace AzureDevOps
                     continue;
                 }
 
-                if (Parameters.Settings.ExtendedLogging)
+                if (logEnabled)
                 {
                     Console.WriteLine($"Pipeline Type: {pipelineDetails?.Configuration?.Type}");
                 }
@@ -276,23 +280,51 @@ namespace AzureDevOps
         async Task<AzDoReleaseList> IRestApi.ListReleasesAsync()
         {
             var content = await CallApiAsync(GetUrl(getReleasesUrl));
+
             if (content == string.Empty)
             {
+                if (logEnabled)
+                {
+                    Console.WriteLine("No Releases content returned");
+                }
+
                 return new AzDoReleaseList();
             }
 
             var releases = JsonConvert.DeserializeObject<AzDoReleaseList>(content);
             if (releases == null)
             {
+                if (logEnabled)
+                {
+                    Console.WriteLine("Unable to deserialize Releases information");
+                }
+
+
                 return new AzDoReleaseList();
             }
 
             foreach (var release in releases.Value)
             {
+                if (logEnabled)
+                {
+                    Console.WriteLine($"Processing Release: {release.Name}, Id: {release.Id}");
+                }
+
                 ReleaseDefinition = release.Id;
                 var runs = await GetReleaseRunsAsync();
+
+                if (logEnabled && (runs == null || runs.Count == 0 || runs.Value.Length == 0))
+                {
+                    Console.WriteLine("\tNo Release Definition information returned");
+                }
+
                 if (runs != null && runs.Count > 0 && runs.Value.Length > 0)
                 {
+                    if (logEnabled)
+                    {
+                        Console.WriteLine($"\tTotal of {runs.Count} Release runs returned.");
+                    }
+
                     var run = runs.Value
                                   .OrderByDescending(r => r.CreatedOn)
                                   .FirstOrDefault();
@@ -303,7 +335,12 @@ namespace AzureDevOps
                         release.LastRunUrl = run.Url;
                         release.State = run.Status;
                         release.Result = null;
-                   }
+
+                        if (logEnabled)
+                        {
+                            Console.WriteLine($"\tLastRunStart: {run.CreatedOn}\n\tLastRunUrl: {run.Url}\n\tState: {run.Status}");
+                        }
+                    }
                 }                
 
                 if (string.IsNullOrEmpty(release.Url))
@@ -327,6 +364,11 @@ namespace AzureDevOps
                     Console.WriteLine(ex);
                     throw;
                 }
+            }
+
+            if (logEnabled)
+            {
+                Console.WriteLine($"A total of ${releases.Count} Releases being returned.");
             }
 
             return releases;
@@ -410,7 +452,7 @@ namespace AzureDevOps
 
         private async Task<string> CallApiAsync(string url, string mediaType = "application/json", bool unzipContent = false)
         {
-            if (Parameters.Settings.ExtendedLogging)
+            if (logEnabled)
             {
                 Console.WriteLine($"CallApiAsync: start! Url = {url}, mediaType = {mediaType}, Unzip = {unzipContent}");
             }
@@ -422,7 +464,7 @@ namespace AzureDevOps
 
                 if (unzipContent && Directory.Exists(CheckoutDirectory))
                 {
-                    if (Parameters.Settings.ExtendedLogging)
+                    if (logEnabled)
                     {
                         Console.WriteLine($">>> CallApiAsync - unzipContent: start by deleting the checkout directory {CheckoutDirectory} first.");
                     }
@@ -432,7 +474,7 @@ namespace AzureDevOps
 
                 HttpClient httpClient = GetClient(url);
 
-                if (Parameters.Settings.ExtendedLogging)
+                if (logEnabled)
                 {
                     Console.WriteLine($"API Call: {url}");
                     startTime = DateTime.Now;
@@ -468,7 +510,7 @@ namespace AzureDevOps
 
                 ThrottleApi(response);
 
-                if (Parameters.Settings.ExtendedLogging)
+                if (logEnabled)
                 {
                     Console.WriteLine($"End API Call, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
                     startTime = DateTime.Now;
@@ -479,7 +521,7 @@ namespace AzureDevOps
                     if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                     {
                         // Repository is empty
-                        if (Parameters.Settings.ExtendedLogging)
+                        if (logEnabled)
                         {
                             Console.WriteLine($">>> CallApiAsync: request failed! StatusCode = {response.StatusCode}, Reason = {response.ReasonPhrase},\n\t>>> URL = {url}");
                         }
@@ -492,14 +534,14 @@ namespace AzureDevOps
 
                 if (unzipContent)
                 {
-                    if (Parameters.Settings.ExtendedLogging)
+                    if (logEnabled)
                     {
                         Console.WriteLine($">>> CallApiAsync - unzipContent: extract files to {CheckoutDirectory}");
                     }
 
                     GetZipContent(response.Content.ReadAsStream());
 
-                    if (Parameters.Settings.ExtendedLogging)
+                    if (logEnabled)
                     {
                         Console.WriteLine($"Unzip, duration = {(DateTime.Now - startTime).TotalMilliseconds}");
                     }
@@ -557,7 +599,7 @@ namespace AzureDevOps
 
                 var headerValue = header.Value?.ToString();
 
-                if (Parameters.Settings.ExtendedLogging)
+                if (logEnabled)
                 {
                     if (headerName.StartsWith("x-ratelimit") || headerName.Equals("retry-after"))
                     {
@@ -607,7 +649,7 @@ namespace AzureDevOps
         {
             ZipFile.ExtractToDirectory(zipStream, CheckoutDirectory, true);
 
-            if (Parameters.Settings.ExtendedLogging)
+            if (logEnabled)
             {
                 var files = Directory.GetFiles(CheckoutDirectory, "*.*", SearchOption.AllDirectories);
                 Console.WriteLine($">>> GetZipContent: List of files, total = {files.Length}");
