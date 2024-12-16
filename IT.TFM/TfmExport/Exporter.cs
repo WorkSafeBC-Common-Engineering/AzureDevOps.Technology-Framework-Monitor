@@ -10,6 +10,8 @@ namespace TfmExport
         
         private SqlConnection db;
 
+        private const int blockSize = 50;
+
         #endregion
 
         #region Public Methods
@@ -47,13 +49,13 @@ namespace TfmExport
 
             foreach (var table in tables)
             {
-                Truncate(table);
+                Delete(table);
             }
 
-            file.WriteLine("GO");
             file.WriteLine();
 
-            foreach (var table in tables)
+            var reverseTables = tables.ToArray().Reverse();
+            foreach (var table in reverseTables)
             {
                 Console.WriteLine($"Exporting {table.Name}...");
 
@@ -71,7 +73,6 @@ namespace TfmExport
                     IdentityInsert(table, false);
                 }
 
-                file.WriteLine("GO");
                 file.WriteLine();
             }
             Console.WriteLine();
@@ -94,9 +95,14 @@ namespace TfmExport
             file.WriteLine($"TRUNCATE TABLE {table.Name};");
         }
 
+        private void Delete(TfmTable table)
+        {
+            file.WriteLine($"DELETE FROM {table.Name};\nGO");
+        }
+
         private void IdentityInsert(TfmTable table, bool on)
         {
-            file.WriteLine($"SET IDENTITY_INSERT {table.Name} {(on ? "ON" : "OFF")};");
+            file.WriteLine($"SET IDENTITY_INSERT {table.Name} {(on ? "ON" : "OFF")};\nGO");
         }
 
         private void GetColumns(TfmTable table)
@@ -126,21 +132,40 @@ namespace TfmExport
             if (reader.HasRows)
             {
                 file.WriteLine($"-- Inserting data into {table.Name}");
+                var currentRow = 0;
                 while (reader.Read())
                 {
+                    if (++currentRow % blockSize == 0)
+                    {
+                        file.WriteLine("GO");
+                    }
+
                     var values = new List<string>();
+                    string value;
                     foreach (var column in table.Columns)
                     {
-                        var value = reader[column.Name].ToString();
-                        if (column.UseQuotes)
+                        var index = reader.GetOrdinal(column.Name);
+
+                        if (reader.IsDBNull(index))
                         {
-                            value = $"'{value}'";
+                            value = "null";
                         }
+                        else
+                        {
+                            value = reader[index].ToString() ?? string.Empty;
+                            if (column.UseQuotes)
+                            {
+                                value = $"'{value.Replace("'", "''" )}'";
+                            }
+                        }
+
                         values.Add(value);
                     }
                     var row = string.Join(", ", values);
                     file.WriteLine($"INSERT INTO {table.Name} ({columns}) VALUES ({row});");
                 }
+
+                file.WriteLine("GO");
             }
         }
 
