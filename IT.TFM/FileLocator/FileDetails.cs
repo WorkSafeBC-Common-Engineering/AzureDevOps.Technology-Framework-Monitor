@@ -1,4 +1,5 @@
-﻿using ProjectData.Interfaces;
+﻿using ProjectData;
+using ProjectData.Interfaces;
 
 using ProjectScanner;
 
@@ -178,9 +179,15 @@ namespace RepoScan.FileLocator
                         writer.Write(fileDetails, forceDetails);
                     }
 
-                    if (!Parameters.Settings.ExtendedLogging && fileData == null)
+                    if (fileInfo.FileType != FileItemType.NoMatch)
                     {
-                        Console.WriteLine($"");
+                        fileInfo.RepositoryId = repoItem.RepositoryId;
+                        var metrics = GetMetrics(fileInfo);
+                        if (metrics != null)
+                        {
+                            var writer = Storage.StorageFactory.GetStorageWriter();
+                            writer.SaveMetrics(fileInfo, metrics);
+                        }
                     }
 
                     if (Parameters.Settings.ExtendedLogging)
@@ -201,6 +208,13 @@ namespace RepoScan.FileLocator
 
                 scanner.DeleteFiles();
             }
+        }
+
+        private static Metrics GetMetrics(ProjectData.FileItem file)
+        {
+            var scanner = MetricsScannerFactory.GetScanner(file.FileType.ToString());
+            var metrics = scanner.Get(file);
+            return metrics;
         }
     }
 }

@@ -38,6 +38,8 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
         public virtual Repository Repository { get; set; }
 
+        public virtual ProjectMetrics ProjectMetrics { get; set; }
+
         //public virtual Pipeline Pipeline { get; set; }
     }
 }

@@ -28,5 +28,7 @@ namespace ProjectData.Interfaces
         int SaveNuGetPackage(NuGetPackage package);
 
         void CleanupNuGetPackages(IEnumerable<int> packageIds);
+
+        void SaveMetrics(FileItem file, Metrics metrics);
     }
 }

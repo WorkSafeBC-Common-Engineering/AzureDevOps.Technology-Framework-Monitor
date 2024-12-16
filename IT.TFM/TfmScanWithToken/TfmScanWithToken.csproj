@@ -13,6 +13,7 @@
     <ProjectReference Include="..\AzureDevOpsScannerFramework\AzureDevOpsScannerFramework.csproj" />
     <ProjectReference Include="..\ContentFilter\ContentFilter.csproj" />
     <ProjectReference Include="..\DataModels\RepoScan.DataModels.csproj" />
+    <ProjectReference Include="..\DefaultMetricsScanner\DefaultMetricsScanner.csproj" />
     <ProjectReference Include="..\FileLocator\RepoScan.FileLocator.csproj" />
     <ProjectReference Include="..\FilterConfigurationFromConfigFile\FilterConfigurationFromConfigFile.csproj" />
     <ProjectReference Include="..\NpmFileParser\NpmFileParser.csproj" />
@@ -23,6 +24,7 @@
     <ProjectReference Include="..\ProjectScannerSaveToSqlServer\ProjectScannerSaveToSqlServer.csproj" />
     <ProjectReference Include="..\RepoScan.Storage.SqlServer\RepoScan.Storage.SqlServer.csproj" />
     <ProjectReference Include="..\VisualStudioFileParser\VisualStudioFileParser.csproj" />
+    <ProjectReference Include="..\VisualStudioMetricsScanner\VisualStudioMetricsScanner.csproj" />
     <ProjectReference Include="..\YamlFileParser\YamlFileParser.csproj" />
   </ItemGroup>
   <ItemGroup>

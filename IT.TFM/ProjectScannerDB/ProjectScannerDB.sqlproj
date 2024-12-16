@@ -95,6 +95,7 @@
     <Build Include="dbo\Tables\NugetTargetFrameworks.sql" />
     <Build Include="dbo\Tables\FrameworkProducts.sql" />
     <Build Include="dbo\Views\PipelineReport.sql" />
+    <Build Include="dbo\Tables\ProjectMetrics.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\PopulateDotNetEOL.sql" />

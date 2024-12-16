@@ -17,6 +17,7 @@
     <ProjectReference Include="..\ParameterSettings\Parameters.csproj" />
     <ProjectReference Include="..\ProjectDataFramework\ProjectData.csproj" />
     <ProjectReference Include="..\ProjectScannerFramework\ProjectScanner.csproj" />
+    <ProjectReference Include="..\Storage\Storage.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
