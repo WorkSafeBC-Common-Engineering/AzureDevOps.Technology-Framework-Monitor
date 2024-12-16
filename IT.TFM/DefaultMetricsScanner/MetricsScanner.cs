@@ -7,7 +7,7 @@ namespace DefaultMetricsScanner
     {
         #region IMetricsScanner Implementation
         
-        Metrics? IMetricsScanner.Get(FileItem file)
+        Metrics? IMetricsScanner.Get(FileItem file, string basePath)
         {
             return null;
         }

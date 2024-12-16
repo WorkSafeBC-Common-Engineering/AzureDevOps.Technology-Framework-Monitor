@@ -34,4 +34,11 @@
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.0" />
   </ItemGroup>
+
+	<Target Name="CopyMetricsExe" AfterTargets="Build">
+		<ItemGroup>
+			<MetricsExe Include="$(UserProfile)\.nuget\packages\microsoft.codeanalysis.metrics\**\Metrics\*.*" />
+		</ItemGroup>
+		<Copy SourceFiles="@(MetricsExe)" DestinationFolder="$(OutputPath)Metrics" SkipUnchangedFiles="true" />
+	</Target>
 </Project>

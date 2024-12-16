@@ -27,5 +27,7 @@ namespace ProjectData.Interfaces
         FileItem FileDetails(Guid projectId, Guid repositoryId, FileItem file);
 
         IEnumerable<string> FilePropertyNames { get; }
+
+        string BasePath { get; }
     }
 }

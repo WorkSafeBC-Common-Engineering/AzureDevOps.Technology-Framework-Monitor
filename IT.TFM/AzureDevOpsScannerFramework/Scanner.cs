@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -355,6 +356,14 @@ namespace AzureDevOpsScannerFramework
         }
 
         IEnumerable<string> IScanner.FilePropertyNames => propertyFields.AsEnumerable();
+
+        string IScanner.BasePath
+        {
+            get
+            {
+                return api.CheckoutDirectory;
+            }
+        }
 
         #endregion
 

@@ -574,6 +574,7 @@ namespace ProjectScannerSaveToSqlServer
 
             dbMetrics.MaintainabilityIndex = metrics.MaintainabilityIndex;
             dbMetrics.CyclomaticComplexity = metrics.CyclomaticComplexity;
+            dbMetrics.ClassCoupling = metrics.ClassCoupling;
             dbMetrics.DepthOfInheritance = metrics.DepthOfInheritance;
             dbMetrics.SourceLines = metrics.SourceLines;
             dbMetrics.ExecutableLines = metrics.ExecutableLines;

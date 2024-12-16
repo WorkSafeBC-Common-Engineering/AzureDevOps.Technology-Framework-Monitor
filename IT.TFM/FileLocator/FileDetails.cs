@@ -22,6 +22,7 @@ namespace RepoScan.FileLocator
 
             IScanner scanner = null;
             var currentScanner = string.Empty;
+            var currentBasePath = string.Empty;
 
             var options = new ParallelOptions
             {
@@ -44,6 +45,7 @@ namespace RepoScan.FileLocator
                 {
                     currentScanner = repoItem.OrgName;
                     scanner = ScannerFactory.GetScanner(currentScanner);
+                    currentBasePath = scanner.BasePath;
                 }
 
                 if (repoItem.RepositoryTotalFiles == 0)
@@ -182,7 +184,7 @@ namespace RepoScan.FileLocator
                     if (fileInfo.FileType != FileItemType.NoMatch)
                     {
                         fileInfo.RepositoryId = repoItem.RepositoryId;
-                        var metrics = GetMetrics(fileInfo);
+                        var metrics = GetMetrics(fileInfo, currentBasePath);
                         if (metrics != null)
                         {
                             var writer = Storage.StorageFactory.GetStorageWriter();
@@ -210,10 +212,10 @@ namespace RepoScan.FileLocator
             }
         }
 
-        private static Metrics GetMetrics(ProjectData.FileItem file)
+        private static Metrics GetMetrics(ProjectData.FileItem file, string basePath)
         {
             var scanner = MetricsScannerFactory.GetScanner(file.FileType.ToString());
-            var metrics = scanner.Get(file);
+            var metrics = scanner.Get(file, basePath);
             return metrics;
         }
     }
