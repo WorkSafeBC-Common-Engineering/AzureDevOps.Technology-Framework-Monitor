@@ -552,6 +552,36 @@ namespace ProjectScannerSaveToSqlServer
             }
         }
 
+        void IStorageWriter.SaveMetrics(FileItem file, Metrics metrics)
+        {
+            var dbRepo = context.Repositories
+                    .SingleOrDefault(r => r.RepositoryId.Equals(file.RepositoryId.ToString("D")));
+
+            var dbFile = context.Files
+                                .SingleOrDefault(f => f.RepositoryId == dbRepo.Id
+                                                   && f.Path.Equals(file.Path));
+
+            var dbMetrics = dbFile.ProjectMetrics;
+            if (dbMetrics == null)
+            {
+                dbMetrics = new ProjectMetrics
+                {
+                    FileId = dbFile.Id
+                };
+
+                dbFile.ProjectMetrics = dbMetrics;
+            }
+
+            dbMetrics.MaintainabilityIndex = metrics.MaintainabilityIndex;
+            dbMetrics.CyclomaticComplexity = metrics.CyclomaticComplexity;
+            dbMetrics.ClassCoupling = metrics.ClassCoupling;
+            dbMetrics.DepthOfInheritance = metrics.DepthOfInheritance;
+            dbMetrics.SourceLines = metrics.SourceLines;
+            dbMetrics.ExecutableLines = metrics.ExecutableLines;
+
+            _ = context.SaveChangesAsync().Result;
+        }
+
         #endregion
 
         #region Private Methods

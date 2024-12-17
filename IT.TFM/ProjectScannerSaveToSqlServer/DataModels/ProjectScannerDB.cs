@@ -20,7 +20,7 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         public virtual DbSet<ScannerType> ScannerTypes { get; set; }
         public virtual DbSet<Pipeline> Pipelines { get; set; }
         public virtual DbSet<ReleaseArtifact> ReleaseArtifacts { get; set; }
-
+        public virtual DbSet<ProjectMetrics> ProjectMetrics { get; set; }
         private readonly string dbConnection = connection;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -114,6 +114,11 @@ namespace ProjectScannerSaveToSqlServer.DataModels
                 .WithMany(n => n.NuGetTargetFrameworks)
                 .HasForeignKey(t => t.NuGetPackageId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ProjectMetrics>()
+                    .HasOne(m => m.File)
+                    .WithOne(f => f.ProjectMetrics)
+                    .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
