@@ -15,12 +15,16 @@ namespace VisualStudioMetricsScanner
 
         private const string metricsExe = @"Metrics\Metrics.exe";
 
+        private string metricsTargetFile = string.Empty;
+
         #endregion
 
         #region IMetricsScanner Implementation
 
         Metrics? IMetricsScanner.Get(FileItem file, string basePath)
         {
+            SetMetricsPath(basePath, file);
+
             GenerateMetricsFile($"{basePath}{file.Path}");
 
             var metrics = ParseMetricsFile();
@@ -32,12 +36,12 @@ namespace VisualStudioMetricsScanner
 
         #region Private Methods
 
-        private static void GenerateMetricsFile(string filePath)
+        private void GenerateMetricsFile(string filePath)
         {
             var startInfo = new ProcessStartInfo
             {
                 FileName = metricsExe,
-                Arguments = $"/p:{filePath} /o:{metricsFile}"
+                Arguments = $"/p:{filePath} /o:{metricsTargetFile}"
             };
 
             var process = new Process
@@ -58,7 +62,7 @@ namespace VisualStudioMetricsScanner
             try
             {
                 var xmlDoc = new XmlDocument();
-                xmlDoc.Load(metricsFile);
+                xmlDoc.Load(metricsTargetFile);
 
                 var rootNode = xmlDoc.SelectSingleNode("/CodeMetricsReport/Targets/Target/Assembly/Metrics");
                 if (rootNode == null)
@@ -117,13 +121,18 @@ namespace VisualStudioMetricsScanner
             }
             finally
             {
-                if (File.Exists(metricsFile))
+                if (File.Exists(metricsTargetFile))
                 {
-                    File.Delete(metricsFile);
+                    File.Delete(metricsTargetFile);
                 }
             }
 
             return null;
+        }
+
+        private void SetMetricsPath(string basePath, FileItem file)
+        {
+            metricsTargetFile = $"{basePath}\\{file.Id}.{metricsFile}";
         }
 
         #endregion
