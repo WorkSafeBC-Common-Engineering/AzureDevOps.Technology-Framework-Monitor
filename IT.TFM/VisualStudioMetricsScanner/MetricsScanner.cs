@@ -23,11 +23,17 @@ namespace VisualStudioMetricsScanner
 
         Metrics? IMetricsScanner.Get(FileItem file, string basePath)
         {
+            Console.WriteLine($"Getting metrics for {file.Path}");
             SetMetricsPath(basePath, file);
 
             GenerateMetricsFile($"{basePath}{file.Path}");
 
             var metrics = ParseMetricsFile();
+
+            if (metrics == null)
+            {
+                Console.WriteLine($"\t>>> Unable to retrieving metrics");
+            }
 
             return metrics;
         }
