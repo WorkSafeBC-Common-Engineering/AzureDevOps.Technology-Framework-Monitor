@@ -440,6 +440,11 @@ namespace ProjectScannerSaveToSqlServer
                 pipeline.FileId = null;
             }
 
+            if (dbFile.ProjectMetrics != null)
+            {
+                context.ProjectMetrics.Remove(dbFile.ProjectMetrics);
+            }
+
             _ = context.SaveChangesAsync().Result;
 
             context.Files.Remove(dbFile);
