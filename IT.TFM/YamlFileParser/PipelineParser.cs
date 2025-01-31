@@ -48,6 +48,20 @@ namespace YamlFileParser
                     {
                         ParseV1Template(cleanContent, variables, file);
                     }
+
+                    // If portfolio and product are still empty, see if any of the variables match.
+                    if (file.PipelineProperties["portfolio"] == string.Empty && file.PipelineProperties["product"] == string.Empty)
+                    {
+                        if (variables.TryGetValue("portfolioName", out var portfolio))
+                        {
+                            file.PipelineProperties["portfolio"] = portfolio;
+                        }
+
+                        if (variables.TryGetValue("productName", out var product))
+                        {
+                            file.PipelineProperties["product"] = product;
+                        }
+                    }
                     break;
             }
         }
