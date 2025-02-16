@@ -15,6 +15,8 @@ namespace ProjectData.Interfaces
 
         void SavePipeline(Pipeline pipeline);
 
+        void SavePipelineParameter(int pipelineId, string name, string value);
+
         void SaveRelease(Release release);
 
         void LinkPipelineToFile(int pipelineId, string repositoryId, string path);

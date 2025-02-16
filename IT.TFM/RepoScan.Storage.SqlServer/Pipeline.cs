@@ -60,8 +60,13 @@ namespace RepoScan.Storage.SqlServer
                 }
 
                 writer.SavePipeline(pipeline);
-            }
 
+                foreach (var key in file.PipelineProperties.Keys)
+                {
+                    var value = file.PipelineProperties[key];
+                    writer.SavePipelineParameter(pipeline.Id, key, value);
+                }
+            }
         }
 
         void IWritePipeline.Delete(int id)

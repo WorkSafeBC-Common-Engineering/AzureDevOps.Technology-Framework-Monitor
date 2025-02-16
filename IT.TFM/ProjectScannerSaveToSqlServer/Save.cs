@@ -298,6 +298,30 @@ namespace ProjectScannerSaveToSqlServer
             _ = context.SaveChangesAsync().Result;
         }
 
+        void IStorageWriter.SavePipelineParameter(int pipelineId, string name, string value)
+        {
+            var dbPipeline = context.Pipelines
+                                    .SingleOrDefault(p => p.PipelineId == pipelineId && p.Type != ProjData.Pipeline.pipelineTypeRelease);
+
+            if ( (dbPipeline != null))
+            {
+                var dbParameter = context.PipelineParameters
+                                        .SingleOrDefault(pp => pp.PipelineId == dbPipeline.Id
+                                                            && pp.Name.Equals(name));
+                if (dbParameter == null)
+                {
+                    dbParameter = new DataModels.PipelineParameter
+                    {
+                        PipelineId = dbPipeline.Id,
+                        Name = name
+                    };
+                    context.PipelineParameters.Add(dbParameter);
+                }
+                dbParameter.Value = value;
+                _ = context.SaveChangesAsync().Result;
+            }
+        }
+
         void IStorageWriter.SaveRelease(Release release)
         {
             if (Parameters.Settings.ExtendedLogging)

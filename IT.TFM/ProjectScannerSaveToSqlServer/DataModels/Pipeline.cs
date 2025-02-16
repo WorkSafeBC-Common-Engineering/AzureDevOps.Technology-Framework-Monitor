@@ -9,6 +9,7 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         public Pipeline()
         {
             ReleaseArtifacts = [];
+            PipelineParameters = [];
         }
 
         public int Id { get; set; }
@@ -86,5 +87,7 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         public virtual Project Project { get; set; }
 
         public virtual ICollection<ReleaseArtifact> ReleaseArtifacts { get; set; }
+
+        public virtual ICollection<PipelineParameter> PipelineParameters { get; set; }
     }
 }

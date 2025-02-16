@@ -9,8 +9,12 @@ namespace YamlFileParser
         #region Private Members
 
         private static readonly char[] variableSeparator = [':'];
+        private static readonly char[] pathSeparator = ['/', '\\'];
         private const string v1TemplateRepo = "/AzureDevOps.Automation.Pipeline.Templates";
         private const string v2TemplateRepo = "/AzureDevOps.Automation.Pipeline.Templates.v2";
+
+        private const string defaultBlueprint = "generic";
+        private const string templatePathRootFolder = "blueprints";
 
         #endregion
 
@@ -29,7 +33,7 @@ namespace YamlFileParser
             var templateType = GetTemplateType(cleanContent);
             file.PipelineProperties.Add("template", templateType.ToString());
 
-            switch(templateType)
+            switch (templateType)
             {
                 case PipelineTemplateType.V1:
                     ParseV1Template(cleanContent, variables, file);
@@ -46,6 +50,7 @@ namespace YamlFileParser
                     // Generic pipelines are structured like a V1 with respect to parsing the portfolio and product values.
                     if (file.PipelineProperties["portfolio"] == string.Empty && file.PipelineProperties["product"] == string.Empty)
                     {
+                        file.PipelineProperties.Remove("blueprint");
                         ParseV1Template(cleanContent, variables, file);
                     }
 
@@ -84,7 +89,6 @@ namespace YamlFileParser
 
             return [.. lines];
         }
-
 
         private static PipelineTemplateType GetTemplateType(string[] content)
         {
@@ -144,6 +148,7 @@ namespace YamlFileParser
         {
             var portfolio = string.Empty;
             var product = string.Empty;
+            var blueprint = string.Empty;
 
             for (var index = 0; index < content.Length; index++)
             {
@@ -177,6 +182,10 @@ namespace YamlFileParser
                                         case "productName":
                                             product = GetParameterValue(fields[1], variables);
                                             break;
+
+                                        case "applicationBlueprint":
+                                            blueprint = GetParameterValue(fields[1], variables);
+                                            break;
                                     }
                                 }
                             }
@@ -202,12 +211,12 @@ namespace YamlFileParser
 
             file.PipelineProperties["portfolio"] = portfolio;
             file.PipelineProperties["product"] = product;
+            file.PipelineProperties["blueprint"] = blueprint;
         }
 
         private static void ParseV2Template(string[] content, Dictionary<string, string> variables, FileItem file)
         {
-            var portfolio = string.Empty;
-            var product = string.Empty;
+            var blueprint = defaultBlueprint;
 
             for (var index = 0; index < content.Length; index++)
             {
@@ -216,6 +225,12 @@ namespace YamlFileParser
                     index++;
                     if (content[index].Trim().StartsWith("template:"))
                     {
+                        var blueprintValue = GetBlueprintName(content[index]);
+                        if (blueprintValue != string.Empty)
+                        {
+                            blueprint = blueprintValue;
+                        }
+
                         index++;
                         if (content[index].Trim().Equals("parameters:"))
                         {
@@ -240,14 +255,19 @@ namespace YamlFileParser
                                     continue;
                                 }
 
+
                                 switch (fields[0])
                                 {
                                     case "portfolioName":
-                                        portfolio = GetParameterValue(fields[1], variables);
+                                        file.PipelineProperties["portfolio"] = GetParameterValue(fields[1], variables);
                                         break;
 
                                     case "productName":
-                                        product = GetParameterValue(fields[1], variables);
+                                        file.PipelineProperties["product"] = GetParameterValue(fields[1], variables);
+                                        break;
+
+                                    default:
+                                        file.PipelineProperties[fields[0]] = GetParameterValue(fields[1], variables);
                                         break;
                                 }
                             }
@@ -256,8 +276,7 @@ namespace YamlFileParser
                 }
             }
 
-            file.PipelineProperties["portfolio"] = portfolio;
-            file.PipelineProperties["product"] = product;
+            file.PipelineProperties["blueprint"] = blueprint;
         }
 
         private static string GetParameterValue(string parameter, Dictionary<string, string> variables)
@@ -354,6 +373,23 @@ namespace YamlFileParser
             }
 
             return variables;
+        }
+
+        private static string GetBlueprintName(string line)
+        {
+            var fields = line.Split(variableSeparator, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            if (fields.Length != 2)
+            {
+                return string.Empty;
+            }
+
+            var pathFields = fields[1].Split(pathSeparator, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            if (pathFields.Length <= 1 ||  pathFields[0] != templatePathRootFolder)
+            {
+                return string.Empty;
+            }
+
+            return pathFields[1];
         }
 
         #endregion
