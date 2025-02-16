@@ -11,6 +11,7 @@
     [Url] NVARCHAR(MAX) NOT NULL, 
     [Type] NVARCHAR(20) NOT NULL, 
     [PipelineType] NVARCHAR(20) NULL, 
+    [Blueprint] NVARCHAR(MAX) NULL,
     [Path] NVARCHAR(MAX) NULL,
     [YamlType] NVARCHAR(20) NULL,
     [Portfolio] NVARCHAR(MAX) NULL,
