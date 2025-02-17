@@ -481,6 +481,11 @@ namespace ProjectScannerSaveToSqlServer
                                                                && p.Type != ProjData.Pipeline.pipelineTypeRelease);
             if (pipeline != null)
             {
+                foreach (var parameter in pipeline.PipelineParameters)
+                {
+                    context.PipelineParameters.Remove(parameter);
+                }
+
                 context.Entry(pipeline).State = EntityState.Deleted;
                 _ = context.SaveChangesAsync().Result;
             }
