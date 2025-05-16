@@ -47,6 +47,8 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
         public string Product { get; set; } = null;
 
+        public int BlueprintApplicationTypeId { get; set; } = 0;
+
         public string Source { get; set; }
 
         public string CreatedByName { get; set; }
@@ -64,6 +66,8 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         public bool IsDeleted { get; set; } = false;
 
         public bool IsDisabled { get; set; } = false;
+
+        public bool SuppressCD { get; set; } = true;
 
         public int? LastReleaseId { get; set; }
 

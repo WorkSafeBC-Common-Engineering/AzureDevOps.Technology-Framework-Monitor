@@ -24,6 +24,8 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
         public int ExecutableLines { get; set; }
 
+        public byte UnitTestCodeCoverage { get; set; }
+
         public virtual File File { get; set; }
     }
 }
