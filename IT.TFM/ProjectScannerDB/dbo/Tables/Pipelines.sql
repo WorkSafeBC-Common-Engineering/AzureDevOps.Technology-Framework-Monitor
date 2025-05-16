@@ -24,6 +24,7 @@
     [ModifiedDateTime] DATETIME NULL,
     [IsDeleted] BIT NOT NULL DEFAULT(0),
     [IsDisabled] BIT NOT NULL DEFAULT(0),
+    [SuppressCD] BIT NOT NULL DEFAULT(1),
     [LastReleaseId] INT NULL,
     [LastReleaseName] NVARCHAR(MAX) NULL,
     [Environments] NVARCHAR(MAX) NULL,
