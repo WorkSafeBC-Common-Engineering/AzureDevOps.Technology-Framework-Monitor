@@ -15,6 +15,7 @@
     [YamlType] NVARCHAR(20) NULL,
     [Portfolio] NVARCHAR(MAX) NULL,
     [Product] NVARCHAR(MAX) NULL,
+    [BlueprintApplicationTypeId] INT NULL,
     [Source] NVARCHAR(MAX) NULL,
     [CreatedByName] NVARCHAR(MAX) NULL,
     [CreatedById] NVARCHAR(MAX) NULL,
@@ -34,5 +35,6 @@
     [LastRunStart] DATETIME NULL,
     [LastRunEnd] DATETIME NULL,
     CONSTRAINT [FK_Pipelines_ToRepository] FOREIGN KEY ([RepositoryId]) REFERENCES Repositories([Id]), 
-    CONSTRAINT [FK_Pipelines_ToFile] FOREIGN KEY ([FileId]) REFERENCES [Files]([Id])
+    CONSTRAINT [FK_Pipelines_ToFile] FOREIGN KEY ([FileId]) REFERENCES [Files]([Id]), 
+    CONSTRAINT [FK_Pipelines_ToPipelineTypes] FOREIGN KEY ([BlueprintApplicationTypeId]) REFERENCES [PipelineTypes]([Id])
 )

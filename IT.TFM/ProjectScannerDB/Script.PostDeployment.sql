@@ -16,3 +16,4 @@ Post-Deployment Script Template
 :r ./PostDeployment/PopulateFileReferenceTypes.sql
 :r ./PostDeployment/PopulateFileTypes.sql
 :r ./PostDeployment/PopulateScannerTypes.sql
+:r ./PostDeployment/PopulatePipelineTypes.sql

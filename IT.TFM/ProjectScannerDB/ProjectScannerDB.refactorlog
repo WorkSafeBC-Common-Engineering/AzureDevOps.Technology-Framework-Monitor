@@ -7,4 +7,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="CommitId" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="37612b3b-d8c3-402c-971e-4b2d6659946c" ChangeDateTime="05/16/2025 21:15:57">
+    <Property Name="ElementName" Value="[dbo].[Pipelines].[BlueprintApplicationType]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Pipelines]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="BlueprintApplicationTypeId" />
+  </Operation>
 </Operations>
