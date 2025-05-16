@@ -15,6 +15,8 @@
     [WebUrl] NVARCHAR(MAX) NULL, 
     [Deleted] BIT NOT NULL DEFAULT 0,
     [LastCommitId] NVARCHAR(50) NULL DEFAULT '', 
+    [CreatedOn] DATETIME NULL,
+    [LastUpdatedOn] DATETIME NULL,
     [TooBig] BIT NOT NULL DEFAULT 0, 
     [NoScan] BIT NOT NULL DEFAULT 0, 
     CONSTRAINT [PK_Repositories] PRIMARY KEY ([Id]), 
