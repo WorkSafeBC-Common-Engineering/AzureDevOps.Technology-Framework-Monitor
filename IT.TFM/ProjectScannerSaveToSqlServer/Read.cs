@@ -406,6 +406,8 @@ namespace ProjectScannerSaveToSqlServer
                 PipelineType = p.PipelineType,
                 Path = p.Path,
                 YamlType = p.YamlType,
+                BlueprintApplicationType = p.BlueprintType.Value,
+                SuppressCD = p.SuppressCD,
                 Portfolio = p.Portfolio,
                 Product = p.Product
             }).AsEnumerable();

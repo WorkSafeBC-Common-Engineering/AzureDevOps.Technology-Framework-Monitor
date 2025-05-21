@@ -33,9 +33,13 @@ namespace ProjectData
 
         public string YamlType { get; set; }
 
+        public string BlueprintApplicationType { get; set; }
+
         public string Portfolio { get;set; }
 
         public string Product { get; set; }
+
+        public bool SuppressCD { get; set; }
 
         public string State { get; set; } = string.Empty;
 

@@ -253,6 +253,9 @@ namespace ProjectScannerSaveToSqlServer
                                                                     && f.Path.Equals(pipeline.Path))
                                         : null;
 
+            var dbBluePrintType = context.PipelineTypes
+                                                .SingleOrDefault(b => b.Value.Equals(pipeline.BlueprintApplicationType));
+
             if (dbPipeline == null)
             {
                 dbPipeline = new DataModels.Pipeline
@@ -295,6 +298,8 @@ namespace ProjectScannerSaveToSqlServer
                 dbPipeline.YamlType = pipeline.YamlType;
                 dbPipeline.Portfolio = pipeline.Portfolio;
                 dbPipeline.Product = pipeline.Product;
+                dbPipeline.BlueprintType = dbBluePrintType;
+                dbPipeline.SuppressCD = pipeline.SuppressCD;
             }
 
             _ = context.SaveChangesAsync().Result;
