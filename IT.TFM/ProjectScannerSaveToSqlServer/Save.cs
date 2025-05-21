@@ -119,6 +119,8 @@ namespace ProjectScannerSaveToSqlServer
             dbRepo.WebUrl = repository.WebUrl;
             dbRepo.Deleted = repository.Deleted;
             dbRepo.LastCommitId = repository.LastCommitId;
+            dbRepo.CreatedOn = repository.CreatedOn;
+            dbRepo.LastUpdatedOn = repository.LastUpdatedOn;
 
             // remove all the tildes and carets in spreadsheet
 
@@ -129,7 +131,7 @@ namespace ProjectScannerSaveToSqlServer
             // split first token into portfolio, second token application name, third token component.,
             string[] nameTokens = repository.Name.Split('-');
 
-            // its likely we have a case where the seperation token was a '.' instead
+            // its likely we have a case where the separation token was a '.' instead
             if (nameTokens.Length < 2)
             {
                 nameTokens = repository.Name.Split('.');
