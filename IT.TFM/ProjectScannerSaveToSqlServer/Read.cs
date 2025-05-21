@@ -156,7 +156,9 @@ namespace ProjectScannerSaveToSqlServer
                     OrgName = repo.Project.Organization.Name,
                     Deleted = repo.Deleted,
                     LastCommitId = repo.LastCommitId,
-                    NoScan = repo.NoScan
+                    NoScan = repo.NoScan,
+                    CreatedOn = repo.CreatedOn,
+                    LastUpdatedOn = repo.LastUpdatedOn
                 };
             }
 

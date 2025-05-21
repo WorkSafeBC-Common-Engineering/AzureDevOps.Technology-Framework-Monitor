@@ -45,6 +45,10 @@ namespace ProjectData
 
         public string LastCommitId { get; set; }
 
+        public DateOnly? CreatedOn { get; set; }
+
+        public DateOnly? LastUpdatedOn { get; set; }
+
         public bool NoScan { get; set; }
 
         #endregion
