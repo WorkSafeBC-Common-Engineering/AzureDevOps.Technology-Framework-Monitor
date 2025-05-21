@@ -90,5 +90,7 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         public virtual Project Project { get; set; }
 
         public virtual ICollection<ReleaseArtifact> ReleaseArtifacts { get; set; }
+
+        public virtual PipelineType BlueprintType { get; set; }
     }
 }

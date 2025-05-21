@@ -19,6 +19,7 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         public virtual DbSet<Repository> Repositories { get; set; }
         public virtual DbSet<ScannerType> ScannerTypes { get; set; }
         public virtual DbSet<Pipeline> Pipelines { get; set; }
+        public virtual DbSet<PipelineType> PipelineTypes { get; set; }
         public virtual DbSet<ReleaseArtifact> ReleaseArtifacts { get; set; }
         public virtual DbSet<ProjectMetrics> ProjectMetrics { get; set; }
         private readonly string dbConnection = connection;
@@ -95,6 +96,12 @@ namespace ProjectScannerSaveToSqlServer.DataModels
             modelBuilder.Entity <Pipeline>()
                 .HasMany(e => e.ReleaseArtifacts)
                 .WithOne(e => e.Pipeline)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PipelineType>()
+                .HasMany(e => e.Pipelines)
+                .WithOne(e => e.BlueprintType)
+                .HasForeignKey(e => e.BlueprintApplicationTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<NuGetFeed>()
