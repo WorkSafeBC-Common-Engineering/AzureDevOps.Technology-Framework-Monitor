@@ -4,8 +4,6 @@ using DataStorage = Storage;
 using System.Collections.Generic;
 using System.Linq;
 using ProjectData;
-using System.Reflection.PortableExecutable;
-using System;
 
 namespace RepoScan.Storage.SqlServer
 {

@@ -2,7 +2,6 @@
 using ProjectData.Interfaces;
 
 using System.Diagnostics;
-using System.Linq.Expressions;
 using System.Xml;
 
 namespace VisualStudioMetricsScanner

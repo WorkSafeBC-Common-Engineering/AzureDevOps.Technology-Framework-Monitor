@@ -1,6 +1,4 @@
-﻿using Microsoft.Identity.Client;
-
-using RepoScan.FileLocator;
+﻿using RepoScan.FileLocator;
 
 using System;
 using System.Configuration;

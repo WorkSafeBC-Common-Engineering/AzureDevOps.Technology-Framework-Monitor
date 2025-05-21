@@ -1,5 +1,4 @@
 ﻿using ProjectData;
-using ProjectData.Interfaces;
 
 using ProjectScanner;
 
