@@ -590,6 +590,7 @@ namespace ProjectScannerSaveToSqlServer
             dbMetrics.DepthOfInheritance = metrics.DepthOfInheritance;
             dbMetrics.SourceLines = metrics.SourceLines;
             dbMetrics.ExecutableLines = metrics.ExecutableLines;
+            dbMetrics.UnitTestCodeCoverage = metrics.UnitTestCodeCoverage;
 
             _ = context.SaveChangesAsync().Result;
         }

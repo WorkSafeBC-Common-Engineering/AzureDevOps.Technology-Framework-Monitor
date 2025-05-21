@@ -19,5 +19,7 @@ namespace ProjectData
         public int SourceLines { get; set; }
 
         public int ExecutableLines { get; set; }
+
+        public byte UnitTestCodeCoverage { get; set; }
     }
 }
