@@ -393,30 +393,16 @@ namespace YamlFileParser
             var templateType = template[(template.LastIndexOf('/') + 1)..];
             templateType = templateType[..templateType.IndexOf('@')];
 
-            switch (templateType)
+            return templateType switch
             {
-                //      azure-pipeline-azure-function-control.yml
-                case "azure-pipeline-azure-function-control.yml":
-                    return BlueprintType.AzureFunction;
-
-                case "azure-pipeline-batch-console-control.yml":
-                    return BlueprintType.BatchConsole;
-
-                case "azure-pipeline-nuget-package-control.yml":
-                    return BlueprintType.NugetPackage;
-
-                case "azure-pipeline-universal-artifact-control.yml":
-                    return BlueprintType.UniversalArtifact;
-
-                case "azure-pipeline-webapp-control.yml":
-                    return BlueprintType.WebApp;
-
-                case "azure-pipeline-winapp-appsync-control.yml":
-                    return BlueprintType.WinAppAppSync;
-
-                default:
-                    return BlueprintType.None;
-            }
+                "azure-pipeline-azure-function-control.yml" => BlueprintType.AzureFunction,
+                "azure-pipeline-batch-console-control.yml" => BlueprintType.BatchConsole,
+                "azure-pipeline-nuget-package-control.yml" => BlueprintType.NugetPackage,
+                "azure-pipeline-universal-artifact-control.yml" => BlueprintType.UniversalArtifact,
+                "azure-pipeline-webapp-control.yml" => BlueprintType.WebApp,
+                "azure-pipeline-winapp-appsync-control.yml" => BlueprintType.WinAppAppSync,
+                _ => BlueprintType.None,
+            };
         }
 
         private static BlueprintType GetGenericBlueprintType(string genericBlueprint)
