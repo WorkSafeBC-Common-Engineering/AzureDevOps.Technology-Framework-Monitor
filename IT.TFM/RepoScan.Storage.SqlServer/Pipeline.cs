@@ -56,6 +56,14 @@ namespace RepoScan.Storage.SqlServer
                         case "product":
                             pipeline.Product = value;
                             break;
+
+                        case "blueprintType":
+                            pipeline.BlueprintApplicationType = value;
+                            break;
+
+                        case "suppressCD":
+                            pipeline.SuppressCD = value.ToLower() != "false";
+                            break;
                     }
                 }
 

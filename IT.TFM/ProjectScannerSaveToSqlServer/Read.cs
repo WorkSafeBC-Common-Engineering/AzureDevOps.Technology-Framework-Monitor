@@ -406,7 +406,7 @@ namespace ProjectScannerSaveToSqlServer
                 PipelineType = p.PipelineType,
                 Path = p.Path,
                 YamlType = p.YamlType,
-                BlueprintApplicationType = p.BlueprintType.Value,
+                BlueprintApplicationType = p.BlueprintType?.Value ?? string.Empty,
                 SuppressCD = p.SuppressCD,
                 Portfolio = p.Portfolio,
                 Product = p.Product

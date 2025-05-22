@@ -35,7 +35,7 @@ namespace ProjectData
 
         public string BlueprintApplicationType { get; set; }
 
-        public string Portfolio { get;set; }
+        public string Portfolio { get; set; }
 
         public string Product { get; set; }
 
@@ -43,9 +43,9 @@ namespace ProjectData
 
         public string State { get; set; } = string.Empty;
 
-        public string Result {  get; set; } = string.Empty;
+        public string Result { get; set; } = string.Empty;
 
-        public DateTime? LastRunStart {  get; set; }
+        public DateTime? LastRunStart { get; set; }
 
         public DateTime? LastRunEnd { get; set; }
 

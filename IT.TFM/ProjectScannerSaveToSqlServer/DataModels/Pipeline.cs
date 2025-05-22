@@ -47,7 +47,7 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
         public string Product { get; set; } = null;
 
-        public int BlueprintApplicationTypeId { get; set; } = 0;
+        public int? BlueprintApplicationTypeId { get; set; } = null;
 
         public string Source { get; set; }
 
@@ -91,6 +91,6 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
         public virtual ICollection<ReleaseArtifact> ReleaseArtifacts { get; set; }
 
-        public virtual PipelineType BlueprintType { get; set; }
+        public virtual PipelineType? BlueprintType { get; set; }
     }
 }

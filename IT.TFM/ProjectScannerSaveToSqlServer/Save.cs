@@ -356,7 +356,14 @@ namespace ProjectScannerSaveToSqlServer
             dbPipeline.Result = release.Result;
             dbPipeline.Environments = string.Join('|', release.Environments);
 
-            _ = context.SaveChangesAsync().Result;
+            try
+            {
+                _ = context.SaveChangesAsync().Result;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
 
             var currentArtifacts = context.ReleaseArtifacts.Where(a => a.PipelineId == dbPipeline.Id);
             foreach (var artifact in release.Artifacts)

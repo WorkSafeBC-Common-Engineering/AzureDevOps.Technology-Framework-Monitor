@@ -2,6 +2,9 @@
 
 using ProjectData;
 
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime;
+
 namespace YamlFileParser
 {
     public class PipelineParser : IFileParser
@@ -49,6 +52,15 @@ namespace YamlFileParser
                         ParseV1Template(cleanContent, variables, file);
                     }
 
+                    if (!file.PipelineProperties.ContainsKey("blueprintType") && file.PipelineProperties.ContainsKey("blueprint"))
+                    {
+                        var genericType = GetGenericBlueprintType(file.PipelineProperties["blueprint"]);
+                        if (genericType != BlueprintType.None)
+                        {
+                            file.PipelineProperties["blueprintType"] = genericType.ToString();
+                        }
+                    }
+
                     // If portfolio and product are still empty, see if any of the variables match.
                     if (file.PipelineProperties["portfolio"] == string.Empty && file.PipelineProperties["product"] == string.Empty)
                     {
@@ -62,6 +74,7 @@ namespace YamlFileParser
                             file.PipelineProperties["product"] = product;
                         }
                     }
+
                     break;
             }
         }
@@ -144,6 +157,7 @@ namespace YamlFileParser
         {
             var portfolio = string.Empty;
             var product = string.Empty;
+            var appBlueprint = string.Empty;
 
             for (var index = 0; index < content.Length; index++)
             {
@@ -177,12 +191,16 @@ namespace YamlFileParser
                                         case "productName":
                                             product = GetParameterValue(fields[1], variables);
                                             break;
+
+                                        case "applicationBlueprint":
+                                            appBlueprint = GetParameterValue(fields[1], variables);
+                                            break;
                                     }
                                 }
                             }
                         }
 
-                        if (portfolio != string.Empty && product != string.Empty)
+                        if (portfolio != string.Empty && product != string.Empty && appBlueprint != string.Empty)
                         {
                             break;
                         }
@@ -202,12 +220,15 @@ namespace YamlFileParser
 
             file.PipelineProperties["portfolio"] = portfolio;
             file.PipelineProperties["product"] = product;
+            file.PipelineProperties["blueprint"] = appBlueprint;
         }
 
         private static void ParseV2Template(string[] content, Dictionary<string, string> variables, FileItem file)
         {
             var portfolio = string.Empty;
             var product = string.Empty;
+            var suppressCD = string.Empty;
+            var blueprintType = BlueprintType.None;
 
             for (var index = 0; index < content.Length; index++)
             {
@@ -216,6 +237,8 @@ namespace YamlFileParser
                     index++;
                     if (content[index].Trim().StartsWith("template:"))
                     {
+                        blueprintType = GetBlueprintType(content[index]);
+
                         index++;
                         if (content[index].Trim().Equals("parameters:"))
                         {
@@ -249,6 +272,10 @@ namespace YamlFileParser
                                     case "productName":
                                         product = GetParameterValue(fields[1], variables);
                                         break;
+
+                                    case "suppressCD":
+                                        suppressCD = GetParameterValue(fields[1], variables);
+                                        break;
                                 }
                             }
                         }
@@ -258,6 +285,11 @@ namespace YamlFileParser
 
             file.PipelineProperties["portfolio"] = portfolio;
             file.PipelineProperties["product"] = product;
+            file.PipelineProperties["suppressCD"] = suppressCD;
+            if (blueprintType != BlueprintType.None)
+            {
+                file.PipelineProperties["blueprintType"] = blueprintType.ToString();
+            }
         }
 
         private static string GetParameterValue(string parameter, Dictionary<string, string> variables)
@@ -354,6 +386,52 @@ namespace YamlFileParser
             }
 
             return variables;
+        }
+
+        private static BlueprintType GetBlueprintType(string template)
+        {
+            var templateType = template[(template.LastIndexOf('/') + 1)..];
+            templateType = templateType[..templateType.IndexOf('@')];
+
+            switch (templateType)
+            {
+                //      azure-pipeline-azure-function-control.yml
+                case "azure-pipeline-azure-function-control.yml":
+                    return BlueprintType.AzureFunction;
+
+                case "azure-pipeline-batch-console-control.yml":
+                    return BlueprintType.BatchConsole;
+
+                case "azure-pipeline-nuget-package-control.yml":
+                    return BlueprintType.NugetPackage;
+
+                case "azure-pipeline-universal-artifact-control.yml":
+                    return BlueprintType.UniversalArtifact;
+
+                case "azure-pipeline-webapp-control.yml":
+                    return BlueprintType.WebApp;
+
+                case "azure-pipeline-winapp-appsync-control.yml":
+                    return BlueprintType.WinAppAppSync;
+
+                default:
+                    return BlueprintType.None;
+            }
+        }
+
+        private static BlueprintType GetGenericBlueprintType(string genericBlueprint)
+        {
+            switch (genericBlueprint)
+            {
+                case "generic-steps":
+                    return BlueprintType.GenericSteps;
+
+                case "generic-jobs":
+                    return BlueprintType.GenericJobs;
+
+                default:
+                    return BlueprintType.None;
+            }
         }
 
         #endregion
