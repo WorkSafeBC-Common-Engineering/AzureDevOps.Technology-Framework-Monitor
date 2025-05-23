@@ -219,16 +219,18 @@ namespace RepoScan.FileLocator
                         var portfolio = fileDetails.PipelineProperties["portfolio"];
                         var product = fileDetails.PipelineProperties["product"];
 
-                        var pipeline = pipelineReader.FindPipeline(repoItem.ProjectId, fileDetails.RepositoryId, portfolio, product);
-                        if (pipeline == null)
+                        var pipelines = pipelineReader.FindPipelines(repoItem.ProjectId, fileDetails.RepositoryId, portfolio, product);
+                        if (!pipelines.Any())
                         {
                             continue;
                         }
 
                         var environments = fileDetails.PipelineProperties["Environments"].Split('|');
-                        pipeline.Environments = environments;
-
-                        pipelineWriter.Write(pipeline);
+                        foreach (var pipeline in pipelines)
+                        {
+                            pipeline.Environments = environments;
+                            pipelineWriter.Write(pipeline);
+                        }
                     }
                 }
 

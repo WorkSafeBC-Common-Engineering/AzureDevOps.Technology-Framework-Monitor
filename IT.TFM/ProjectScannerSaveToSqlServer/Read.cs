@@ -463,44 +463,51 @@ namespace ProjectScannerSaveToSqlServer
             return files.AsEnumerable();            
         }
 
-        Pipeline? IStorageReader.FindPipeline(string projectId, string repositoryId, string portfolio, string product)
+        IEnumerable<Pipeline> FindPipelines(string projectId, string repositoryId, string portfolio, string product)
         {
+            List<Pipeline> pipelines = [];
+
             var project = _compiledProjectQueryByProjectId(context, projectId).Result;
 
             var repository = _compiledRepositoryQueryByRepositoryId(context, repositoryId).Result;
 
-            var pipeline = context.Pipelines
-                .SingleOrDefault(p => p.ProjectId == project.Id
-                                   && p.RepositoryId == repository.Id
-                                   && p.Portfolio == portfolio
-                                   && p.Product == product);
+            var pipelinesData = context.Pipelines
+                                       .Where(p => p.ProjectId == project.Id
+                                                && p.RepositoryId == repository.Id
+                                                && p.Portfolio == portfolio
+                                                && p.Product == product);
 
-            if (pipeline == null)
+            if (!pipelinesData.Any())
             {
                 return null;
             }
 
-            var file = context.Files.SingleOrDefault(f => f.Id == pipeline.FileId);
-
-            return new Pipeline
+            foreach (var item in pipelinesData)
             {
-                Id = pipeline.PipelineId,
-                ProjectId = projectId,
-                RepositoryId = repositoryId,
-                FileId = file.FileId,
-                Name = pipeline.Name,
-                Folder = pipeline.Folder,
-                Revision = pipeline.Revision,
-                Url = pipeline.Url,
-                Type = pipeline.Type,
-                PipelineType = pipeline.PipelineType,
-                Path = pipeline.Path,
-                YamlType = pipeline.YamlType,
-                BlueprintApplicationType = pipeline.BlueprintType?.Value ?? string.Empty,
-                SuppressCD = pipeline.SuppressCD,
-                Portfolio = pipeline.Portfolio,
-                Product = pipeline.Product
-            };
+                var file = context.Files.SingleOrDefault(f => f.Id == item.FileId);
+
+                pipelines.Add(new Pipeline
+                {
+                    Id = item.PipelineId,
+                    ProjectId = projectId,
+                    RepositoryId = repositoryId,
+                    FileId = file.FileId,
+                    Name = item.Name,
+                    Folder = item.Folder,
+                    Revision = item.Revision,
+                    Url = item.Url,
+                    Type = item.Type,
+                    PipelineType = item.PipelineType,
+                    Path = item.Path,
+                    YamlType = item.YamlType,
+                    BlueprintApplicationType = item.BlueprintType?.Value ?? string.Empty,
+                    SuppressCD = item.SuppressCD,
+                    Portfolio = item.Portfolio,
+                    Product = item.Product
+                });
+            }
+
+            return pipelines.AsEnumerable();
         }
 
         #endregion
@@ -540,6 +547,11 @@ namespace ProjectScannerSaveToSqlServer
 
                 project.AddRepository(repository);
             }
+        }
+
+        IEnumerable<Pipeline> IStorageReader.FindPipelines(string projectId, string repositoryId, string portfolio, string product)
+        {
+            return FindPipelines(projectId, repositoryId, portfolio, product);
         }
 
         #endregion

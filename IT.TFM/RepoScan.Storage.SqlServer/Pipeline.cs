@@ -105,15 +105,15 @@ namespace RepoScan.Storage.SqlServer
             return reader.GetPipelineIdsForProject(projectId).ToArray();
         }
 
-        ProjectData.Pipeline? IReadPipelines.FindPipeline(Guid projectId, Guid repositoryId, string portfolio, string product)
+        IEnumerable<ProjectData.Pipeline> IReadPipelines.FindPipelines(Guid projectId, Guid repositoryId, string portfolio, string product)
         {
             using var reader = GetReader();
 
             var project = projectId.ToString("D");
             var repository = repositoryId.ToString("D");
 
-            var pipeline = reader.FindPipeline(project, repository, portfolio, product);
-            return pipeline;
+            var pipelines = reader.FindPipelines(project, repository, portfolio, product);
+            return pipelines;
         }
 
         #endregion
