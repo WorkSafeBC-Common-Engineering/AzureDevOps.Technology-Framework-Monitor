@@ -376,7 +376,7 @@ namespace YamlFileParser
         {
             var portfolio = string.Empty;
             var product = string.Empty;
-            var suppressCD = string.Empty;
+            var suppressCD = "false"; // default if not specified in pipeline
             var blueprintType = BlueprintType.None;
 
             for (var index = 0; index < content.Length; index++)
