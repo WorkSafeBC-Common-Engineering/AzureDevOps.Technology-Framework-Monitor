@@ -4,6 +4,8 @@ using ProjectData;
 
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime;
+using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace YamlFileParser
 {
@@ -27,12 +29,159 @@ namespace YamlFileParser
         void IFileParser.Parse(FileItem file, string[] content)
         {
             var cleanContent = StripComments(content);
+
+            if (CheckIfConfigFile(file))
+            {
+                ParseConfigFile(file, cleanContent);
+            }
+            else
+            {
+                ParsePipelineFile(file, cleanContent);
+            }
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private static bool CheckIfConfigFile(FileItem file)
+        {
+            return file.Path.EndsWith("-config.yml", StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        private static void ParseConfigFile(FileItem file, string[] cleanContent)
+        {
+            // skip if not in the same repository as the pipeline
+            if (!file.Path.StartsWith("/deploy/"))
+            {
+                return;
+            }
+
+            var environments = ParseEnabledEnvironments(cleanContent);
+            if (environments == null || environments.Count == 0)
+            {
+                return;
+            }
+
+            file.PipelineProperties.Add("IsConfigFile", "true");
+            file.PipelineProperties.Add("Environments", string.Join('|', environments));
+            ParseConfigProperties(file);
+        }
+
+        private static List<string> ParseEnabledEnvironments(string[] content)
+        {
+            var environments = new List<string>();
+
+            var enabledEnvironments = new List<string>();
+
+
+            for (var index = 0; index < content.Length; index++)
+            {
+                var line = content[index].Trim();
+                if (line.Equals("variables:", StringComparison.OrdinalIgnoreCase))
+                {
+                    index++;
+
+                    while (index < content.Length - 1)
+                    {
+                        var variable = ParseConfigEnabledVariable(content[index], content[index + 1].Trim());
+
+                        if (variable != null && variable.Value.Item2)
+                        {
+                            enabledEnvironments.Add(variable.Value.Item1);
+                        }
+
+                        index += 2;
+                    }
+
+                    index = 1;
+                    foreach (var enabledItem in enabledEnvironments)
+                    {
+                        var environmentNameAndIndex = ParseConfigEnvironmentName(enabledItem, index, content);
+                        if (environmentNameAndIndex == null)
+                        {
+                            continue;
+                        }
+
+                        environments.Add(environmentNameAndIndex.Value.Item1);
+                        index = environmentNameAndIndex.Value.Item2;
+                    }
+                }
+            }
+
+            return environments;
+        }
+
+        private static (string, bool)? ParseConfigEnabledVariable(string name, string value)
+        {
+            if (name.StartsWith("- name:") && value.StartsWith("value:"))
+            {
+                var nameValue = name[7..].Trim();
+
+                if (nameValue.EndsWith("StageActive"))
+                {
+                    nameValue = nameValue.Replace("StageActive", string.Empty);
+
+                    if (!bool.TryParse(value[6..].Trim(), out var boolValue))
+                    {
+                        boolValue = false;
+                    }
+
+                    return (nameValue, boolValue);
+                }
+            }
+
+            return null;
+        }
+
+        private static (string, int)? ParseConfigEnvironmentName(string environment, int index, string[] content)
+        {
+            var parseIndex = index;
+            while (parseIndex - 1 < content.Length)
+            {
+                if (content[parseIndex].Trim().StartsWith("- name:"))
+                {
+                    var name = content[parseIndex][7..].Trim();
+                    var value = content[parseIndex + 1].Trim();
+                    if (name.Equals($"{environment}StageName") && value.StartsWith("value:"))
+                    {
+                        return (value[6..].Trim().Replace("'", string.Empty), parseIndex);
+                    }
+                }
+
+                parseIndex += 2;
+            }
+
+            return null;
+        }
+
+        private static void ParseConfigProperties(FileItem file)
+        {
+            // Get the portfolio and product from the file path
+            var filename = Path.GetFileNameWithoutExtension(file.Path)
+                               .Replace("-config", string.Empty);
+            var parts = filename.Split('-', StringSplitOptions.TrimEntries);
+
+            if (parts.Length < 2)
+            {
+                parts = filename.Split('.', StringSplitOptions.TrimEntries);
+            }
+
+            if (parts.Length >= 2 && !string.IsNullOrEmpty(parts[0]) && !string.IsNullOrEmpty(parts[1]))
+            {
+                file.PipelineProperties.Add("portfolio", parts[0]);
+                file.PipelineProperties.Add("product", parts[1]);
+            }
+        }
+
+        private static void ParsePipelineFile(FileItem file, string[] cleanContent)
+        {
             var variables = ParseVariables(cleanContent);
 
             var templateType = GetTemplateType(cleanContent);
             file.PipelineProperties.Add("template", templateType.ToString());
 
-            switch(templateType)
+            switch (templateType)
             {
                 case PipelineTemplateType.V1:
                     ParseV1Template(cleanContent, variables, file);
@@ -75,13 +224,14 @@ namespace YamlFileParser
                         }
                     }
 
+                    // SuppressCD parameter defaults to false if not found
+                    if (!file.PipelineProperties.ContainsKey("suppressCD") && !file.PipelineProperties["blueprintType"].StartsWith("Generic"))
+                    {
+                        file.PipelineProperties["suppressCD"] = "false";
+                    }
                     break;
             }
         }
-
-        #endregion
-
-        #region Private Methods
 
         private static string[] StripComments(string[] content)
         {
@@ -97,7 +247,6 @@ namespace YamlFileParser
 
             return [.. lines];
         }
-
 
         private static PipelineTemplateType GetTemplateType(string[] content)
         {
@@ -418,6 +567,19 @@ namespace YamlFileParser
                 default:
                     return BlueprintType.None;
             }
+        }
+
+        private static string GetConfigFileName(Dictionary<string, string> pipelineProperties)
+        {
+            var portfolio = pipelineProperties["portfolioName"];
+            var product = pipelineProperties["productName"];
+
+            if (!string.IsNullOrEmpty(portfolio) && !string.IsNullOrEmpty(product))
+            {
+                return $"/deploy/{portfolio}-{product}-config.yml";
+            }
+
+            return string.Empty;
         }
 
         #endregion

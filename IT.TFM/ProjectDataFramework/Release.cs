@@ -26,8 +26,6 @@ namespace ProjectData
 
         public string LastReleaseName { get; set; }
 
-        public string[] Environments { get; set; }
-
         public Artifact[] Artifacts { get; set; }
     }
 

@@ -5,6 +5,7 @@ using DataStorage = Storage;
 using System.Collections.Generic;
 using System.Linq;
 using ProjectData;
+using System;
 
 namespace RepoScan.Storage.SqlServer
 {
@@ -102,6 +103,17 @@ namespace RepoScan.Storage.SqlServer
         {
             using var reader = GetReader();
             return reader.GetPipelineIdsForProject(projectId).ToArray();
+        }
+
+        ProjectData.Pipeline? IReadPipelines.FindPipeline(Guid projectId, Guid repositoryId, string portfolio, string product)
+        {
+            using var reader = GetReader();
+
+            var project = projectId.ToString("D");
+            var repository = repositoryId.ToString("D");
+
+            var pipeline = reader.FindPipeline(project, repository, portfolio, product);
+            return pipeline;
         }
 
         #endregion

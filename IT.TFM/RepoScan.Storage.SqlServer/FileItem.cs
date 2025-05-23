@@ -34,7 +34,7 @@ namespace RepoScan.Storage.SqlServer
 
             var repoFiles = reader.GetFiles(repoId)
                                   .ToArray();
-
+            
             return repoFiles.Select(f => new DataModels.FileItem
             {
                 Id = f.Id,

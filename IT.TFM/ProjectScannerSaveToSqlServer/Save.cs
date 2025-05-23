@@ -300,6 +300,11 @@ namespace ProjectScannerSaveToSqlServer
                 dbPipeline.Product = pipeline.Product;
                 dbPipeline.BlueprintType = dbBluePrintType;
                 dbPipeline.SuppressCD = pipeline.SuppressCD;
+
+                if (pipeline.Environments != null)
+                {
+                    dbPipeline.Environments = string.Join('|', pipeline.Environments);
+                }
             }
 
             _ = context.SaveChangesAsync().Result;

@@ -41,6 +41,8 @@ namespace ProjectData
 
         public bool SuppressCD { get; set; }
 
+        public string[] Environments { get; set; }
+
         public string State { get; set; } = string.Empty;
 
         public string Result { get; set; } = string.Empty;

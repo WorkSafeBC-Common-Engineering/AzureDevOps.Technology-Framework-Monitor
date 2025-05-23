@@ -463,6 +463,46 @@ namespace ProjectScannerSaveToSqlServer
             return files.AsEnumerable();            
         }
 
+        Pipeline? IStorageReader.FindPipeline(string projectId, string repositoryId, string portfolio, string product)
+        {
+            var project = _compiledProjectQueryByProjectId(context, projectId).Result;
+
+            var repository = _compiledRepositoryQueryByRepositoryId(context, repositoryId).Result;
+
+            var pipeline = context.Pipelines
+                .SingleOrDefault(p => p.ProjectId == project.Id
+                                   && p.RepositoryId == repository.Id
+                                   && p.Portfolio == portfolio
+                                   && p.Product == product);
+
+            if (pipeline == null)
+            {
+                return null;
+            }
+
+            var file = context.Files.SingleOrDefault(f => f.Id == pipeline.FileId);
+
+            return new Pipeline
+            {
+                Id = pipeline.PipelineId,
+                ProjectId = projectId,
+                RepositoryId = repositoryId,
+                FileId = file.FileId,
+                Name = pipeline.Name,
+                Folder = pipeline.Folder,
+                Revision = pipeline.Revision,
+                Url = pipeline.Url,
+                Type = pipeline.Type,
+                PipelineType = pipeline.PipelineType,
+                Path = pipeline.Path,
+                YamlType = pipeline.YamlType,
+                BlueprintApplicationType = pipeline.BlueprintType?.Value ?? string.Empty,
+                SuppressCD = pipeline.SuppressCD,
+                Portfolio = pipeline.Portfolio,
+                Product = pipeline.Product
+            };
+        }
+
         #endregion
 
         #region Private Methods and Properties
