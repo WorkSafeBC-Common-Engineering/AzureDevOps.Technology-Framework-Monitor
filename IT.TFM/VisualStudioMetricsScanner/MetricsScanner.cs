@@ -12,7 +12,7 @@ namespace VisualStudioMetricsScanner
 
         private const string metricsFile = "metrics.xml";
 
-        private const string metricsExe = @"Metrics\Metrics.exe";
+        private const string metricsExe = @"Microsoft.CodeAnalysis.Metrics\Metrics\Metrics.exe";
 
         private string metricsTargetFile = string.Empty;
 
