@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 
 using AzureDevOps.Models;
 
-using Microsoft.VisualStudio.Services.Common;
-
 using ProjectData;
 using ProjectData.Interfaces;
 
@@ -407,29 +405,28 @@ namespace AzureDevOpsScannerFramework
         {
             buildProperties.Clear();
 
-            Directory.EnumerateFiles(api.CheckoutDirectory, "Directory.Build.props", SearchOption.AllDirectories)
-                .ForEach(f =>
+            foreach (var f in Directory.EnumerateFiles(api.CheckoutDirectory, "Directory.Build.props", SearchOption.AllDirectories))
+            {
+                var xmlDocument = new System.Xml.XmlDocument();
+                xmlDocument.Load(f);
+
+                var propertyGroups = xmlDocument.GetElementsByTagName("PropertyGroup");
+                for (int i = 0; i < propertyGroups.Count; i++)
                 {
-                    var xmlDocument = new System.Xml.XmlDocument();
-                    xmlDocument.Load(f);
-
-                    var propertyGroups = xmlDocument.GetElementsByTagName("PropertyGroup");
-                    for (int i = 0; i < propertyGroups.Count; i++)
+                    var propertyGroup = propertyGroups[i];
+                    for (int j = 0; j < propertyGroup.ChildNodes.Count; j++)
                     {
-                        var propertyGroup = propertyGroups[i];
-                        for (int j = 0; j < propertyGroup.ChildNodes.Count; j++)
+                        var property = propertyGroup.ChildNodes[j];
+                        if (property.NodeType == System.Xml.XmlNodeType.Element)
                         {
-                            var property = propertyGroup.ChildNodes[j];
-                            if (property.NodeType == System.Xml.XmlNodeType.Element)
-                            {
-                                var key = property.Name;
-                                var value = property.InnerText;
+                            var key = property.Name;
+                            var value = property.InnerText;
 
-                                buildProperties.TryAdd(key, value);
-                            }
+                            buildProperties.TryAdd(key, value);
                         }
                     }
-                });
+                }
+            }
         }
 
         private static ProjectData.Pipeline GetPipeline(AzDoPipeline pipeline)
