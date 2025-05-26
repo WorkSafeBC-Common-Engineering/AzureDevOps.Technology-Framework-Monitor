@@ -479,7 +479,7 @@ namespace ProjectScannerSaveToSqlServer
 
             if (!pipelinesData.Any())
             {
-                return null;
+                return pipelines.AsEnumerable();
             }
 
             foreach (var item in pipelinesData)
