@@ -70,12 +70,14 @@ namespace VisualStudioMetricsScanner
             {
                 var xmlDoc = new XmlDocument();
                 int retries = readFileRetries;
+                bool readSuccessful = false;
 
                 do
                 {
                     try
                     {
                         xmlDoc.Load(metricsTargetFile);
+                        readSuccessful = true;
                     }
                     catch (IOException ioException)
                     {
@@ -83,6 +85,12 @@ namespace VisualStudioMetricsScanner
                         Thread.Sleep(1000);
                     }
                 } while (retries-- >= 0);
+
+                if (!readSuccessful)
+                {
+                    Console.WriteLine("Failed to read metrics file after multiple attempts.");
+                    return metrics;
+                }
 
                 var rootNode = xmlDoc.SelectSingleNode("/CodeMetricsReport/Targets/Target/Assembly/Metrics");
                 if (rootNode == null)
