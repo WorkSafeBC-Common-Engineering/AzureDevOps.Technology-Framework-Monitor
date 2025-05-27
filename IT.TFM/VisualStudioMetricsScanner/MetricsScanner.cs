@@ -16,6 +16,8 @@ namespace VisualStudioMetricsScanner
 
         private string metricsTargetFile = string.Empty;
 
+        private const int readFileRetries = 5;
+
         #endregion
 
         #region IMetricsScanner Implementation
@@ -67,7 +69,20 @@ namespace VisualStudioMetricsScanner
             try
             {
                 var xmlDoc = new XmlDocument();
-                xmlDoc.Load(metricsTargetFile);
+                int retries = readFileRetries;
+
+                do
+                {
+                    try
+                    {
+                        xmlDoc.Load(metricsTargetFile);
+                    }
+                    catch (IOException ioException)
+                    {
+                        Console.WriteLine($"Error reading metrics file: {ioException.Message} - retries left {retries}");
+                        Thread.Sleep(1000);
+                    }
+                } while (retries-- >= 0);
 
                 var rootNode = xmlDoc.SelectSingleNode("/CodeMetricsReport/Targets/Target/Assembly/Metrics");
                 if (rootNode == null)
