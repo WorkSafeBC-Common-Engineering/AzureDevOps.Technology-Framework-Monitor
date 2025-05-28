@@ -160,11 +160,12 @@ namespace YamlFileParser
             // Get the portfolio and product from the file path
             var filename = Path.GetFileNameWithoutExtension(file.Path)
                                .Replace("-config", string.Empty);
-            var parts = filename.Split('-', StringSplitOptions.TrimEntries);
+
+            var parts = filename.Split('-', 2, StringSplitOptions.TrimEntries);
 
             if (parts.Length < 2)
             {
-                parts = filename.Split('.', StringSplitOptions.TrimEntries);
+                parts = filename.Split('.', 2, StringSplitOptions.TrimEntries);
             }
 
             if (parts.Length >= 2 && !string.IsNullOrEmpty(parts[0]) && !string.IsNullOrEmpty(parts[1]))
