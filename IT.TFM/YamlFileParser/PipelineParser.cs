@@ -97,14 +97,8 @@ namespace YamlFileParser
                     index = 1;
                     foreach (var enabledItem in enabledEnvironments)
                     {
-                        var environmentNameAndIndex = ParseConfigEnvironmentName(enabledItem, index, content);
-                        if (environmentNameAndIndex == null)
-                        {
-                            continue;
-                        }
-
-                        environments.Add(environmentNameAndIndex.Value.Item1);
-                        index = environmentNameAndIndex.Value.Item2;
+                        var environmentName = ParseConfigEnvironmentName(enabledItem);
+                        environments.Add(environmentName);
                     }
                 }
             }
@@ -134,25 +128,9 @@ namespace YamlFileParser
             return null;
         }
 
-        private static (string, int)? ParseConfigEnvironmentName(string environment, int index, string[] content)
+        private static string ParseConfigEnvironmentName(string environment)
         {
-            var parseIndex = index;
-            while (parseIndex - 1 < content.Length)
-            {
-                if (content[parseIndex].Trim().StartsWith("- name:"))
-                {
-                    var name = content[parseIndex][7..].Trim();
-                    var value = content[parseIndex + 1].Trim();
-                    if (name.Equals($"{environment}StageName") && value.StartsWith("value:"))
-                    {
-                        return (value[6..].Trim().Replace("'", string.Empty), parseIndex);
-                    }
-                }
-
-                parseIndex += 2;
-            }
-
-            return null;
+            return char.ToUpper(environment[0]) + environment[1..];
         }
 
         private static void ParseConfigProperties(FileItem file)
