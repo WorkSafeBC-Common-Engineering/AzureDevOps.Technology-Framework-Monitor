@@ -139,11 +139,11 @@ namespace YamlFileParser
             var filename = Path.GetFileNameWithoutExtension(file.Path)
                                .Replace("-config", string.Empty);
 
-            var parts = filename.Split('-', 2, StringSplitOptions.TrimEntries);
+            var parts = filename.Split('.', 2, StringSplitOptions.TrimEntries);
 
             if (parts.Length < 2)
             {
-                parts = filename.Split('.', 2, StringSplitOptions.TrimEntries);
+                parts = filename.Split('-', 2, StringSplitOptions.TrimEntries);
             }
 
             if (parts.Length >= 2 && !string.IsNullOrEmpty(parts[0]) && !string.IsNullOrEmpty(parts[1]))
