@@ -25,7 +25,7 @@ namespace VisualStudioMetricsScanner
         Metrics? IMetricsScanner.Get(FileItem file, string basePath)
         {
             Console.WriteLine($"Getting metrics for {file.Path}");
-            SetMetricsPath(basePath, file);
+            SetMetricsPath(basePath);
 
             GenerateMetricsFile($"{basePath}{file.Path}");
 
@@ -158,9 +158,10 @@ namespace VisualStudioMetricsScanner
             return null;
         }
 
-        private void SetMetricsPath(string basePath, FileItem file)
+        private void SetMetricsPath(string basePath)
         {
-            metricsTargetFile = $"{basePath}\\{file.Id}.{metricsFile}";
+            var id = Path.GetRandomFileName();
+            metricsTargetFile = $"{basePath}\\{id}.{metricsFile}";
         }
 
         #endregion
