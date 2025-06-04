@@ -1,4 +1,6 @@
-﻿using RepoScan.FileLocator;
+﻿using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+
+using RepoScan.FileLocator;
 
 using System;
 using System.Configuration;
@@ -17,6 +19,7 @@ namespace TfmScanWithToken
         private static bool partThree = false;
         private static bool partFour = false;
         private static bool partFive = false;
+        private static bool partSix = false;
 
         #endregion
 
@@ -54,7 +57,12 @@ namespace TfmScanWithToken
             {
                 await NuGetFeedScan();
             }
-            
+
+            if (partSix)
+            {
+                await GetRuntimeMetrics();
+            }
+
 #if DEBUG
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey();
@@ -105,6 +113,15 @@ namespace TfmScanWithToken
             await NuGetScan.Run();
 
             Console.WriteLine($"NuGet Feed Scan complete at: {DateTime.Now.ToLongTimeString()}");
+        }
+
+        private static async Task GetRuntimeMetrics()
+        {
+            Console.WriteLine($"Starting Runtime Metrics Scan at: {DateTime.Now.ToLongTimeString()}");
+
+            await RuntimeMetricsScan.Run();
+
+            Console.WriteLine($"Runtime Metrics Scan complete at: {DateTime.Now.ToLongTimeString()}");
         }
 
         private static int GetTotalThreads(string[] args)
@@ -160,12 +177,16 @@ namespace TfmScanWithToken
                 case "5":
                     partFive = true;
                     break;
+                case "6":
+                    partSix = true;
+                    break;
                 default:
                     partOne = true;
                     partTwo = true;
                     partThree = true;
                     partFour = true;
                     partFive = true;
+                    partSix = true;
                     break;
             }
         }

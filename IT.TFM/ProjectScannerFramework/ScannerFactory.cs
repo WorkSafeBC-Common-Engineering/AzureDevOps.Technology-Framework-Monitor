@@ -42,5 +42,12 @@ namespace ProjectScanner
             instance.Initialize();
             return instance;
         }
+
+        public static IRuntimeMetricsScanner GetRuntimeMetricsScanner()
+        {
+            var instance = _container.Resolve<IRuntimeMetricsScanner>();
+            instance.Initialize();
+            return instance;
+        }
     }
 }

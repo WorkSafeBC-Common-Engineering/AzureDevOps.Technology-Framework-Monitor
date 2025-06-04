@@ -23,6 +23,7 @@
     <ProjectReference Include="..\ParameterSettings\Parameters.csproj" />
     <ProjectReference Include="..\ProjectScannerSaveToSqlServer\ProjectScannerSaveToSqlServer.csproj" />
     <ProjectReference Include="..\RepoScan.Storage.SqlServer\RepoScan.Storage.SqlServer.csproj" />
+    <ProjectReference Include="..\RuntimeMetricsScanner\RuntimeMetricsScanner.csproj" />
     <ProjectReference Include="..\VisualStudioFileParser\VisualStudioFileParser.csproj" />
     <ProjectReference Include="..\VisualStudioMetricsScanner\VisualStudioMetricsScanner.csproj" />
     <ProjectReference Include="..\YamlFileParser\YamlFileParser.csproj" />
