@@ -116,6 +116,13 @@ namespace RepoScan.Storage.SqlServer
             return pipelines;
         }
 
+        IEnumerable<ProjectData.Pipeline> IReadPipelines.FindPipelines(ProjectData.FileItem file)
+        {
+            using var reader = GetReader();
+            var pipelines = reader.GetPipelines(file.RepositoryId.ToString("D"), file.Path);
+            return pipelines.ToArray().AsEnumerable();
+        }
+
         #endregion
 
         #region Private Methods

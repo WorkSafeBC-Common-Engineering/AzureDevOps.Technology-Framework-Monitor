@@ -10,5 +10,7 @@ namespace RepoScan.DataModels
         IEnumerable<int> GetPipelineIds(string projectId);
 
         IEnumerable<ProjectData.Pipeline> FindPipelines(Guid projectId, Guid repositoryId, string portfolio, string product);
+
+        IEnumerable<ProjectData.Pipeline> FindPipelines(ProjectData.FileItem file);
     }
 }

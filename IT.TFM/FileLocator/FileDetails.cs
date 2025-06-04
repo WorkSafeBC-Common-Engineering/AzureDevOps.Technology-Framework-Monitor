@@ -74,6 +74,7 @@ namespace RepoScan.FileLocator
                                                    new ProjectData.Repository { Id = repoItem.RepositoryId,
                                                                                 DefaultBranch = repoItem.RepositoryDefaultBranch });
 
+                var pipelineFiles = new ConcurrentBag<ProjectData.FileItem>();
                 var configYamlFiles = new ConcurrentBag<ProjectData.FileItem>();
 
                 var deleteList = new ConcurrentBag<DataModels.FileDetails>();
@@ -170,6 +171,7 @@ namespace RepoScan.FileLocator
                             {
                                 var pipelineWriter = StorageFactory.GetPipelineWriter();
                                 pipelineWriter.AddProperties(fileData);
+                                pipelineFiles.Add(fileData);
                             }
                         }
 
@@ -214,31 +216,73 @@ namespace RepoScan.FileLocator
                     var pipelineWriter = StorageFactory.GetPipelineWriter();
                     var pipelineReader = StorageFactory.GetPipelineReader();
 
-                    foreach (var fileDetails in configYamlFiles)
+                    foreach (var pipelineFile in pipelineFiles)
                     {
-                        Console.WriteLine($"Processing config.yml file {fileDetails.Path} in Project {repoItem.ProjectName}, Repository {repoItem.RepositoryName}");
-                        if (!fileDetails.PipelineProperties.TryGetValue("portfolio", out var portfolio))
+                        Console.WriteLine($"Linking config.yml to pipeline file {pipelineFile.Path} in Project {repoItem.ProjectName}, Repository {repoItem.RepositoryName}");
+
+                        var portfolio = pipelineFile.PipelineProperties.TryGetValue("portfolio", out string value) ? value : string.Empty;
+                        var product = pipelineFile.PipelineProperties.TryGetValue("product", out value) ? value : string.Empty;
+
+                        if (string.IsNullOrEmpty(portfolio) || string.IsNullOrEmpty(product))
                         {
-                            continue;
-                        }
-                        if (!fileDetails.PipelineProperties.TryGetValue("product", out var product))
-                        {
+                            Console.WriteLine($"Skipping pipeline {pipelineFile.Path} as it does not have portfolio or product defined.");
                             continue;
                         }
 
-                        var pipelines = pipelineReader.FindPipelines(repoItem.ProjectId, fileDetails.RepositoryId, portfolio, product);
+                        var configPath = $"/deploy/{portfolio}-{product}-config.yml";
+                        var configFile = configYamlFiles.FirstOrDefault(f => f.Path.Equals(configPath, StringComparison.InvariantCultureIgnoreCase));
+                        
+                        if (configFile == null)
+                        {
+                            configPath = $"/deploy/{portfolio}.{product}-config.yml";
+                            configFile = configYamlFiles.FirstOrDefault(f => f.Path.Equals(configPath, StringComparison.InvariantCultureIgnoreCase));
+                        }
+
+                        if (configFile == null)
+                        {
+                            Console.WriteLine($"No config.yml file found for portfolio {portfolio} and product {product} in Project {repoItem.ProjectName}, Repository {repoItem.RepositoryName}");
+                            continue;
+                        }
+
+                        var pipelines = pipelineReader.FindPipelines(pipelineFile);
                         if (!pipelines.Any())
                         {
                             continue;
                         }
 
-                        var environments = fileDetails.PipelineProperties["Environments"].Split('|');
+                        var environments = configFile.PipelineProperties["Environments"].Split('|');
                         foreach (var pipeline in pipelines)
                         {
                             pipeline.Environments = environments;
                             pipelineWriter.Write(pipeline);
                         }
                     }
+
+                    //foreach (var fileDetails in configYamlFiles)
+                    //{
+                    //    Console.WriteLine($"Processing config.yml file {fileDetails.Path} in Project {repoItem.ProjectName}, Repository {repoItem.RepositoryName}");
+                    //    if (!fileDetails.PipelineProperties.TryGetValue("portfolio", out var portfolio))
+                    //    {
+                    //        continue;
+                    //    }
+                    //    if (!fileDetails.PipelineProperties.TryGetValue("product", out var product))
+                    //    {
+                    //        continue;
+                    //    }
+
+                    //    var pipelines = pipelineReader.FindPipelines(repoItem.ProjectId, fileDetails.RepositoryId, portfolio, product);
+                    //    if (!pipelines.Any())
+                    //    {
+                    //        continue;
+                    //    }
+
+                    //    var environments = fileDetails.PipelineProperties["Environments"].Split('|');
+                    //    foreach (var pipeline in pipelines)
+                    //    {
+                    //        pipeline.Environments = environments;
+                    //        pipelineWriter.Write(pipeline);
+                    //    }
+                    //}
                 }
 
                 if (!deleteList.IsEmpty)
