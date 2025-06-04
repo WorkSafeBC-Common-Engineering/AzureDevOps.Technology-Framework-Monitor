@@ -8,6 +8,8 @@ namespace ProjectData.Interfaces
 {
     public interface IRuntimeMetricsScanner
     {
-        void Initialize();
+        void Initialize(string repositoryId);
+
+        Task Run();
     }
 }

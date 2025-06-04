@@ -180,9 +180,9 @@ namespace YamlFileParser
                         ParseV1Template(cleanContent, variables, file);
                     }
 
-                    if (!file.PipelineProperties.ContainsKey("blueprintType") && file.PipelineProperties.ContainsKey("blueprint"))
+                    if (!file.PipelineProperties.ContainsKey("blueprintType") && file.PipelineProperties.TryGetValue("blueprint", out string? value))
                     {
-                        var genericType = GetGenericBlueprintType(file.PipelineProperties["blueprint"]);
+                        var genericType = GetGenericBlueprintType(value);
                         if (genericType != BlueprintType.None)
                         {
                             file.PipelineProperties["blueprintType"] = genericType.ToString();
@@ -535,17 +535,12 @@ namespace YamlFileParser
 
         private static BlueprintType GetGenericBlueprintType(string genericBlueprint)
         {
-            switch (genericBlueprint)
+            return genericBlueprint switch
             {
-                case "generic-steps":
-                    return BlueprintType.GenericSteps;
-
-                case "generic-jobs":
-                    return BlueprintType.GenericJobs;
-
-                default:
-                    return BlueprintType.None;
-            }
+                "generic-steps" => BlueprintType.GenericSteps,
+                "generic-jobs" => BlueprintType.GenericJobs,
+                _ => BlueprintType.None,
+            };
         }
 
         private static string GetConfigFileName(Dictionary<string, string> pipelineProperties)

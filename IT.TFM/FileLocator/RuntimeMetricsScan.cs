@@ -1,5 +1,7 @@
 ﻿using ProjectScanner;
 
+using RepoScan.DataModels;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +16,13 @@ namespace RepoScan.FileLocator
 
         public static async Task Run()
         {
-            var scanner = ScannerFactory.GetRuntimeMetricsScanner();
+            var repoReader = StorageFactory.GetRepoListReader();
+            var repoList = repoReader.GetRepositoryIds();
+            foreach (var id in repoList)
+            {
+                var scanner = ScannerFactory.GetRuntimeMetricsScanner(id);
+                await scanner.Run();
+            }
         }
 
         #endregion

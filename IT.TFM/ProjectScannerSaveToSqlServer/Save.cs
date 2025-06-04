@@ -367,6 +367,7 @@ namespace ProjectScannerSaveToSqlServer
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Error saving release pipeline: {ex.Message}");
                 throw;
             }
 

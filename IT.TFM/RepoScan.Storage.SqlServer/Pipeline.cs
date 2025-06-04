@@ -63,14 +63,13 @@ namespace RepoScan.Storage.SqlServer
                             break;
 
                         case "suppressCD":
-                            pipeline.SuppressCD = value.ToLower() != "false";
+                            pipeline.SuppressCD = !value.Equals("false", StringComparison.CurrentCultureIgnoreCase);
                             break;
                     }
                 }
 
                 writer.SavePipeline(pipeline);
             }
-
         }
 
         void IWritePipeline.Delete(int id)
@@ -102,7 +101,7 @@ namespace RepoScan.Storage.SqlServer
         IEnumerable<int> IReadPipelines.GetPipelineIds(string projectId)
         {
             using var reader = GetReader();
-            return reader.GetPipelineIdsForProject(projectId).ToArray();
+            return [.. reader.GetPipelineIdsForProject(projectId)];
         }
 
         IEnumerable<ProjectData.Pipeline> IReadPipelines.FindPipelines(ProjectData.FileItem file)

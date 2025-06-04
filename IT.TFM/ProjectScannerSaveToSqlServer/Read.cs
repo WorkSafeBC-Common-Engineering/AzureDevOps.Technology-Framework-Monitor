@@ -167,7 +167,7 @@ namespace ProjectScannerSaveToSqlServer
 
         IEnumerable<string> IStorageReader.GetRepositoryIds()
         {
-            return _compiledRepositoryIds(context).ToBlockingEnumerable().ToArray();
+            return [.. _compiledRepositoryIds(context).ToBlockingEnumerable()];
         }
 
         IEnumerable<FileItem> IStorageReader.GetFiles()
@@ -417,7 +417,7 @@ namespace ProjectScannerSaveToSqlServer
         {
             var project = _compiledProjectQueryByProjectId(context, projectId).Result;
 
-            return _compiledGetPipelineIdsByProject(context, project.Id).ToBlockingEnumerable().ToArray();
+            return [.. _compiledGetPipelineIdsByProject(context, project.Id).ToBlockingEnumerable()];
         }
 
         IEnumerable<NuGetFeed> IStorageReader.GetNuGetFeeds()
