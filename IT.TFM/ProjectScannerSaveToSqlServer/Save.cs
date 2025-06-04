@@ -603,6 +603,8 @@ namespace ProjectScannerSaveToSqlServer
             dbMetrics.SourceLines = metrics.SourceLines;
             dbMetrics.ExecutableLines = metrics.ExecutableLines;
             dbMetrics.UnitTestCodeCoverage = metrics.UnitTestCodeCoverage;
+            dbMetrics.LastRunTotalWarnings = metrics.LastRunTotalWarnings;
+            dbMetrics.LastRunTotalErrors = metrics.LastRunTotalErrors;
 
             _ = context.SaveChangesAsync().Result;
         }

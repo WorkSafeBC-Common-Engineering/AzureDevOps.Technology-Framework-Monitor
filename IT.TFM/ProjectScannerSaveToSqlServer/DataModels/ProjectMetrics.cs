@@ -20,6 +20,10 @@
 
         public byte UnitTestCodeCoverage { get; set; }
 
+        public int? LastRunTotalWarnings { get; set; }
+
+        public int? LastRunTotalErrors { get; set; }
+
         public virtual File File { get; set; }
     }
 }

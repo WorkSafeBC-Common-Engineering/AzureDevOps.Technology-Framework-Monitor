@@ -15,5 +15,9 @@
         public int ExecutableLines { get; set; }
 
         public byte UnitTestCodeCoverage { get; set; }
+
+        public int? LastRunTotalWarnings { get; set; }
+
+        public int? LastRunTotalErrors { get; set; }
     }
 }
