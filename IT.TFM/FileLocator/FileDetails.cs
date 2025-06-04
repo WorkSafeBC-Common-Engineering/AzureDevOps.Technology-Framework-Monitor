@@ -257,32 +257,6 @@ namespace RepoScan.FileLocator
                             pipelineWriter.Write(pipeline);
                         }
                     }
-
-                    //foreach (var fileDetails in configYamlFiles)
-                    //{
-                    //    Console.WriteLine($"Processing config.yml file {fileDetails.Path} in Project {repoItem.ProjectName}, Repository {repoItem.RepositoryName}");
-                    //    if (!fileDetails.PipelineProperties.TryGetValue("portfolio", out var portfolio))
-                    //    {
-                    //        continue;
-                    //    }
-                    //    if (!fileDetails.PipelineProperties.TryGetValue("product", out var product))
-                    //    {
-                    //        continue;
-                    //    }
-
-                    //    var pipelines = pipelineReader.FindPipelines(repoItem.ProjectId, fileDetails.RepositoryId, portfolio, product);
-                    //    if (!pipelines.Any())
-                    //    {
-                    //        continue;
-                    //    }
-
-                    //    var environments = fileDetails.PipelineProperties["Environments"].Split('|');
-                    //    foreach (var pipeline in pipelines)
-                    //    {
-                    //        pipeline.Environments = environments;
-                    //        pipelineWriter.Write(pipeline);
-                    //    }
-                    //}
                 }
 
                 if (!deleteList.IsEmpty)
