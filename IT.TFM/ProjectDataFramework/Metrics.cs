@@ -16,8 +16,8 @@
 
         public byte UnitTestCodeCoverage { get; set; }
 
-        public int? LastRunTotalWarnings { get; set; }
+        public int? LastRunTotalWarnings { get; set; } = null;
 
-        public int? LastRunTotalErrors { get; set; }
+        public int? LastRunTotalErrors { get; set; } = null;
     }
 }
