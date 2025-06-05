@@ -346,7 +346,7 @@ namespace ProjectScannerSaveToSqlServer
             }
         }
 
-        IEnumerable<Pipeline> IStorageReader.GetPipelines(string pipelineType)
+        IEnumerable<Pipeline> IStorageReader.GetPipelinesByType(string pipelineType)
         {
             if (pipelineType != Pipeline.pipelineTypeYaml && pipelineType != Pipeline.pipelineTypeClassic)
             {
@@ -381,6 +381,31 @@ namespace ProjectScannerSaveToSqlServer
             }
 
             return pipelineList.AsEnumerable();
+        }
+
+        IEnumerable<Pipeline> IStorageReader.GetPipelines(string repositoryId)
+        {
+            var pipelines = context.Pipelines.Where(p => p.Repository.RepositoryId == repositoryId)
+                                             .Select(p => new Pipeline
+                                             {
+                                                 Id = p.PipelineId,
+                                                 ProjectId = p.Project.ProjectId,
+                                                 RepositoryId = p.Repository.RepositoryId,
+                                                 Name = p.Name,
+                                                 Folder = p.Folder,
+                                                 Revision = p.Revision,
+                                                 Url = p.Url,
+                                                 Type = p.Type,
+                                                 PipelineType = p.PipelineType,
+                                                 Path = p.Path,
+                                                 YamlType = p.YamlType,
+                                                 BlueprintApplicationType = string.Empty,
+                                                 SuppressCD = p.SuppressCD,
+                                                 Portfolio = p.Portfolio,
+                                                 Product = p.Product
+                                             });
+
+            return pipelines;
         }
 
         IEnumerable<Pipeline> IStorageReader.GetPipelines(string repositoryId, string filePath)

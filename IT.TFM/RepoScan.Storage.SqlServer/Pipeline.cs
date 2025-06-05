@@ -85,7 +85,7 @@ namespace RepoScan.Storage.SqlServer
         IEnumerable<YamlPipeline> IReadPipelines.ReadYamlPipelines()
         {
             using var reader = GetReader();
-            var pipelines = reader.GetPipelines(ProjectData.Pipeline.pipelineTypeYaml);
+            var pipelines = reader.GetPipelinesByType(ProjectData.Pipeline.pipelineTypeYaml);
             return pipelines.Select(p => new YamlPipeline
                                    {
                                        PipelineId = p.Id,
@@ -108,6 +108,13 @@ namespace RepoScan.Storage.SqlServer
         {
             using var reader = GetReader();
             var pipelines = reader.GetPipelines(file.RepositoryId.ToString("D"), file.Path);
+            return pipelines.ToArray().AsEnumerable();
+        }
+
+        IEnumerable<ProjectData.Pipeline> IReadPipelines.GetPipelines(string repositoryId)
+        {
+            using var reader = GetReader();
+            var pipelines = reader.GetPipelines(repositoryId);
             return pipelines.ToArray().AsEnumerable();
         }
 

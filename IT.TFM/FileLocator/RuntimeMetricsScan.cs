@@ -14,15 +14,29 @@ namespace RepoScan.FileLocator
     {
         #region Public Methods
 
-        public static async Task Run()
+        public static async Task Run(string projectId, string repositoryId)
         {
             var repoReader = StorageFactory.GetRepoListReader();
-            var repoList = repoReader.GetRepositoryIds();
-            foreach (var id in repoList)
+            Settings.Initialize();
+
+            foreach (var name in Settings.Scanners)
             {
-                var scanner = ScannerFactory.GetRuntimeMetricsScanner(id);
-                await scanner.Run();
+                var scanner = ScannerFactory.GetScanner(name);
+
+                var organization = scanner.GetOrganization();
+
+                await foreach (var project in scanner.Projects(projectId))
+                {
+                    var repos = await scanner.Repositories(project, repositoryId);
+
+                    foreach (var repo in repos)
+                    {
+                        var metricsScanner = ScannerFactory.GetRuntimeMetricsScanner(repo.Id.ToString());
+                        await metricsScanner.Run();
+                    }
+                }
             }
+
         }
 
         #endregion

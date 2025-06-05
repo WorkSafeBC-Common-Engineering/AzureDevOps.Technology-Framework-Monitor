@@ -1,4 +1,9 @@
-﻿using ProjectData.Interfaces;
+﻿using ProjectData;
+using ProjectData.Interfaces;
+
+using ProjectScanner;
+
+using RepoScan.DataModels;
 
 namespace RuntimeMetricsScanner
 {
@@ -24,17 +29,64 @@ namespace RuntimeMetricsScanner
 
         Task IRuntimeMetricsScanner.Run()
         {
+            var reader = StorageFactory.GetPipelineReader();
+            //var scanner = ScannerFactory.GetScanner(token, organization, repositoryId);
 
 
+            var pipelines = reader.GetPipelines(repositoryId);
+            foreach (var pipeline in pipelines)
+            {
+                var logEntry = GetLatestLog(pipeline);
+                if (logEntry != null)
+                {
+                    var logData = GetData(logEntry);
+                    var projectMetrics = ParseLogData(logData);
 
-            throw new NotImplementedException();
+                    foreach (var metrics in projectMetrics)
+                    {
+                        var project = FindProject(repositoryId, metrics.ProjectPath);
+                        var fileMetrics = GetMetrics(project);
+
+                        if (fileMetrics != null)
+                        {
+                            fileMetrics.LastRunTotalWarnings = metrics.TotalWarnings;
+                            fileMetrics.LastRunTotalErrors = metrics.TotalErrors;
+                        }
+                    }
+                }
+            }
+
+            throw new NotImplementedException("Runtime metrics scanning is not yet implemented.");
         }
 
         #endregion
 
         #region Private Methods
 
-        // Add methods to scan runtime metrics here
+        private LogEntry? GetLatestLog(Pipeline pipeline)
+        {
+            throw new NotImplementedException();
+        }
+
+        private string[] GetData(LogEntry logEntry)
+        {
+            throw new NotImplementedException();
+        }
+
+        private IEnumerable<ProjectRuntimeMetrics> ParseLogData(string[] logData)
+        {
+            throw new NotImplementedException();
+        }
+
+        private Project FindProject(string repositoryId, string projectPath)
+        {
+            throw new NotImplementedException();
+        }
+
+        private ProjectMetrics GetMetrics(Project project)
+        {
+            throw new NotImplementedException();
+        }
 
         #endregion
     }

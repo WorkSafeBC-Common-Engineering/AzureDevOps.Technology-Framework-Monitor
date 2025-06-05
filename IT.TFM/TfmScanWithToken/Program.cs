@@ -60,7 +60,7 @@ namespace TfmScanWithToken
 
             if (partSix)
             {
-                await GetRuntimeMetrics();
+                await GetRuntimeMetrics(projectId, repositoryId);
             }
 
 #if DEBUG
@@ -115,11 +115,11 @@ namespace TfmScanWithToken
             Console.WriteLine($"NuGet Feed Scan complete at: {DateTime.Now.ToLongTimeString()}");
         }
 
-        private static async Task GetRuntimeMetrics()
+        private static async Task GetRuntimeMetrics(string projectId, string repositoryId)
         {
             Console.WriteLine($"Starting Runtime Metrics Scan at: {DateTime.Now.ToLongTimeString()}");
 
-            await RuntimeMetricsScan.Run();
+            await RuntimeMetricsScan.Run(projectId, repositoryId);
 
             Console.WriteLine($"Runtime Metrics Scan complete at: {DateTime.Now.ToLongTimeString()}");
         }
