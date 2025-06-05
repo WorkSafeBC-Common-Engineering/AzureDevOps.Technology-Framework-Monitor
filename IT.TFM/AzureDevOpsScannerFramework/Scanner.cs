@@ -507,8 +507,8 @@ namespace AzureDevOpsScannerFramework
                 LastRunUrl = release.LastRunUrl,
                 State = release.State,
                 Result = release.Result,
-                Environments = release.Details.Environments.Select(e => e.Name).ToArray(),
-                Artifacts = release.Details.Artifacts.Select(a => new Artifact
+                Environments = [.. release.Details.Environments.Select(e => e.Name)],
+                Artifacts = [.. release.Details.Artifacts.Select(a => new Artifact
                     {
                         SourceId = a.SourceId,
                         Type = a.Type,
@@ -521,7 +521,7 @@ namespace AzureDevOpsScannerFramework
                         ProjectId = a.DefinitionReference?.Project?.Id,
                         IsPrimary = a.IsPrimary ?? false,
                         IsRetained = a.IsRetained ?? false
-                    }).ToArray()
+                    })]
             };
 
             return pipeline;
