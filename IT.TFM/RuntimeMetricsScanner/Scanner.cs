@@ -27,7 +27,7 @@ namespace RuntimeMetricsScanner
             this.repositoryId = repositoryId;
         }
 
-        Task IRuntimeMetricsScanner.Run()
+        async Task IRuntimeMetricsScanner.Run()
         {
             var reader = StorageFactory.GetPipelineReader();
             //var scanner = ScannerFactory.GetScanner(token, organization, repositoryId);
@@ -36,39 +36,39 @@ namespace RuntimeMetricsScanner
             var pipelines = reader.GetPipelines(repositoryId);
             foreach (var pipeline in pipelines)
             {
-                var logEntry = GetLatestLog(pipeline);
+                var logEntry = await GetLatestLogAsync(pipeline);
                 if (logEntry != null)
                 {
-                    var logData = GetData(logEntry);
+                    var logData = await GetDataAsync(logEntry);
                     var projectMetrics = ParseLogData(logData);
 
                     foreach (var metrics in projectMetrics)
                     {
-                        var project = FindProject(repositoryId, metrics.ProjectPath);
-                        var fileMetrics = GetMetrics(project);
+                        var project = await FindProjectAsync(repositoryId, metrics.ProjectPath);
+                        var fileMetrics = await GetMetricsAsync(project);
 
                         if (fileMetrics != null)
                         {
                             fileMetrics.LastRunTotalWarnings = metrics.TotalWarnings;
                             fileMetrics.LastRunTotalErrors = metrics.TotalErrors;
+
+                            await SaveMetricsAsync(fileMetrics);
                         }
                     }
                 }
             }
-
-            throw new NotImplementedException("Runtime metrics scanning is not yet implemented.");
         }
 
         #endregion
 
         #region Private Methods
 
-        private LogEntry? GetLatestLog(Pipeline pipeline)
+        private async Task<LogEntry?> GetLatestLogAsync(Pipeline pipeline)
         {
             throw new NotImplementedException();
         }
 
-        private string[] GetData(LogEntry logEntry)
+        private async Task<string[]> GetDataAsync(LogEntry logEntry)
         {
             throw new NotImplementedException();
         }
@@ -78,12 +78,17 @@ namespace RuntimeMetricsScanner
             throw new NotImplementedException();
         }
 
-        private Project FindProject(string repositoryId, string projectPath)
+        private async Task<Project> FindProjectAsync(string repositoryId, string projectPath)
         {
             throw new NotImplementedException();
         }
 
-        private ProjectMetrics GetMetrics(Project project)
+        private async Task<ProjectMetrics> GetMetricsAsync(Project project)
+        {
+            throw new NotImplementedException();
+        }
+
+        private async Task SaveMetricsAsync(ProjectMetrics fileMetrics)
         {
             throw new NotImplementedException();
         }

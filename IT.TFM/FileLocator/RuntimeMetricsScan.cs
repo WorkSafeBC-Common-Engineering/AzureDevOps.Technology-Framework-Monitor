@@ -16,7 +16,6 @@ namespace RepoScan.FileLocator
 
         public static async Task Run(string projectId, string repositoryId)
         {
-            var repoReader = StorageFactory.GetRepoListReader();
             Settings.Initialize();
 
             foreach (var name in Settings.Scanners)
