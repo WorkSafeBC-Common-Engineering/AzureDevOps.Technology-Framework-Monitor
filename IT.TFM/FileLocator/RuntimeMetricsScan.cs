@@ -30,8 +30,8 @@ namespace RepoScan.FileLocator
 
                     foreach (var repo in repos)
                     {
-                        var metricsScanner = ScannerFactory.GetRuntimeMetricsScanner(repo.Id.ToString());
-                        await metricsScanner.Run();
+                        var metricsScanner = ScannerFactory.GetRuntimeMetricsScanner(scanner, project.Id.ToString("D").ToLower(), repo.Id.ToString("D").ToLower(), repo.Name);
+                        await metricsScanner.RunAsync();
                     }
                 }
             }

@@ -107,11 +107,11 @@ namespace NuGetScanner
                     ? metadata.Published.Value.DateTime
                     : null;
                 package.Tags = metadata.Tags ?? string.Empty;
-                package.Targets = metadata.DependencySets.Select(f => new NuGetTarget
+                package.Targets = [.. metadata.DependencySets.Select(f => new NuGetTarget
                 {
                     Framework = f.TargetFramework.Framework,
                     Version = f.TargetFramework.Version.ToString()
-                }).ToArray();
+                })];
                 package.DataLoaded = true;
             }
 

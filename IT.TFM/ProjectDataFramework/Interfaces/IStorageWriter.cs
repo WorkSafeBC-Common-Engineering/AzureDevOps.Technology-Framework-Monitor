@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ProjectData.Interfaces
 {
@@ -29,6 +30,6 @@ namespace ProjectData.Interfaces
 
         void CleanupNuGetPackages(IEnumerable<int> packageIds);
 
-        void SaveMetrics(FileItem file, Metrics metrics);
+        Task SaveMetricsAsync(FileItem file, Metrics metrics = null, ProjectRuntimeMetrics runtimeMetrics = null);
     }
 }

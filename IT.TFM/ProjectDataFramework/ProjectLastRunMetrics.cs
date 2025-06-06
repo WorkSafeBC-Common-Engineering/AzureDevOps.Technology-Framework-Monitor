@@ -1,6 +1,6 @@
-﻿namespace RuntimeMetricsScanner
+﻿namespace ProjectData
 {
-    internal class ProjectMetrics
+    public class ProjectLastRunMetrics
     {
         public int? LastRunTotalWarnings { get; set; } = null;
 

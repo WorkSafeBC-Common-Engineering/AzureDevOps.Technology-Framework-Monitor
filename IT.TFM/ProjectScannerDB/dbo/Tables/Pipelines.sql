@@ -31,6 +31,7 @@
     [Environments] NVARCHAR(MAX) NULL,
     [State] NVARCHAR(20) NULL,
     [Result] NVARCHAR(20) NULL,
+    [RunId] int NULL,
     [LastRunUrl] NVARCHAR(MAX) NULL,
     [LastRunStart] DATETIME NULL,
     [LastRunEnd] DATETIME NULL,

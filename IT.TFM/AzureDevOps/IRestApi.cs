@@ -14,10 +14,14 @@ namespace AzureDevOps
 
         string Repository { get; set; }
 
-        int Pipeline {  get; set; }
+        int Pipeline { get; set; }
+
+        int Run { get; set; }
+
+        int Log { get; set; }
 
         int ReleaseDefinition { get; set; }
-        
+
         string RepositoryBranch { get; set; }
 
         string CheckoutDirectory { get; set; }
@@ -40,10 +44,16 @@ namespace AzureDevOps
 
         Task<AzDoPipelineRunList> GetPipelineRunsAsync();
 
+        Task<AzDoPipelineRunLogs> GetPipelineRunLogsAsync();
+
         Task<AzDoFileList> GetFilesAsync();
 
         Task<string> DownloadRepositoryAsync();
 
         Task<IEnumerable<AzDoPipeline>> GetPipelinesAsync();
+
+        Task<string> GetPipelineRunLogSignedUrlAsync();
+
+        Task<string> GetPipelineLogContentAsync(string url);
     }
 }

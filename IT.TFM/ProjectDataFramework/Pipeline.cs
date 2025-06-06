@@ -43,6 +43,8 @@ namespace ProjectData
 
         public string[] Environments { get; set; }
 
+        public int? RunId { get; set; }
+
         public string State { get; set; } = string.Empty;
 
         public string Result { get; set; } = string.Empty;

@@ -11,6 +11,7 @@
     <ProjectReference Include="..\DataModels\RepoScan.DataModels.csproj" />
     <ProjectReference Include="..\ProjectDataFramework\ProjectData.csproj" />
     <ProjectReference Include="..\ProjectScannerFramework\ProjectScanner.csproj" />
+    <ProjectReference Include="..\Storage\Storage.csproj" />
   </ItemGroup>
 
 </Project>

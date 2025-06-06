@@ -185,6 +185,7 @@ namespace AzureDevOpsScannerFramework
 
                     if (run != null)
                     {
+                        p.RunId = run.Id;
                         p.LastRunStart = run.CreatedDate;
                         p.LastRunEnd = run.FinishedDate;
                         p.State = run.State;
@@ -197,6 +198,42 @@ namespace AzureDevOpsScannerFramework
             }
 
             return pipelineList.AsEnumerable();
+        }
+
+        async Task<IEnumerable<PipelineRunLog>> IScanner.PipelineRunLogs(string projectId, int pipelineId, int runId)
+        {
+            api.Project = projectId;
+            api.Pipeline = pipelineId;
+            api.Run = runId;
+
+            var azDoLogs = await api.GetPipelineRunLogsAsync();
+            var logEntries = azDoLogs.Logs
+                                     .Select(l => new PipelineRunLog
+                                     {
+                                         Id = l.Id,
+                                         CreatedOn = l.CreatedOn,
+                                         LastChangedOn = l.LastChangedOn
+                                     })
+                                     .ToArray();
+
+            return logEntries.AsEnumerable();
+        }
+
+        async Task<string> IScanner.PipelineRunLogContent(string projectId, int pipelineId, int runId, int logId)
+        {
+            api.Project = projectId;
+            api.Pipeline = pipelineId;
+            api.Run = runId;
+            api.Log = logId;
+
+            var signedUrl = await api.GetPipelineRunLogSignedUrlAsync();
+            if (string.IsNullOrWhiteSpace(signedUrl))
+            {
+                return string.Empty;
+            }
+
+            var content = await api.GetPipelineLogContentAsync(signedUrl);
+            return content;
         }
 
         async Task<IEnumerable<ProjectData.Pipeline>> IScanner.Releases(Guid projectId, string repositoryId)

@@ -79,7 +79,7 @@ namespace RepoScan.FileLocator
 
                 var deleteList = new ConcurrentBag<DataModels.FileDetails>();
 
-                Parallel.ForEach(fileItems, options, (fileItem) =>
+                Parallel.ForEach(fileItems, options, async (fileItem) =>
                 {
                     if (Parameters.Settings.ExtendedLogging)
                     {
@@ -201,7 +201,7 @@ namespace RepoScan.FileLocator
                         if (metrics != null)
                         {
                             var writer = Storage.StorageFactory.GetStorageWriter();
-                            writer.SaveMetrics(fileInfo, metrics);
+                            await writer.SaveMetricsAsync(fileInfo, metrics, null);
                         }
                     }
 

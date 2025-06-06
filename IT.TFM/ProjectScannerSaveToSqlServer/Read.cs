@@ -374,7 +374,13 @@ namespace ProjectScannerSaveToSqlServer
                     Type = dbPipeline.Type,
                     PipelineType = dbPipeline.Type,
                     Path = dbPipeline.Path,
-                    FileId = file?.FileId
+                    FileId = file?.FileId,
+                    RunId = dbPipeline.RunId,
+                    State = dbPipeline.State,
+                    Result = dbPipeline.Result,
+                    LastRunStart = dbPipeline.LastRunStart,
+                    LastRunEnd = dbPipeline.LastRunEnd,
+                    LastRunUrl = dbPipeline.LastRunUrl
                 };
 
                 pipelineList.Add(pipeline);
@@ -402,7 +408,13 @@ namespace ProjectScannerSaveToSqlServer
                                                  BlueprintApplicationType = string.Empty,
                                                  SuppressCD = p.SuppressCD,
                                                  Portfolio = p.Portfolio,
-                                                 Product = p.Product
+                                                 Product = p.Product,
+                                                 RunId = p.RunId,
+                                                 State = p.State,
+                                                 Result = p.Result,
+                                                 LastRunStart = p.LastRunStart,
+                                                 LastRunEnd = p.LastRunEnd,
+                                                 LastRunUrl = p.LastRunUrl
                                              });
 
             return pipelines;
@@ -434,7 +446,13 @@ namespace ProjectScannerSaveToSqlServer
                 BlueprintApplicationType = p.BlueprintType?.Value ?? string.Empty,
                 SuppressCD = p.SuppressCD,
                 Portfolio = p.Portfolio,
-                Product = p.Product
+                Product = p.Product,
+                RunId = p.RunId,
+                State = p.State,
+                Result = p.Result,
+                LastRunStart = p.LastRunStart,
+                LastRunEnd = p.LastRunEnd,
+                LastRunUrl = p.LastRunUrl
             }).AsEnumerable();
         }
 

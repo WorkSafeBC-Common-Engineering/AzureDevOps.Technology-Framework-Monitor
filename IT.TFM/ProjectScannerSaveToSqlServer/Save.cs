@@ -7,6 +7,7 @@ using System.Linq;
 using ProjectData;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace ProjectScannerSaveToSqlServer
 {
@@ -276,6 +277,7 @@ namespace ProjectScannerSaveToSqlServer
             dbPipeline.PipelineType = pipeline.PipelineType;
             dbPipeline.Path = pipeline.Path;
             dbPipeline.FileId = dbFile?.Id;
+            dbPipeline.RunId = pipeline.RunId;
             dbPipeline.State = pipeline.State;
             dbPipeline.Result = pipeline.Result;
             dbPipeline.LastRunUrl = pipeline.LastRunUrl;
@@ -577,8 +579,14 @@ namespace ProjectScannerSaveToSqlServer
             }
         }
 
-        void IStorageWriter.SaveMetrics(FileItem file, Metrics metrics)
+        async Task IStorageWriter.SaveMetricsAsync(FileItem file, Metrics metrics, ProjectRuntimeMetrics runtimeMetrics)
         {
+            if (metrics == null && runtimeMetrics == null)
+            {
+                // no data provided to save
+                return;
+            }
+
             var dbRepo = context.Repositories
                     .SingleOrDefault(r => r.RepositoryId.Equals(file.RepositoryId.ToString("D")));
 
@@ -597,17 +605,31 @@ namespace ProjectScannerSaveToSqlServer
                 dbFile.ProjectMetrics = dbMetrics;
             }
 
-            dbMetrics.MaintainabilityIndex = metrics.MaintainabilityIndex;
-            dbMetrics.CyclomaticComplexity = metrics.CyclomaticComplexity;
-            dbMetrics.ClassCoupling = metrics.ClassCoupling;
-            dbMetrics.DepthOfInheritance = metrics.DepthOfInheritance;
-            dbMetrics.SourceLines = metrics.SourceLines;
-            dbMetrics.ExecutableLines = metrics.ExecutableLines;
-            dbMetrics.UnitTestCodeCoverage = metrics.UnitTestCodeCoverage;
-            dbMetrics.LastRunTotalWarnings = metrics.LastRunTotalWarnings;
-            dbMetrics.LastRunTotalErrors = metrics.LastRunTotalErrors;
+            if (metrics != null)
+            {
 
-            _ = context.SaveChangesAsync().Result;
+                dbMetrics.MaintainabilityIndex = metrics.MaintainabilityIndex;
+                dbMetrics.CyclomaticComplexity = metrics.CyclomaticComplexity;
+                dbMetrics.ClassCoupling = metrics.ClassCoupling;
+                dbMetrics.DepthOfInheritance = metrics.DepthOfInheritance;
+                dbMetrics.SourceLines = metrics.SourceLines;
+                dbMetrics.ExecutableLines = metrics.ExecutableLines;
+                dbMetrics.UnitTestCodeCoverage = metrics.UnitTestCodeCoverage;
+            }
+
+            if (runtimeMetrics != null)
+            {
+                var warnings = (runtimeMetrics.TotalWarnings > (dbMetrics.LastRunTotalWarnings ?? 0))
+                        ? runtimeMetrics.TotalWarnings : dbMetrics.LastRunTotalWarnings ?? 0;
+
+                var errors = (runtimeMetrics.TotalErrors > (dbMetrics.LastRunTotalErrors ?? 0))
+                        ? runtimeMetrics.TotalErrors : dbMetrics.LastRunTotalErrors ?? 0;
+
+                dbMetrics.LastRunTotalWarnings = warnings;
+                dbMetrics.LastRunTotalErrors = errors;
+            }
+
+            _ = await context.SaveChangesAsync();
         }
 
         #endregion

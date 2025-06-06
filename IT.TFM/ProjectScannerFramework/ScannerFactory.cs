@@ -43,10 +43,10 @@ namespace ProjectScanner
             return instance;
         }
 
-        public static IRuntimeMetricsScanner GetRuntimeMetricsScanner(string repositoryId)
+        public static IRuntimeMetricsScanner GetRuntimeMetricsScanner(IScanner scanner, string projectId, string repositoryId, string repositoryName)
         {
             var instance = _container.Resolve<IRuntimeMetricsScanner>();
-            instance.Initialize(repositoryId);
+            instance.Initialize(scanner, projectId, repositoryId, repositoryName);
             return instance;
         }
     }

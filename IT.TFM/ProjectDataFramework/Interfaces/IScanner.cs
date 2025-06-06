@@ -20,6 +20,10 @@ namespace ProjectData.Interfaces
 
         Task<IEnumerable<Pipeline>> Pipelines(Guid projectId, string repositoryId);
 
+        Task<IEnumerable<PipelineRunLog>> PipelineRunLogs(string projectId, int pipelineId, int runId);
+
+        Task<string> PipelineRunLogContent(string projectId, int pipelineId, int runId, int logId);
+
         Task<IEnumerable<Pipeline>> Releases(Guid projectId, string repositoryId);
 
         void DeleteFiles();
