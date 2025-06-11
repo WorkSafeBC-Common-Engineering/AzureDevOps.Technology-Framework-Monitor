@@ -78,6 +78,7 @@ namespace VisualStudioMetricsScanner
                     {
                         xmlDoc.Load(metricsTargetFile);
                         readSuccessful = true;
+                        break;
                     }
                     catch (IOException ioException)
                     {
