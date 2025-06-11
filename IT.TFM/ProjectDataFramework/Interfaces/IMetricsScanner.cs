@@ -1,7 +1,9 @@
-﻿namespace ProjectData.Interfaces
+﻿using System.Collections.Generic;
+
+namespace ProjectData.Interfaces
 {
     public interface IMetricsScanner
     {
-        Metrics? Get(FileItem file, string basePath);
+        Dictionary<string, Metrics> Get(FileItem file, string basePath);
     }
 }

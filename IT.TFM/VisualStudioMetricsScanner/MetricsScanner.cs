@@ -22,7 +22,7 @@ namespace VisualStudioMetricsScanner
 
         #region IMetricsScanner Implementation
 
-        Metrics? IMetricsScanner.Get(FileItem file, string basePath)
+        Dictionary<string, Metrics> IMetricsScanner.Get(FileItem file, string basePath)
         {
             Console.WriteLine($"Getting metrics for {file.Path}");
             SetMetricsPath(basePath);
@@ -31,7 +31,7 @@ namespace VisualStudioMetricsScanner
 
             var metrics = ParseMetricsFile();
 
-            if (metrics == null)
+            if (metrics.Count == 0)
             {
                 Console.WriteLine($"\t>>> Unable to retrieving metrics");
             }
@@ -48,7 +48,7 @@ namespace VisualStudioMetricsScanner
             var startInfo = new ProcessStartInfo
             {
                 FileName = metricsExe,
-                Arguments = $"/p:{filePath} /o:{metricsTargetFile}"
+                Arguments = $"/q /s:{filePath} /o:{metricsTargetFile}"
             };
 
             var process = new Process
@@ -62,9 +62,9 @@ namespace VisualStudioMetricsScanner
             }
         }
 
-        private Metrics? ParseMetricsFile()
+        private Dictionary<string, Metrics> ParseMetricsFile()
         {
-            Metrics? metrics = null;
+            var metricsList = new Dictionary<string, Metrics>();
 
             try
             {
@@ -90,59 +90,80 @@ namespace VisualStudioMetricsScanner
                 if (!readSuccessful)
                 {
                     Console.WriteLine("Failed to read metrics file after multiple attempts.");
-                    return metrics;
+                    return metricsList;
                 }
 
-                var rootNode = xmlDoc.SelectSingleNode("/CodeMetricsReport/Targets/Target/Assembly/Metrics");
-                if (rootNode == null)
+                var rootSolutionNodes = xmlDoc.SelectNodes("/CodeMetricsReport/Targets/Target");
+                if (rootSolutionNodes == null)
                 {
-                    return metrics;
+                    return metricsList;
                 }
-                metrics = new Metrics();
 
-                foreach (XmlNode node in rootNode.ChildNodes)
+                foreach (XmlNode node in rootSolutionNodes)
                 {
-                    if (node.Attributes == null)
+                    if (node == null || node.Attributes == null)
                     {
-                        return null;
+                        continue;
                     }
 
-                    var nodeKey = node.Attributes["Name"]?.Value ?? string.Empty;
-                    var nodeValue = node.Attributes["Value"]?.Value ?? string.Empty;
-                    if (!int.TryParse(nodeValue, out var nodeIntValue))
+                    var projectPath = node.Attributes["Name"]?.Value;
+                    if (projectPath == null)
                     {
-                        nodeIntValue = 0;
+                        continue;
                     }
 
-                    switch (nodeKey)
+                    var metricsNode = node.SelectSingleNode("Assembly/Metrics");
+                    if (metricsNode == null)
                     {
-                        case "MaintainabilityIndex":
-                            metrics.MaintainabilityIndex = nodeIntValue;
-                            break;
-
-                        case "CyclomaticComplexity":
-                            metrics.CyclomaticComplexity = nodeIntValue;
-                            break;
-
-                        case "ClassCoupling":
-                            metrics.ClassCoupling = nodeIntValue;
-                            break;
-
-                        case "DepthOfInheritance":
-                            metrics.DepthOfInheritance = nodeIntValue;
-                            break;
-
-                        case "SourceLines":
-                            metrics.SourceLines = nodeIntValue;
-                            break;
-
-                        case "ExecutableLines":
-                            metrics.ExecutableLines = nodeIntValue;
-                            break;
+                        continue;
                     }
+
+                    var metrics = new Metrics();
+
+                    foreach (XmlNode valueNode in metricsNode.ChildNodes)
+                    {
+                        if (valueNode.Attributes == null)
+                        {
+                            continue;
+                        }
+
+                        var nodeKey = valueNode.Attributes["Name"]?.Value ?? string.Empty;
+                        var nodeValue = valueNode.Attributes["Value"]?.Value ?? string.Empty;
+                        if (!int.TryParse(nodeValue, out var nodeIntValue))
+                        {
+                            nodeIntValue = 0;
+                        }
+
+                        switch (nodeKey)
+                        {
+                            case "MaintainabilityIndex":
+                                metrics.MaintainabilityIndex = nodeIntValue;
+                                break;
+
+                            case "CyclomaticComplexity":
+                                metrics.CyclomaticComplexity = nodeIntValue;
+                                break;
+
+                            case "ClassCoupling":
+                                metrics.ClassCoupling = nodeIntValue;
+                                break;
+
+                            case "DepthOfInheritance":
+                                metrics.DepthOfInheritance = nodeIntValue;
+                                break;
+
+                            case "SourceLines":
+                                metrics.SourceLines = nodeIntValue;
+                                break;
+
+                            case "ExecutableLines":
+                                metrics.ExecutableLines = nodeIntValue;
+                                break;
+                        }
+                    }
+
+                    metricsList[projectPath] = metrics;
                 }
-
-                return metrics;
             }
             catch (Exception ex)
             {
@@ -156,7 +177,7 @@ namespace VisualStudioMetricsScanner
                 }
             }
 
-            return null;
+            return metricsList;
         }
 
         private void SetMetricsPath(string basePath)

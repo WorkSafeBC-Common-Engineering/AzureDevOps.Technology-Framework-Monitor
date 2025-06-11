@@ -7,6 +7,7 @@ using RepoScan.DataModels;
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -198,10 +199,17 @@ namespace RepoScan.FileLocator
                     {
                         fileInfo.RepositoryId = repoItem.RepositoryId;
                         var metrics = GetMetrics(fileInfo, currentBasePath);
-                        if (metrics != null)
+
+                        var writer = Storage.StorageFactory.GetStorageWriter();
+
+                        foreach (var projectFile in metrics.Keys)
                         {
-                            var writer = Storage.StorageFactory.GetStorageWriter();
-                            await writer.SaveMetricsAsync(fileInfo, metrics, null);
+                            var projectItem = fileItems.FirstOrDefault(f => f.Path.EndsWith(projectFile, StringComparison.OrdinalIgnoreCase));
+                            if (projectItem != null)
+                            {
+                                var metricsValues = metrics[projectFile];
+                                await writer.SaveMetricsAsync(fileInfo, metricsValues, null);
+                            }
                         }
                     }
 
@@ -272,7 +280,7 @@ namespace RepoScan.FileLocator
             }
         }
 
-        private static Metrics GetMetrics(ProjectData.FileItem file, string basePath)
+        private static Dictionary<string, Metrics> GetMetrics(ProjectData.FileItem file, string basePath)
         {
             var scanner = MetricsScannerFactory.GetScanner(file.FileType.ToString());
             var metrics = scanner.Get(file, basePath);
