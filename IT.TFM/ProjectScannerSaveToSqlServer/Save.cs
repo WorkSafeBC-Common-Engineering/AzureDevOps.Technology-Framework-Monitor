@@ -167,7 +167,7 @@ namespace ProjectScannerSaveToSqlServer
 
             var id = repoId.ToString("D").ToLower();
             var repo = context.Repositories
-                              .SingleOrDefaultAsync(r => r.RepositoryId == id)
+                              .SingleOrDefaultAsync(r => !r.Deleted && r.RepositoryId == id)
                               .Result;
             int repositoryId = repo == null ? 0 : repo.Id;
 
@@ -244,7 +244,8 @@ namespace ProjectScannerSaveToSqlServer
                                    .SingleOrDefault(p => p.ProjectId == pipeline.ProjectId);
 
             var dbRepo = context.Repositories
-                                .SingleOrDefault(r => r.RepositoryId.Equals(pipeline.RepositoryId));
+                                .SingleOrDefault(r => !r.Deleted
+                                                   && r.RepositoryId.Equals(pipeline.RepositoryId));
 
             var dbPipeline = context.Pipelines
                                     .SingleOrDefault(p => p.PipelineId == pipeline.Id && p.Type != ProjData.Pipeline.pipelineTypeRelease);
@@ -588,13 +589,18 @@ namespace ProjectScannerSaveToSqlServer
             }
 
             var dbRepo = context.Repositories
-                    .SingleOrDefault(r => r.RepositoryId.Equals(file.RepositoryId.ToString("D")));
+                    .SingleOrDefault(r => !r.Deleted && r.RepositoryId.Equals(file.RepositoryId.ToString("D")));
 
             var dbFile = context.Files
                                 .SingleOrDefault(f => f.RepositoryId == dbRepo.Id
                                                    && f.Path.Equals(file.Path));
 
-            var dbMetrics = dbFile.ProjectMetrics;
+            if (dbFile == null)
+            {
+                return;
+            }
+
+            var dbMetrics = dbFile?.ProjectMetrics;
             if (dbMetrics == null)
             {
                 dbMetrics = new ProjectMetrics

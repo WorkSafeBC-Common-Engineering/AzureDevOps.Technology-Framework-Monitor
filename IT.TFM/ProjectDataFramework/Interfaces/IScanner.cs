@@ -10,7 +10,7 @@ namespace ProjectData.Interfaces
 
         Organization GetOrganization();
 
-        IAsyncEnumerable<Project> Projects(string projectId);
+        IAsyncEnumerable<Project> Projects(string projectId, string[] excludedProjects);
 
         Task<IEnumerable<Repository>> Repositories(Project project, string repositoryId);
 

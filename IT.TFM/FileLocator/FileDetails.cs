@@ -14,7 +14,7 @@ namespace RepoScan.FileLocator
 {
     public static class FileDetails
     {
-        public static async Task GetDetailsAsync(int totalThreads, bool forceDetails, string projectId, string repositoryId)
+        public static async Task GetDetailsAsync(int totalThreads, bool forceDetails, string projectId, string repositoryId, string[] excludedProjects)
         {
             Settings.Initialize();
 

@@ -14,7 +14,7 @@ namespace RepoScan.FileLocator
     {
         #region Public Methods
 
-        public static async Task Run(string projectId, string repositoryId)
+        public static async Task Run(string projectId, string repositoryId, string[] excludedProjects)
         {
             Settings.Initialize();
 
@@ -24,7 +24,7 @@ namespace RepoScan.FileLocator
 
                 var organization = scanner.GetOrganization();
 
-                await foreach (var project in scanner.Projects(projectId))
+                await foreach (var project in scanner.Projects(projectId, excludedProjects))
                 {
                     var repos = await scanner.Repositories(project, repositoryId);
 

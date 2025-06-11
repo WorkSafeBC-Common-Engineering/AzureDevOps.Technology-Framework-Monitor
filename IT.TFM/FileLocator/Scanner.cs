@@ -18,7 +18,7 @@ namespace RepoScan.FileLocator
 
         #region Public Methods
 
-        public async Task ScanAsync(string projectId, string repositoryId)
+        public async Task ScanAsync(string projectId, string repositoryId, string[] excludedProjects)
         {
             IWriteRepoList writer = StorageFactory.GetRepoListWriter();
 
@@ -30,7 +30,7 @@ namespace RepoScan.FileLocator
 
                 var organization = scanner.GetOrganization();
 
-                await foreach (var project in scanner.Projects(projectId))
+                await foreach (var project in scanner.Projects(projectId, excludedProjects))
                 {
                     bool repoOnly = false;
 

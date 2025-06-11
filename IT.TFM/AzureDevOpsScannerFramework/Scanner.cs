@@ -58,7 +58,7 @@ namespace AzureDevOpsScannerFramework
             return new Organization(ProjectSource.AzureDevOps, organizationName, azureDevOpsOrganizationUrl);
         }
 
-        async IAsyncEnumerable<Project> IScanner.Projects(string projectId)
+        async IAsyncEnumerable<Project> IScanner.Projects(string projectId, string[] excludedProjects)
         {
             if (projectId != string.Empty)
             {
@@ -98,6 +98,12 @@ namespace AzureDevOpsScannerFramework
 
                         foreach (var p in azDoProjects.Value)
                         {
+
+                            if (excludedProjects.Any(excluded => string.Equals(excluded, p.Id, StringComparison.InvariantCultureIgnoreCase)))
+                            {
+                                continue;
+                            }
+
                             var project = new Project
                             {
                                 Name = p.Name,

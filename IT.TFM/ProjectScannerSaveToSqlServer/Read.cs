@@ -613,7 +613,7 @@ namespace ProjectScannerSaveToSqlServer
 
         private static readonly Func<DbContext, string, Task<DataModels.Repository>> _compiledRepositoryQueryByRepositoryId
             = EF.CompileAsyncQuery((DbContext context, string repositoryId) => context.Repositories
-                                                                                      .SingleOrDefault(r => r.RepositoryId == repositoryId));
+                                                                                      .SingleOrDefault(r => !r.Deleted && r.RepositoryId == repositoryId));
 
         private static readonly Func<DbContext, string, Task<DataModels.Repository>> _compiledRepositoryQueryByRepositoryIdNotDeleted
             = EF.CompileAsyncQuery((DbContext context, string repositoryId) => context.Repositories

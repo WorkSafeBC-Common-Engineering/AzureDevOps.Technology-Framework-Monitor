@@ -663,6 +663,11 @@ namespace AzureDevOps
 
             if (Parameters.Settings.ExtendedLogging)
             {
+                if (!Directory.Exists(CheckoutDirectory))
+                {
+                    Directory.CreateDirectory(CheckoutDirectory);
+                }
+
                 var files = Directory.GetFiles(CheckoutDirectory, "*.*", SearchOption.AllDirectories);
                 Console.WriteLine($">>> GetZipContent: List of files, total = {files.Length}");
                 foreach (var file in files)

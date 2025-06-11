@@ -16,7 +16,7 @@ namespace RepoScan.FileLocator
     {
         #region Public Methods
 
-        public static async Task GetFiles(int totalThreads, bool forceDetails, string projectId, string repositoryId)
+        public static async Task GetFiles(int totalThreads, bool forceDetails, string projectId, string repositoryId, string[] excludedProjects)
         {
             Settings.Initialize();
 
@@ -56,7 +56,7 @@ namespace RepoScan.FileLocator
                     scanner = ScannerFactory.GetScanner(orgName);
 
                     List<Guid> pList = [];
-                    await foreach (var p in scanner.Projects(string.Empty))
+                    await foreach (var p in scanner.Projects(string.Empty, excludedProjects))
                     {
                         pList.Add(p.Id);
                     }
