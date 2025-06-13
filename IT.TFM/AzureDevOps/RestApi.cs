@@ -38,7 +38,7 @@ namespace AzureDevOps
 
         private const string fieldPagingSkip = "{$skip}";
 
-        private const string apiVersion = "api-version=7.0";
+        private const string apiVersion = "api-version=7.2-preview.2";
 
         private const string getProjectUrl = "https://{baseUrl}/{organization}/_apis/projects/{project}?{apiVersion}";
 
@@ -164,6 +164,29 @@ namespace AzureDevOps
             var content = await CallApiAsync(GetUrl(getRepositoryUrl));
 
             var repository = JsonConvert.DeserializeObject<AzDoRepository>(content);
+
+            if (repository != null)
+            {
+                Repository = repository.Id;
+                var commitContent = await CallApiAsync(GetUrl(getRepositoryCommitUrl));
+                if (commitContent == string.Empty)
+                {
+                    repository.LastCommitId = string.Empty;
+                }
+
+                var commit = JsonConvert.DeserializeObject<AzDoCommitList>(commitContent);
+                if (commit == null || commit.Value == null || commit.Count == 0)
+                {
+                    repository.LastUpdateDate = string.Empty;
+                }
+                else
+                {
+                    repository.LastUpdateDate = commit?.Value?.Length > 0
+                        ? commit.Value[0].Committer.Date
+                        : string.Empty;
+                }
+            }
+
             return repository; ;
         }
 
@@ -181,24 +204,16 @@ namespace AzureDevOps
             {
                 Repository = repo.Id;
                 var commitContent = await CallApiAsync(GetUrl(getRepositoryCommitUrl));
-                if (commitContent == string.Empty)
+                if (string.IsNullOrEmpty(commitContent))
                 {
                     repo.LastCommitId = string.Empty;
                     continue;
                 }
 
                 var commit = JsonConvert.DeserializeObject<AzDoCommitList>(commitContent);
-
-                if (commit == null || commit.Value == null)
-                {
-                    repo.LastCommitId = string.Empty;
-                }
-                else
-                {
-                    repo.LastCommitId = commit.Count == 0
-                        ? string.Empty
-                        : commit.Value[0].CommitId;
-                }
+                repo.LastUpdateDate = commit?.Value?.Length > 0
+                    ? commit.Value[0].Committer.Date
+                    : string.Empty;
             }
 
             return repositories ?? new AzDoRepositoryList();

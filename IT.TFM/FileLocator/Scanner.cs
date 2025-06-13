@@ -63,7 +63,9 @@ namespace RepoScan.FileLocator
                             RepositoryUrl = repo.Url,
                             RepositoryRemoteUrl = repo.RemoteUrl,
                             RepositoryWebUrl = repo.WebUrl,
-                            RepositoryLastCommitId = repo.LastCommitId
+                            RepositoryLastCommitId = repo.LastCommitId,
+                            RepositoryCreationDate = repo.CreatedOn,
+                            RepositoryLastUpdatedOn = repo.LastUpdatedOn
                         };
 
                         // Write repo item to queue

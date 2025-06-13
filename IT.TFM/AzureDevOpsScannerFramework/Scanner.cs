@@ -160,7 +160,9 @@ namespace AzureDevOpsScannerFramework
                     Url = r.Url,
                     RemoteUrl = r.RemoteUrl,
                     WebUrl = r.WebUrl,
-                    LastCommitId = r.LastCommitId
+                    LastCommitId = r.LastCommitId,
+                    CreatedOn = DateTime.TryParse(r.CreationDate, out var createdOn) ? createdOn : null,
+                    LastUpdatedOn = DateTime.TryParse(r.LastUpdateDate, out var lastUpdatedOn) ? lastUpdatedOn : null
                 };
 
                 repoList.Add(repo);
