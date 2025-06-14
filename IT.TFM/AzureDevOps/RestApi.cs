@@ -38,7 +38,7 @@ namespace AzureDevOps
 
         private const string fieldPagingSkip = "{$skip}";
 
-        private const string apiVersion = "api-version=7.2-preview.2";
+        private const string apiVersion = "api-version=7.1";
 
         private const string getProjectUrl = "https://{baseUrl}/{organization}/_apis/projects/{project}?{apiVersion}";
 
