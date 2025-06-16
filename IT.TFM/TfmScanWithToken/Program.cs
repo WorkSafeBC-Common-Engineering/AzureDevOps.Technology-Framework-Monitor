@@ -205,7 +205,7 @@ namespace TfmScanWithToken
         private static string[] GetExclusions(string[] args)
         {
             var exclusionsValue = GetCommandLineValue(args, "-xp");
-            var fields = exclusionsValue?.Split(',');
+            var fields = exclusionsValue?.Split(',', StringSplitOptions.RemoveEmptyEntries);
             return fields;
         }
 
