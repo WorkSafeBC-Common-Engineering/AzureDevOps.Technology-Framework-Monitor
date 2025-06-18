@@ -613,7 +613,6 @@ namespace ProjectScannerSaveToSqlServer
 
             if (metrics != null)
             {
-
                 dbMetrics.MaintainabilityIndex = metrics.MaintainabilityIndex;
                 dbMetrics.CyclomaticComplexity = metrics.CyclomaticComplexity;
                 dbMetrics.ClassCoupling = metrics.ClassCoupling;
