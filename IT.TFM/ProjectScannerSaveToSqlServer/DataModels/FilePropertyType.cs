@@ -15,7 +15,7 @@
         public int Id { get; set; }
 
         [Required]
-        [StringLength(10)]
+        [StringLength(20)]
         public string Value { get; set; }
 
         public virtual ICollection<FileProperty> FileProperties { get; set; }

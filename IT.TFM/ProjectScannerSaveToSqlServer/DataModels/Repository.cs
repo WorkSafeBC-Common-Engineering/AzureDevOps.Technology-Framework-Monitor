@@ -1,5 +1,6 @@
 namespace ProjectScannerSaveToSqlServer.DataModels
 {
+    using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
 
@@ -48,6 +49,10 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
         [StringLength(50)]
         public string LastCommitId { get; set; }
+
+        public DateOnly? CreatedOn {  get; set; }
+
+        public DateOnly? LastUpdatedOn { get; set; }
 
         public virtual ICollection<File> Files { get; set; }
 

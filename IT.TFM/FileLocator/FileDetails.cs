@@ -74,6 +74,8 @@ namespace RepoScan.FileLocator
                                                    new ProjectData.Repository { Id = repoItem.RepositoryId,
                                                                                 DefaultBranch = repoItem.RepositoryDefaultBranch });
 
+                var configYamlFiles = new ConcurrentBag<ProjectData.FileItem>();
+
                 var deleteList = new ConcurrentBag<DataModels.FileDetails>();
 
                 Parallel.ForEach(fileItems, options, (fileItem) =>
@@ -154,12 +156,21 @@ namespace RepoScan.FileLocator
                             Console.WriteLine($"File Details: updating details for file {azDoFile.Path} in Project {repoItem.ProjectName}, Repository {repoItem.RepositoryName}");
                         }
 
-                        if (fileData.FileType == ProjectData.FileItemType.YamlPipeline && fileData.PipelineProperties.Count > 0)
+                        if (fileData.FileType == FileItemType.YamlPipeline && fileData.PipelineProperties.Count > 0)
                         {
                             fileData.RepositoryId = repoItem.RepositoryId;
 
-                            var pipelineWriter = StorageFactory.GetPipelineWriter();
-                            pipelineWriter.AddProperties(fileData);
+                            // If this is a config.yml file, we need to update this later to ensure that the pipeline itself has been created or updated.
+                            if (fileData.PipelineProperties.ContainsKey("IsConfigFile"))
+                            {
+                                configYamlFiles.Add(fileData);
+                            }
+
+                            else
+                            {
+                                var pipelineWriter = StorageFactory.GetPipelineWriter();
+                                pipelineWriter.AddProperties(fileData);
+                            }
                         }
 
                         var fileDetails = new DataModels.FileDetails
@@ -198,6 +209,30 @@ namespace RepoScan.FileLocator
                     }
                 });
 
+                if (!configYamlFiles.IsEmpty)
+                {
+                    var pipelineWriter = StorageFactory.GetPipelineWriter();
+                    var pipelineReader = StorageFactory.GetPipelineReader();
+
+                    foreach (var fileDetails in configYamlFiles)
+                    {
+                        var portfolio = fileDetails.PipelineProperties["portfolio"];
+                        var product = fileDetails.PipelineProperties["product"];
+
+                        var pipelines = pipelineReader.FindPipelines(repoItem.ProjectId, fileDetails.RepositoryId, portfolio, product);
+                        if (!pipelines.Any())
+                        {
+                            continue;
+                        }
+
+                        var environments = fileDetails.PipelineProperties["Environments"].Split('|');
+                        foreach (var pipeline in pipelines)
+                        {
+                            pipeline.Environments = environments;
+                            pipelineWriter.Write(pipeline);
+                        }
+                    }
+                }
 
                 if (!deleteList.IsEmpty)
                 {

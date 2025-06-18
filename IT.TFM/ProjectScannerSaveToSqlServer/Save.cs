@@ -119,6 +119,8 @@ namespace ProjectScannerSaveToSqlServer
             dbRepo.WebUrl = repository.WebUrl;
             dbRepo.Deleted = repository.Deleted;
             dbRepo.LastCommitId = repository.LastCommitId;
+            dbRepo.CreatedOn = repository.CreatedOn;
+            dbRepo.LastUpdatedOn = repository.LastUpdatedOn;
 
             // remove all the tildes and carets in spreadsheet
 
@@ -129,7 +131,7 @@ namespace ProjectScannerSaveToSqlServer
             // split first token into portfolio, second token application name, third token component.,
             string[] nameTokens = repository.Name.Split('-');
 
-            // its likely we have a case where the seperation token was a '.' instead
+            // its likely we have a case where the separation token was a '.' instead
             if (nameTokens.Length < 2)
             {
                 nameTokens = repository.Name.Split('.');
@@ -251,6 +253,9 @@ namespace ProjectScannerSaveToSqlServer
                                                                     && f.Path.Equals(pipeline.Path))
                                         : null;
 
+            var dbBluePrintType = context.PipelineTypes
+                                                .SingleOrDefault(b => b.Value.Equals(pipeline.BlueprintApplicationType));
+
             if (dbPipeline == null)
             {
                 dbPipeline = new DataModels.Pipeline
@@ -293,6 +298,13 @@ namespace ProjectScannerSaveToSqlServer
                 dbPipeline.YamlType = pipeline.YamlType;
                 dbPipeline.Portfolio = pipeline.Portfolio;
                 dbPipeline.Product = pipeline.Product;
+                dbPipeline.BlueprintType = dbBluePrintType;
+                dbPipeline.SuppressCD = pipeline.SuppressCD;
+
+                if (pipeline.Environments != null)
+                {
+                    dbPipeline.Environments = string.Join('|', pipeline.Environments);
+                }
             }
 
             _ = context.SaveChangesAsync().Result;
@@ -349,7 +361,14 @@ namespace ProjectScannerSaveToSqlServer
             dbPipeline.Result = release.Result;
             dbPipeline.Environments = string.Join('|', release.Environments);
 
-            _ = context.SaveChangesAsync().Result;
+            try
+            {
+                _ = context.SaveChangesAsync().Result;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
 
             var currentArtifacts = context.ReleaseArtifacts.Where(a => a.PipelineId == dbPipeline.Id);
             foreach (var artifact in release.Artifacts)
@@ -583,6 +602,7 @@ namespace ProjectScannerSaveToSqlServer
             dbMetrics.DepthOfInheritance = metrics.DepthOfInheritance;
             dbMetrics.SourceLines = metrics.SourceLines;
             dbMetrics.ExecutableLines = metrics.ExecutableLines;
+            dbMetrics.UnitTestCodeCoverage = metrics.UnitTestCodeCoverage;
 
             _ = context.SaveChangesAsync().Result;
         }

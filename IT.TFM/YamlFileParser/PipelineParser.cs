@@ -2,6 +2,11 @@
 
 using ProjectData;
 
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime;
+using System.Runtime.CompilerServices;
+using System.Text;
+
 namespace YamlFileParser
 {
     public class PipelineParser : IFileParser
@@ -24,12 +29,159 @@ namespace YamlFileParser
         void IFileParser.Parse(FileItem file, string[] content)
         {
             var cleanContent = StripComments(content);
+
+            if (CheckIfConfigFile(file))
+            {
+                ParseConfigFile(file, cleanContent);
+            }
+            else
+            {
+                ParsePipelineFile(file, cleanContent);
+            }
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private static bool CheckIfConfigFile(FileItem file)
+        {
+            return file.Path.EndsWith("-config.yml", StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        private static void ParseConfigFile(FileItem file, string[] cleanContent)
+        {
+            // skip if not in the same repository as the pipeline
+            if (!file.Path.StartsWith("/deploy/"))
+            {
+                return;
+            }
+
+            var environments = ParseEnabledEnvironments(cleanContent);
+            if (environments == null || environments.Count == 0)
+            {
+                return;
+            }
+
+            file.PipelineProperties.Add("IsConfigFile", "true");
+            file.PipelineProperties.Add("Environments", string.Join('|', environments));
+            ParseConfigProperties(file);
+        }
+
+        private static List<string> ParseEnabledEnvironments(string[] content)
+        {
+            var environments = new List<string>();
+
+            var enabledEnvironments = new List<string>();
+
+
+            for (var index = 0; index < content.Length; index++)
+            {
+                var line = content[index].Trim();
+                if (line.Equals("variables:", StringComparison.OrdinalIgnoreCase))
+                {
+                    index++;
+
+                    while (index < content.Length - 1)
+                    {
+                        var variable = ParseConfigEnabledVariable(content[index], content[index + 1].Trim());
+
+                        if (variable != null && variable.Value.Item2)
+                        {
+                            enabledEnvironments.Add(variable.Value.Item1);
+                        }
+
+                        index += 2;
+                    }
+
+                    index = 1;
+                    foreach (var enabledItem in enabledEnvironments)
+                    {
+                        var environmentNameAndIndex = ParseConfigEnvironmentName(enabledItem, index, content);
+                        if (environmentNameAndIndex == null)
+                        {
+                            continue;
+                        }
+
+                        environments.Add(environmentNameAndIndex.Value.Item1);
+                        index = environmentNameAndIndex.Value.Item2;
+                    }
+                }
+            }
+
+            return environments;
+        }
+
+        private static (string, bool)? ParseConfigEnabledVariable(string name, string value)
+        {
+            if (name.StartsWith("- name:") && value.StartsWith("value:"))
+            {
+                var nameValue = name[7..].Trim();
+
+                if (nameValue.EndsWith("StageActive"))
+                {
+                    nameValue = nameValue.Replace("StageActive", string.Empty);
+
+                    if (!bool.TryParse(value[6..].Trim(), out var boolValue))
+                    {
+                        boolValue = false;
+                    }
+
+                    return (nameValue, boolValue);
+                }
+            }
+
+            return null;
+        }
+
+        private static (string, int)? ParseConfigEnvironmentName(string environment, int index, string[] content)
+        {
+            var parseIndex = index;
+            while (parseIndex - 1 < content.Length)
+            {
+                if (content[parseIndex].Trim().StartsWith("- name:"))
+                {
+                    var name = content[parseIndex][7..].Trim();
+                    var value = content[parseIndex + 1].Trim();
+                    if (name.Equals($"{environment}StageName") && value.StartsWith("value:"))
+                    {
+                        return (value[6..].Trim().Replace("'", string.Empty), parseIndex);
+                    }
+                }
+
+                parseIndex += 2;
+            }
+
+            return null;
+        }
+
+        private static void ParseConfigProperties(FileItem file)
+        {
+            // Get the portfolio and product from the file path
+            var filename = Path.GetFileNameWithoutExtension(file.Path)
+                               .Replace("-config", string.Empty);
+            var parts = filename.Split('-', StringSplitOptions.TrimEntries);
+
+            if (parts.Length < 2)
+            {
+                parts = filename.Split('.', StringSplitOptions.TrimEntries);
+            }
+
+            if (parts.Length >= 2 && !string.IsNullOrEmpty(parts[0]) && !string.IsNullOrEmpty(parts[1]))
+            {
+                file.PipelineProperties.Add("portfolio", parts[0]);
+                file.PipelineProperties.Add("product", parts[1]);
+            }
+        }
+
+        private static void ParsePipelineFile(FileItem file, string[] cleanContent)
+        {
             var variables = ParseVariables(cleanContent);
 
             var templateType = GetTemplateType(cleanContent);
             file.PipelineProperties.Add("template", templateType.ToString());
 
-            switch(templateType)
+            switch (templateType)
             {
                 case PipelineTemplateType.V1:
                     ParseV1Template(cleanContent, variables, file);
@@ -49,6 +201,15 @@ namespace YamlFileParser
                         ParseV1Template(cleanContent, variables, file);
                     }
 
+                    if (!file.PipelineProperties.ContainsKey("blueprintType") && file.PipelineProperties.ContainsKey("blueprint"))
+                    {
+                        var genericType = GetGenericBlueprintType(file.PipelineProperties["blueprint"]);
+                        if (genericType != BlueprintType.None)
+                        {
+                            file.PipelineProperties["blueprintType"] = genericType.ToString();
+                        }
+                    }
+
                     // If portfolio and product are still empty, see if any of the variables match.
                     if (file.PipelineProperties["portfolio"] == string.Empty && file.PipelineProperties["product"] == string.Empty)
                     {
@@ -62,13 +223,15 @@ namespace YamlFileParser
                             file.PipelineProperties["product"] = product;
                         }
                     }
+
+                    // SuppressCD parameter defaults to false if not found
+                    if (!file.PipelineProperties.ContainsKey("suppressCD") && !file.PipelineProperties["blueprintType"].StartsWith("Generic"))
+                    {
+                        file.PipelineProperties["suppressCD"] = "false";
+                    }
                     break;
             }
         }
-
-        #endregion
-
-        #region Private Methods
 
         private static string[] StripComments(string[] content)
         {
@@ -84,7 +247,6 @@ namespace YamlFileParser
 
             return [.. lines];
         }
-
 
         private static PipelineTemplateType GetTemplateType(string[] content)
         {
@@ -144,6 +306,7 @@ namespace YamlFileParser
         {
             var portfolio = string.Empty;
             var product = string.Empty;
+            var appBlueprint = string.Empty;
 
             for (var index = 0; index < content.Length; index++)
             {
@@ -177,12 +340,16 @@ namespace YamlFileParser
                                         case "productName":
                                             product = GetParameterValue(fields[1], variables);
                                             break;
+
+                                        case "applicationBlueprint":
+                                            appBlueprint = GetParameterValue(fields[1], variables);
+                                            break;
                                     }
                                 }
                             }
                         }
 
-                        if (portfolio != string.Empty && product != string.Empty)
+                        if (portfolio != string.Empty && product != string.Empty && appBlueprint != string.Empty)
                         {
                             break;
                         }
@@ -202,12 +369,15 @@ namespace YamlFileParser
 
             file.PipelineProperties["portfolio"] = portfolio;
             file.PipelineProperties["product"] = product;
+            file.PipelineProperties["blueprint"] = appBlueprint;
         }
 
         private static void ParseV2Template(string[] content, Dictionary<string, string> variables, FileItem file)
         {
             var portfolio = string.Empty;
             var product = string.Empty;
+            var suppressCD = "false"; // default if not specified in pipeline
+            var blueprintType = BlueprintType.None;
 
             for (var index = 0; index < content.Length; index++)
             {
@@ -216,6 +386,8 @@ namespace YamlFileParser
                     index++;
                     if (content[index].Trim().StartsWith("template:"))
                     {
+                        blueprintType = GetBlueprintType(content[index]);
+
                         index++;
                         if (content[index].Trim().Equals("parameters:"))
                         {
@@ -249,6 +421,10 @@ namespace YamlFileParser
                                     case "productName":
                                         product = GetParameterValue(fields[1], variables);
                                         break;
+
+                                    case "suppressCD":
+                                        suppressCD = GetParameterValue(fields[1], variables);
+                                        break;
                                 }
                             }
                         }
@@ -258,6 +434,11 @@ namespace YamlFileParser
 
             file.PipelineProperties["portfolio"] = portfolio;
             file.PipelineProperties["product"] = product;
+            file.PipelineProperties["suppressCD"] = suppressCD;
+            if (blueprintType != BlueprintType.None)
+            {
+                file.PipelineProperties["blueprintType"] = blueprintType.ToString();
+            }
         }
 
         private static string GetParameterValue(string parameter, Dictionary<string, string> variables)
@@ -354,6 +535,51 @@ namespace YamlFileParser
             }
 
             return variables;
+        }
+
+        private static BlueprintType GetBlueprintType(string template)
+        {
+            var templateType = template[(template.LastIndexOf('/') + 1)..];
+            templateType = templateType[..templateType.IndexOf('@')];
+
+            return templateType switch
+            {
+                "azure-pipeline-azure-function-control.yml" => BlueprintType.AzureFunction,
+                "azure-pipeline-batch-console-control.yml" => BlueprintType.BatchConsole,
+                "azure-pipeline-nuget-package-control.yml" => BlueprintType.NugetPackage,
+                "azure-pipeline-universal-artifact-control.yml" => BlueprintType.UniversalArtifact,
+                "azure-pipeline-webapp-control.yml" => BlueprintType.WebApp,
+                "azure-pipeline-winapp-appsync-control.yml" => BlueprintType.WinAppAppSync,
+                _ => BlueprintType.None,
+            };
+        }
+
+        private static BlueprintType GetGenericBlueprintType(string genericBlueprint)
+        {
+            switch (genericBlueprint)
+            {
+                case "generic-steps":
+                    return BlueprintType.GenericSteps;
+
+                case "generic-jobs":
+                    return BlueprintType.GenericJobs;
+
+                default:
+                    return BlueprintType.None;
+            }
+        }
+
+        private static string GetConfigFileName(Dictionary<string, string> pipelineProperties)
+        {
+            var portfolio = pipelineProperties["portfolioName"];
+            var product = pipelineProperties["productName"];
+
+            if (!string.IsNullOrEmpty(portfolio) && !string.IsNullOrEmpty(product))
+            {
+                return $"/deploy/{portfolio}-{product}-config.yml";
+            }
+
+            return string.Empty;
         }
 
         #endregion

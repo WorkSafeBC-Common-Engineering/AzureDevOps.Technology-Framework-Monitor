@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ProjectScannerSaveToSqlServer.DataModels
+﻿namespace ProjectScannerSaveToSqlServer.DataModels
 {
     public partial class ProjectMetrics
     {
@@ -23,6 +17,8 @@ namespace ProjectScannerSaveToSqlServer.DataModels
         public int SourceLines { get; set; }
 
         public int ExecutableLines { get; set; }
+
+        public byte UnitTestCodeCoverage { get; set; }
 
         public virtual File File { get; set; }
     }

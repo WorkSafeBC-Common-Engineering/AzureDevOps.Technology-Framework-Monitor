@@ -4,8 +4,6 @@ using DataStorage = Storage;
 using System.Collections.Generic;
 using System.Linq;
 using ProjectData;
-using System.Reflection.PortableExecutable;
-using System;
 
 namespace RepoScan.Storage.SqlServer
 {
@@ -36,7 +34,7 @@ namespace RepoScan.Storage.SqlServer
 
             var repoFiles = reader.GetFiles(repoId)
                                   .ToArray();
-
+            
             return repoFiles.Select(f => new DataModels.FileItem
             {
                 Id = f.Id,

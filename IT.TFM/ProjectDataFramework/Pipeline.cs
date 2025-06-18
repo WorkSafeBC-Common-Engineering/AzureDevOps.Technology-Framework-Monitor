@@ -33,15 +33,21 @@ namespace ProjectData
 
         public string YamlType { get; set; }
 
-        public string Portfolio { get;set; }
+        public string BlueprintApplicationType { get; set; }
+
+        public string Portfolio { get; set; }
 
         public string Product { get; set; }
 
+        public bool SuppressCD { get; set; }
+
+        public string[] Environments { get; set; }
+
         public string State { get; set; } = string.Empty;
 
-        public string Result {  get; set; } = string.Empty;
+        public string Result { get; set; } = string.Empty;
 
-        public DateTime? LastRunStart {  get; set; }
+        public DateTime? LastRunStart { get; set; }
 
         public DateTime? LastRunEnd { get; set; }
 

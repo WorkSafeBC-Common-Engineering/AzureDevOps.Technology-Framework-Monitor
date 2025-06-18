@@ -5,6 +5,7 @@ using DataStorage = Storage;
 using System.Collections.Generic;
 using System.Linq;
 using ProjectData;
+using System;
 
 namespace RepoScan.Storage.SqlServer
 {
@@ -56,6 +57,14 @@ namespace RepoScan.Storage.SqlServer
                         case "product":
                             pipeline.Product = value;
                             break;
+
+                        case "blueprintType":
+                            pipeline.BlueprintApplicationType = value;
+                            break;
+
+                        case "suppressCD":
+                            pipeline.SuppressCD = value.ToLower() != "false";
+                            break;
                     }
                 }
 
@@ -94,6 +103,17 @@ namespace RepoScan.Storage.SqlServer
         {
             using var reader = GetReader();
             return reader.GetPipelineIdsForProject(projectId).ToArray();
+        }
+
+        IEnumerable<ProjectData.Pipeline> IReadPipelines.FindPipelines(Guid projectId, Guid repositoryId, string portfolio, string product)
+        {
+            using var reader = GetReader();
+
+            var project = projectId.ToString("D");
+            var repository = repositoryId.ToString("D");
+
+            var pipelines = reader.FindPipelines(project, repository, portfolio, product);
+            return pipelines;
         }
 
         #endregion

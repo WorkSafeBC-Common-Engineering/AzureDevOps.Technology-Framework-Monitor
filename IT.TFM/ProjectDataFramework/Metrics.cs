@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ProjectData
+﻿namespace ProjectData
 {
     public class Metrics
     {
@@ -19,5 +13,7 @@ namespace ProjectData
         public int SourceLines { get; set; }
 
         public int ExecutableLines { get; set; }
+
+        public byte UnitTestCodeCoverage { get; set; }
     }
 }
