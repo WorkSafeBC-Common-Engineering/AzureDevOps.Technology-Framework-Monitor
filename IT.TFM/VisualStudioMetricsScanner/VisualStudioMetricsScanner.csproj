@@ -7,11 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.Metrics" Version="4.14.0" />
+	  <PackageReference Include="Microsoft.CodeAnalysis.Metrics" Version="4.14.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ProjectDataFramework\ProjectData.csproj" />
+	  <ProjectReference Include="..\ProjectDataFramework\ProjectData.csproj" />
   </ItemGroup>
 
   <Target Name="CopyMetricsExe" AfterTargets="Build">

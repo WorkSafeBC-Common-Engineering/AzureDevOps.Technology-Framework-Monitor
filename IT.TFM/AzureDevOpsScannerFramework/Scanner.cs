@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 
 using AzureDevOps.Models;
 
-using Microsoft.VisualStudio.Services.Common;
-
 using ProjectData;
 using ProjectData.Interfaces;
 
@@ -60,7 +58,7 @@ namespace AzureDevOpsScannerFramework
             return new Organization(ProjectSource.AzureDevOps, organizationName, azureDevOpsOrganizationUrl);
         }
 
-        async IAsyncEnumerable<Project> IScanner.Projects(string projectId)
+        async IAsyncEnumerable<Project> IScanner.Projects(string projectId, string[] excludedProjects)
         {
             if (projectId != string.Empty)
             {
@@ -100,6 +98,12 @@ namespace AzureDevOpsScannerFramework
 
                         foreach (var p in azDoProjects.Value)
                         {
+
+                            if (excludedProjects.Any(excluded => string.Equals(excluded, p.Id, StringComparison.InvariantCultureIgnoreCase)))
+                            {
+                                continue;
+                            }
+
                             var project = new Project
                             {
                                 Name = p.Name,
@@ -156,7 +160,9 @@ namespace AzureDevOpsScannerFramework
                     Url = r.Url,
                     RemoteUrl = r.RemoteUrl,
                     WebUrl = r.WebUrl,
-                    LastCommitId = r.LastCommitId
+                    LastCommitId = r.LastCommitId,
+                    CreatedOn = DateTime.TryParse(r.CreationDate, out var createdOn) ? createdOn : null,
+                    LastUpdatedOn = DateTime.TryParse(r.LastUpdateDate, out var lastUpdatedOn) ? lastUpdatedOn : null
                 };
 
                 repoList.Add(repo);
@@ -187,6 +193,7 @@ namespace AzureDevOpsScannerFramework
 
                     if (run != null)
                     {
+                        p.RunId = run.Id;
                         p.LastRunStart = run.CreatedDate;
                         p.LastRunEnd = run.FinishedDate;
                         p.State = run.State;
@@ -199,6 +206,42 @@ namespace AzureDevOpsScannerFramework
             }
 
             return pipelineList.AsEnumerable();
+        }
+
+        async Task<IEnumerable<PipelineRunLog>> IScanner.PipelineRunLogs(string projectId, int pipelineId, int runId)
+        {
+            api.Project = projectId;
+            api.Pipeline = pipelineId;
+            api.Run = runId;
+
+            var azDoLogs = await api.GetPipelineRunLogsAsync();
+            var logEntries = azDoLogs.Logs
+                                     .Select(l => new PipelineRunLog
+                                     {
+                                         Id = l.Id,
+                                         CreatedOn = l.CreatedOn,
+                                         LastChangedOn = l.LastChangedOn
+                                     })
+                                     .ToArray();
+
+            return logEntries.AsEnumerable();
+        }
+
+        async Task<string> IScanner.PipelineRunLogContent(string projectId, int pipelineId, int runId, int logId)
+        {
+            api.Project = projectId;
+            api.Pipeline = pipelineId;
+            api.Run = runId;
+            api.Log = logId;
+
+            var signedUrl = await api.GetPipelineRunLogSignedUrlAsync();
+            if (string.IsNullOrWhiteSpace(signedUrl))
+            {
+                return string.Empty;
+            }
+
+            var content = await api.GetPipelineLogContentAsync(signedUrl);
+            return content;
         }
 
         async Task<IEnumerable<ProjectData.Pipeline>> IScanner.Releases(Guid projectId, string repositoryId)
@@ -407,29 +450,28 @@ namespace AzureDevOpsScannerFramework
         {
             buildProperties.Clear();
 
-            Directory.EnumerateFiles(api.CheckoutDirectory, "Directory.Build.props", SearchOption.AllDirectories)
-                .ForEach(f =>
+            foreach (var f in Directory.EnumerateFiles(api.CheckoutDirectory, "Directory.Build.props", SearchOption.AllDirectories))
+            {
+                var xmlDocument = new System.Xml.XmlDocument();
+                xmlDocument.Load(f);
+
+                var propertyGroups = xmlDocument.GetElementsByTagName("PropertyGroup");
+                for (int i = 0; i < propertyGroups.Count; i++)
                 {
-                    var xmlDocument = new System.Xml.XmlDocument();
-                    xmlDocument.Load(f);
-
-                    var propertyGroups = xmlDocument.GetElementsByTagName("PropertyGroup");
-                    for (int i = 0; i < propertyGroups.Count; i++)
+                    var propertyGroup = propertyGroups[i];
+                    for (int j = 0; j < propertyGroup.ChildNodes.Count; j++)
                     {
-                        var propertyGroup = propertyGroups[i];
-                        for (int j = 0; j < propertyGroup.ChildNodes.Count; j++)
+                        var property = propertyGroup.ChildNodes[j];
+                        if (property.NodeType == System.Xml.XmlNodeType.Element)
                         {
-                            var property = propertyGroup.ChildNodes[j];
-                            if (property.NodeType == System.Xml.XmlNodeType.Element)
-                            {
-                                var key = property.Name;
-                                var value = property.InnerText;
+                            var key = property.Name;
+                            var value = property.InnerText;
 
-                                buildProperties.TryAdd(key, value);
-                            }
+                            buildProperties.TryAdd(key, value);
                         }
                     }
-                });
+                }
+            }
         }
 
         private static ProjectData.Pipeline GetPipeline(AzDoPipeline pipeline)
@@ -510,8 +552,8 @@ namespace AzureDevOpsScannerFramework
                 LastRunUrl = release.LastRunUrl,
                 State = release.State,
                 Result = release.Result,
-                Environments = release.Details.Environments.Select(e => e.Name).ToArray(),
-                Artifacts = release.Details.Artifacts.Select(a => new Artifact
+                Environments = [.. release.Details.Environments.Select(e => e.Name)],
+                Artifacts = [.. release.Details.Artifacts.Select(a => new Artifact
                     {
                         SourceId = a.SourceId,
                         Type = a.Type,
@@ -524,7 +566,7 @@ namespace AzureDevOpsScannerFramework
                         ProjectId = a.DefinitionReference?.Project?.Id,
                         IsPrimary = a.IsPrimary ?? false,
                         IsRetained = a.IsRetained ?? false
-                    }).ToArray()
+                    })]
             };
 
             return pipeline;

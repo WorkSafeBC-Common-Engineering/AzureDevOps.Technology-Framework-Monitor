@@ -167,7 +167,7 @@ namespace ProjectScannerSaveToSqlServer
 
         IEnumerable<string> IStorageReader.GetRepositoryIds()
         {
-            return _compiledRepositoryIds(context).ToBlockingEnumerable().ToArray();
+            return [.. _compiledRepositoryIds(context).ToBlockingEnumerable()];
         }
 
         IEnumerable<FileItem> IStorageReader.GetFiles()
@@ -346,7 +346,7 @@ namespace ProjectScannerSaveToSqlServer
             }
         }
 
-        IEnumerable<Pipeline> IStorageReader.GetPipelines(string pipelineType)
+        IEnumerable<Pipeline> IStorageReader.GetPipelinesByType(string pipelineType)
         {
             if (pipelineType != Pipeline.pipelineTypeYaml && pipelineType != Pipeline.pipelineTypeClassic)
             {
@@ -374,13 +374,50 @@ namespace ProjectScannerSaveToSqlServer
                     Type = dbPipeline.Type,
                     PipelineType = dbPipeline.Type,
                     Path = dbPipeline.Path,
-                    FileId = file?.FileId
+                    FileId = file?.FileId,
+                    RunId = dbPipeline.RunId,
+                    State = dbPipeline.State,
+                    Result = dbPipeline.Result,
+                    LastRunStart = dbPipeline.LastRunStart,
+                    LastRunEnd = dbPipeline.LastRunEnd,
+                    LastRunUrl = dbPipeline.LastRunUrl
                 };
 
                 pipelineList.Add(pipeline);
             }
 
             return pipelineList.AsEnumerable();
+        }
+
+        IEnumerable<Pipeline> IStorageReader.GetPipelines(string repositoryId)
+        {
+            var pipelines = context.Pipelines.Where(p => p.Repository.RepositoryId == repositoryId)
+                                             .Select(p => new Pipeline
+                                             {
+                                                 Id = p.PipelineId,
+                                                 ProjectId = p.Project.ProjectId,
+                                                 RepositoryId = p.Repository.RepositoryId,
+                                                 Name = p.Name,
+                                                 Folder = p.Folder,
+                                                 Revision = p.Revision,
+                                                 Url = p.Url,
+                                                 Type = p.Type,
+                                                 PipelineType = p.PipelineType,
+                                                 Path = p.Path,
+                                                 YamlType = p.YamlType,
+                                                 BlueprintApplicationType = string.Empty,
+                                                 SuppressCD = p.SuppressCD,
+                                                 Portfolio = p.Portfolio,
+                                                 Product = p.Product,
+                                                 RunId = p.RunId,
+                                                 State = p.State,
+                                                 Result = p.Result,
+                                                 LastRunStart = p.LastRunStart,
+                                                 LastRunEnd = p.LastRunEnd,
+                                                 LastRunUrl = p.LastRunUrl
+                                             });
+
+            return pipelines;
         }
 
         IEnumerable<Pipeline> IStorageReader.GetPipelines(string repositoryId, string filePath)
@@ -409,7 +446,13 @@ namespace ProjectScannerSaveToSqlServer
                 BlueprintApplicationType = p.BlueprintType?.Value ?? string.Empty,
                 SuppressCD = p.SuppressCD,
                 Portfolio = p.Portfolio,
-                Product = p.Product
+                Product = p.Product,
+                RunId = p.RunId,
+                State = p.State,
+                Result = p.Result,
+                LastRunStart = p.LastRunStart,
+                LastRunEnd = p.LastRunEnd,
+                LastRunUrl = p.LastRunUrl
             }).AsEnumerable();
         }
 
@@ -417,7 +460,7 @@ namespace ProjectScannerSaveToSqlServer
         {
             var project = _compiledProjectQueryByProjectId(context, projectId).Result;
 
-            return _compiledGetPipelineIdsByProject(context, project.Id).ToBlockingEnumerable().ToArray();
+            return [.. _compiledGetPipelineIdsByProject(context, project.Id).ToBlockingEnumerable()];
         }
 
         IEnumerable<NuGetFeed> IStorageReader.GetNuGetFeeds()
@@ -570,7 +613,7 @@ namespace ProjectScannerSaveToSqlServer
 
         private static readonly Func<DbContext, string, Task<DataModels.Repository>> _compiledRepositoryQueryByRepositoryId
             = EF.CompileAsyncQuery((DbContext context, string repositoryId) => context.Repositories
-                                                                                      .SingleOrDefault(r => r.RepositoryId == repositoryId));
+                                                                                      .SingleOrDefault(r => !r.Deleted && r.RepositoryId == repositoryId));
 
         private static readonly Func<DbContext, string, Task<DataModels.Repository>> _compiledRepositoryQueryByRepositoryIdNotDeleted
             = EF.CompileAsyncQuery((DbContext context, string repositoryId) => context.Repositories

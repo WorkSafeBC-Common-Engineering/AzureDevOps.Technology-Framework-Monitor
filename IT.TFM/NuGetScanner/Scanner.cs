@@ -97,7 +97,17 @@ namespace NuGetScanner
             var metadataResource = await repository.GetResourceAsync<PackageMetadataResource>();
 
             var identity = new NuGet.Packaging.Core.PackageIdentity(package.Name, packageVersion);
-            var metadata = await metadataResource.GetMetadataAsync(identity, cache, logger, CancellationToken.None);
+
+            IPackageSearchMetadata? metadata = null;
+            try
+                {
+                // Check if the package exists in the feed
+                metadata = await metadataResource.GetMetadataAsync(identity, cache, logger, CancellationToken.None);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"NuGetScanner GetAsync: Exception when calling GetMetadataAsync(): {ex.Message}");
+            }
 
             if (metadata != null)
             {
@@ -107,11 +117,11 @@ namespace NuGetScanner
                     ? metadata.Published.Value.DateTime
                     : null;
                 package.Tags = metadata.Tags ?? string.Empty;
-                package.Targets = metadata.DependencySets.Select(f => new NuGetTarget
+                package.Targets = [.. metadata.DependencySets.Select(f => new NuGetTarget
                 {
                     Framework = f.TargetFramework.Framework,
                     Version = f.TargetFramework.Version.ToString()
-                }).ToArray();
+                })];
                 package.DataLoaded = true;
             }
 

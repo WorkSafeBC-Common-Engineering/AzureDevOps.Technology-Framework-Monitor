@@ -79,6 +79,8 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
         public string Result { get; set; } = string.Empty;
 
+        public int? RunId { get; set; }
+
         public DateTime? LastRunStart { get; set; }
 
         public DateTime? LastRunEnd { get; set; }

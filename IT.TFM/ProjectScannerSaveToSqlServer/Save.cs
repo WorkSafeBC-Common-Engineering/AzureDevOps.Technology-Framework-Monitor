@@ -7,6 +7,7 @@ using System.Linq;
 using ProjectData;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace ProjectScannerSaveToSqlServer
 {
@@ -166,7 +167,7 @@ namespace ProjectScannerSaveToSqlServer
 
             var id = repoId.ToString("D").ToLower();
             var repo = context.Repositories
-                              .SingleOrDefaultAsync(r => r.RepositoryId == id)
+                              .SingleOrDefaultAsync(r => !r.Deleted && r.RepositoryId == id)
                               .Result;
             int repositoryId = repo == null ? 0 : repo.Id;
 
@@ -243,7 +244,8 @@ namespace ProjectScannerSaveToSqlServer
                                    .SingleOrDefault(p => p.ProjectId == pipeline.ProjectId);
 
             var dbRepo = context.Repositories
-                                .SingleOrDefault(r => r.RepositoryId.Equals(pipeline.RepositoryId));
+                                .SingleOrDefault(r => !r.Deleted
+                                                   && r.RepositoryId.Equals(pipeline.RepositoryId));
 
             var dbPipeline = context.Pipelines
                                     .SingleOrDefault(p => p.PipelineId == pipeline.Id && p.Type != ProjData.Pipeline.pipelineTypeRelease);
@@ -276,6 +278,7 @@ namespace ProjectScannerSaveToSqlServer
             dbPipeline.PipelineType = pipeline.PipelineType;
             dbPipeline.Path = pipeline.Path;
             dbPipeline.FileId = dbFile?.Id;
+            dbPipeline.RunId = pipeline.RunId;
             dbPipeline.State = pipeline.State;
             dbPipeline.Result = pipeline.Result;
             dbPipeline.LastRunUrl = pipeline.LastRunUrl;
@@ -367,6 +370,7 @@ namespace ProjectScannerSaveToSqlServer
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Error saving release pipeline: {ex.Message}");
                 throw;
             }
 
@@ -576,16 +580,27 @@ namespace ProjectScannerSaveToSqlServer
             }
         }
 
-        void IStorageWriter.SaveMetrics(FileItem file, Metrics metrics)
+        async Task IStorageWriter.SaveMetricsAsync(FileItem file, Metrics metrics, ProjectRuntimeMetrics runtimeMetrics)
         {
+            if (metrics == null && runtimeMetrics == null)
+            {
+                // no data provided to save
+                return;
+            }
+
             var dbRepo = context.Repositories
-                    .SingleOrDefault(r => r.RepositoryId.Equals(file.RepositoryId.ToString("D")));
+                    .SingleOrDefault(r => !r.Deleted && r.RepositoryId.Equals(file.RepositoryId.ToString("D")));
 
             var dbFile = context.Files
                                 .SingleOrDefault(f => f.RepositoryId == dbRepo.Id
                                                    && f.Path.Equals(file.Path));
 
-            var dbMetrics = dbFile.ProjectMetrics;
+            if (dbFile == null)
+            {
+                return;
+            }
+
+            var dbMetrics = dbFile?.ProjectMetrics;
             if (dbMetrics == null)
             {
                 dbMetrics = new ProjectMetrics
@@ -596,15 +611,30 @@ namespace ProjectScannerSaveToSqlServer
                 dbFile.ProjectMetrics = dbMetrics;
             }
 
-            dbMetrics.MaintainabilityIndex = metrics.MaintainabilityIndex;
-            dbMetrics.CyclomaticComplexity = metrics.CyclomaticComplexity;
-            dbMetrics.ClassCoupling = metrics.ClassCoupling;
-            dbMetrics.DepthOfInheritance = metrics.DepthOfInheritance;
-            dbMetrics.SourceLines = metrics.SourceLines;
-            dbMetrics.ExecutableLines = metrics.ExecutableLines;
-            dbMetrics.UnitTestCodeCoverage = metrics.UnitTestCodeCoverage;
+            if (metrics != null)
+            {
+                dbMetrics.MaintainabilityIndex = metrics.MaintainabilityIndex;
+                dbMetrics.CyclomaticComplexity = metrics.CyclomaticComplexity;
+                dbMetrics.ClassCoupling = metrics.ClassCoupling;
+                dbMetrics.DepthOfInheritance = metrics.DepthOfInheritance;
+                dbMetrics.SourceLines = metrics.SourceLines;
+                dbMetrics.ExecutableLines = metrics.ExecutableLines;
+                dbMetrics.UnitTestCodeCoverage = metrics.UnitTestCodeCoverage;
+            }
 
-            _ = context.SaveChangesAsync().Result;
+            if (runtimeMetrics != null)
+            {
+                var warnings = (runtimeMetrics.TotalWarnings > (dbMetrics.LastRunTotalWarnings ?? 0))
+                        ? runtimeMetrics.TotalWarnings : dbMetrics.LastRunTotalWarnings ?? 0;
+
+                var errors = (runtimeMetrics.TotalErrors > (dbMetrics.LastRunTotalErrors ?? 0))
+                        ? runtimeMetrics.TotalErrors : dbMetrics.LastRunTotalErrors ?? 0;
+
+                dbMetrics.LastRunTotalWarnings = warnings;
+                dbMetrics.LastRunTotalErrors = errors;
+            }
+
+            _ = await context.SaveChangesAsync();
         }
 
         #endregion

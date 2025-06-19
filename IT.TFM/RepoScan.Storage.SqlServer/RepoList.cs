@@ -125,7 +125,9 @@ namespace RepoScan.Storage.SqlServer
                 Url = item.RepositoryUrl,
                 WebUrl = item.RepositoryWebUrl,
                 Deleted = item.IsDeleted,
-                LastCommitId = item.RepositoryLastCommitId
+                LastCommitId = item.RepositoryLastCommitId,
+                CreatedOn = item.RepositoryCreationDate,
+                LastUpdatedOn = item.RepositoryLastUpdatedOn
             };
 
             _ = writer.SaveRepository(repository, projectId);

@@ -60,6 +60,10 @@ namespace RepoScan.DataModels
 
         public string RepositoryLastCommitId { get; set; }
 
+        public DateTime? RepositoryCreationDate { get; set; }
+
+        public DateTime? RepositoryLastUpdatedOn { get; set; }
+
         public bool IsDeleted { get; set; }
 
         public bool RepositoryNoScan { get; set; } = false;

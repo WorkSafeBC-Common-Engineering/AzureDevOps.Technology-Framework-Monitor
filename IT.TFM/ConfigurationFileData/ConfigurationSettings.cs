@@ -66,9 +66,11 @@ namespace ConfigurationFileData
 
         private static Configuration GetConfiguration(string file)
         {
+            var configPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? string.Empty;
+
             var configFileMap = new ExeConfigurationFileMap()
             {
-                ExeConfigFilename = file
+                ExeConfigFilename = Path.Combine(configPath, file)
             };
 
             return ConfigurationManager.OpenMappedExeConfiguration(configFileMap, ConfigurationUserLevel.None);

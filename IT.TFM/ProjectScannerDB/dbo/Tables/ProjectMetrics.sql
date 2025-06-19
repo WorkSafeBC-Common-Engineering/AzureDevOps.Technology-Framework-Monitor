@@ -9,5 +9,7 @@
     [SourceLines] INT NOT NULL, 
     [ExecutableLines] INT NOT NULL,
     [UnitTestCodeCoverage] TINYINT NOT NULL DEFAULT (0),
+    [LastRunTotalWarnings] INT NULL, 
+    [LastRunTotalErrors] INT NULL, 
     CONSTRAINT [FK_ProjectMetrics_ToFiles] FOREIGN KEY ([FileId]) REFERENCES [Files]([Id])
 )

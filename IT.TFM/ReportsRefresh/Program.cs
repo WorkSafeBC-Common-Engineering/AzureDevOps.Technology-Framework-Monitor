@@ -1,5 +1,5 @@
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 
 const int sqlExecuteTimeout = 3600;  // 3600 seconds = 30 minutes
 const string sqlUpdate = "dbo.UpdateReports";

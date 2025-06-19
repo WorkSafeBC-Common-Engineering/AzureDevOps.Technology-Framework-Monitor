@@ -7,6 +7,7 @@ using RepoScan.DataModels;
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,7 +15,7 @@ namespace RepoScan.FileLocator
 {
     public static class FileDetails
     {
-        public static async Task GetDetailsAsync(int totalThreads, bool forceDetails, string projectId, string repositoryId)
+        public static async Task GetDetailsAsync(int totalThreads, bool forceDetails, string projectId, string repositoryId, string[] excludedProjects)
         {
             Settings.Initialize();
 
@@ -74,11 +75,12 @@ namespace RepoScan.FileLocator
                                                    new ProjectData.Repository { Id = repoItem.RepositoryId,
                                                                                 DefaultBranch = repoItem.RepositoryDefaultBranch });
 
+                var pipelineFiles = new ConcurrentBag<ProjectData.FileItem>();
                 var configYamlFiles = new ConcurrentBag<ProjectData.FileItem>();
 
                 var deleteList = new ConcurrentBag<DataModels.FileDetails>();
 
-                Parallel.ForEach(fileItems, options, (fileItem) =>
+                Parallel.ForEach(fileItems, options, async (fileItem) =>
                 {
                     if (Parameters.Settings.ExtendedLogging)
                     {
@@ -170,6 +172,7 @@ namespace RepoScan.FileLocator
                             {
                                 var pipelineWriter = StorageFactory.GetPipelineWriter();
                                 pipelineWriter.AddProperties(fileData);
+                                pipelineFiles.Add(fileData);
                             }
                         }
 
@@ -196,10 +199,17 @@ namespace RepoScan.FileLocator
                     {
                         fileInfo.RepositoryId = repoItem.RepositoryId;
                         var metrics = GetMetrics(fileInfo, currentBasePath);
-                        if (metrics != null)
+
+                        var writer = Storage.StorageFactory.GetStorageWriter();
+
+                        foreach (var projectFile in metrics.Keys)
                         {
-                            var writer = Storage.StorageFactory.GetStorageWriter();
-                            writer.SaveMetrics(fileInfo, metrics);
+                            var projectItem = fileItems.FirstOrDefault(f => f.Path.EndsWith(projectFile, StringComparison.OrdinalIgnoreCase));
+                            if (projectItem != null)
+                            {
+                                var metricsValues = metrics[projectFile];
+                                await writer.SaveMetricsAsync(fileInfo, metricsValues, null);
+                            }
                         }
                     }
 
@@ -214,18 +224,41 @@ namespace RepoScan.FileLocator
                     var pipelineWriter = StorageFactory.GetPipelineWriter();
                     var pipelineReader = StorageFactory.GetPipelineReader();
 
-                    foreach (var fileDetails in configYamlFiles)
+                    foreach (var pipelineFile in pipelineFiles)
                     {
-                        var portfolio = fileDetails.PipelineProperties["portfolio"];
-                        var product = fileDetails.PipelineProperties["product"];
+                        Console.WriteLine($"Linking config.yml to pipeline file {pipelineFile.Path} in Project {repoItem.ProjectName}, Repository {repoItem.RepositoryName}");
 
-                        var pipelines = pipelineReader.FindPipelines(repoItem.ProjectId, fileDetails.RepositoryId, portfolio, product);
+                        var portfolio = pipelineFile.PipelineProperties.TryGetValue("portfolio", out string value) ? value : string.Empty;
+                        var product = pipelineFile.PipelineProperties.TryGetValue("product", out value) ? value : string.Empty;
+
+                        if (string.IsNullOrEmpty(portfolio) || string.IsNullOrEmpty(product))
+                        {
+                            Console.WriteLine($"Skipping pipeline {pipelineFile.Path} as it does not have portfolio or product defined.");
+                            continue;
+                        }
+
+                        var configPath = $"/deploy/{portfolio}-{product}-config.yml";
+                        var configFile = configYamlFiles.FirstOrDefault(f => f.Path.Equals(configPath, StringComparison.InvariantCultureIgnoreCase));
+                        
+                        if (configFile == null)
+                        {
+                            configPath = $"/deploy/{portfolio}.{product}-config.yml";
+                            configFile = configYamlFiles.FirstOrDefault(f => f.Path.Equals(configPath, StringComparison.InvariantCultureIgnoreCase));
+                        }
+
+                        if (configFile == null)
+                        {
+                            Console.WriteLine($"No config.yml file found for portfolio {portfolio} and product {product} in Project {repoItem.ProjectName}, Repository {repoItem.RepositoryName}");
+                            continue;
+                        }
+
+                        var pipelines = pipelineReader.FindPipelines(pipelineFile);
                         if (!pipelines.Any())
                         {
                             continue;
                         }
 
-                        var environments = fileDetails.PipelineProperties["Environments"].Split('|');
+                        var environments = configFile.PipelineProperties["Environments"].Split('|');
                         foreach (var pipeline in pipelines)
                         {
                             pipeline.Environments = environments;
@@ -247,7 +280,7 @@ namespace RepoScan.FileLocator
             }
         }
 
-        private static Metrics GetMetrics(ProjectData.FileItem file, string basePath)
+        private static Dictionary<string, Metrics> GetMetrics(ProjectData.FileItem file, string basePath)
         {
             var scanner = MetricsScannerFactory.GetScanner(file.FileType.ToString());
             var metrics = scanner.Get(file, basePath);

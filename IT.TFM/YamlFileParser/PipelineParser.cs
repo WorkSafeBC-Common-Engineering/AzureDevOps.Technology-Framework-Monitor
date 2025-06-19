@@ -97,14 +97,8 @@ namespace YamlFileParser
                     index = 1;
                     foreach (var enabledItem in enabledEnvironments)
                     {
-                        var environmentNameAndIndex = ParseConfigEnvironmentName(enabledItem, index, content);
-                        if (environmentNameAndIndex == null)
-                        {
-                            continue;
-                        }
-
-                        environments.Add(environmentNameAndIndex.Value.Item1);
-                        index = environmentNameAndIndex.Value.Item2;
+                        var environmentName = ParseConfigEnvironmentName(enabledItem);
+                        environments.Add(environmentName);
                     }
                 }
             }
@@ -134,25 +128,9 @@ namespace YamlFileParser
             return null;
         }
 
-        private static (string, int)? ParseConfigEnvironmentName(string environment, int index, string[] content)
+        private static string ParseConfigEnvironmentName(string environment)
         {
-            var parseIndex = index;
-            while (parseIndex - 1 < content.Length)
-            {
-                if (content[parseIndex].Trim().StartsWith("- name:"))
-                {
-                    var name = content[parseIndex][7..].Trim();
-                    var value = content[parseIndex + 1].Trim();
-                    if (name.Equals($"{environment}StageName") && value.StartsWith("value:"))
-                    {
-                        return (value[6..].Trim().Replace("'", string.Empty), parseIndex);
-                    }
-                }
-
-                parseIndex += 2;
-            }
-
-            return null;
+            return char.ToUpper(environment[0]) + environment[1..];
         }
 
         private static void ParseConfigProperties(FileItem file)
@@ -160,11 +138,12 @@ namespace YamlFileParser
             // Get the portfolio and product from the file path
             var filename = Path.GetFileNameWithoutExtension(file.Path)
                                .Replace("-config", string.Empty);
-            var parts = filename.Split('-', StringSplitOptions.TrimEntries);
+
+            var parts = filename.Split('.', 2, StringSplitOptions.TrimEntries);
 
             if (parts.Length < 2)
             {
-                parts = filename.Split('.', StringSplitOptions.TrimEntries);
+                parts = filename.Split('-', 2, StringSplitOptions.TrimEntries);
             }
 
             if (parts.Length >= 2 && !string.IsNullOrEmpty(parts[0]) && !string.IsNullOrEmpty(parts[1]))
@@ -201,9 +180,9 @@ namespace YamlFileParser
                         ParseV1Template(cleanContent, variables, file);
                     }
 
-                    if (!file.PipelineProperties.ContainsKey("blueprintType") && file.PipelineProperties.ContainsKey("blueprint"))
+                    if (!file.PipelineProperties.ContainsKey("blueprintType") && file.PipelineProperties.TryGetValue("blueprint", out string? value))
                     {
-                        var genericType = GetGenericBlueprintType(file.PipelineProperties["blueprint"]);
+                        var genericType = GetGenericBlueprintType(value);
                         if (genericType != BlueprintType.None)
                         {
                             file.PipelineProperties["blueprintType"] = genericType.ToString();
@@ -556,17 +535,12 @@ namespace YamlFileParser
 
         private static BlueprintType GetGenericBlueprintType(string genericBlueprint)
         {
-            switch (genericBlueprint)
+            return genericBlueprint switch
             {
-                case "generic-steps":
-                    return BlueprintType.GenericSteps;
-
-                case "generic-jobs":
-                    return BlueprintType.GenericJobs;
-
-                default:
-                    return BlueprintType.None;
-            }
+                "generic-steps" => BlueprintType.GenericSteps,
+                "generic-jobs" => BlueprintType.GenericJobs,
+                _ => BlueprintType.None,
+            };
         }
 
         private static string GetConfigFileName(Dictionary<string, string> pipelineProperties)

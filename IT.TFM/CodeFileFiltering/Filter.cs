@@ -51,13 +51,11 @@ namespace FileFiltering
 
         public static void Initialize(IEnumerable<FilterData> filterData)
         {
-            fileExtensions = filterData.Where(f => f.FilterType.Equals(filterType, StringComparison.InvariantCultureIgnoreCase))
-                                       .Select(f => f.Data.ToLower())
-                                       .ToArray();
+            fileExtensions = [.. filterData.Where(f => f.FilterType.Equals(filterType, StringComparison.InvariantCultureIgnoreCase))
+                                           .Select(f => f.Data.ToLower())];
 
-            matches = filterData.Where(f => f.FilterType.Equals(filterContent, StringComparison.InvariantCultureIgnoreCase))
-                                .Select(f => f.Data.ToLower())
-                                .ToArray();
+            matches = [.. filterData.Where(f => f.FilterType.Equals(filterContent, StringComparison.InvariantCultureIgnoreCase))
+                                    .Select(f => f.Data.ToLower())];
         }
 
         private static bool HasMatchingExtension(FileItem file)

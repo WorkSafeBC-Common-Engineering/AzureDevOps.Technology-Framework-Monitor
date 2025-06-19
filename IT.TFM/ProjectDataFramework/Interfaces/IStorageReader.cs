@@ -23,9 +23,13 @@ namespace ProjectData.Interfaces
 
         IEnumerable<FileItem> GetYamlFiles(string id);
 
+        IEnumerable<Pipeline> GetPipelines(string repositoryId);
+
         IEnumerable<Pipeline> GetPipelines(string repositoryId, string filePath);
 
-        IEnumerable<Pipeline> GetPipelines(string pipelineType);
+        IEnumerable<Pipeline> GetPipelinesByType(string pipelineType);
+
+        IEnumerable<Pipeline> FindPipelines(string projectId, string repositoryId, string portfolio, string product);
 
         IEnumerable<Pipeline> FindPipelines(string projectId, string repositoryId, string portfolio, string product);
 

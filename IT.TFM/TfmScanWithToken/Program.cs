@@ -1,4 +1,6 @@
-﻿using RepoScan.FileLocator;
+﻿using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+
+using RepoScan.FileLocator;
 
 using System;
 using System.Configuration;
@@ -17,6 +19,7 @@ namespace TfmScanWithToken
         private static bool partThree = false;
         private static bool partFour = false;
         private static bool partFive = false;
+        private static bool partSix = false;
 
         #endregion
 
@@ -24,6 +27,7 @@ namespace TfmScanWithToken
         {
             var threadCount = GetTotalThreads(args);
             var forceDetails = GetForceDetails(args);
+            var excludedProjects = GetExclusions(args);
             GetParts(args);
             GetExtendedLogging(args);
 
@@ -32,12 +36,12 @@ namespace TfmScanWithToken
 
             if (partOne)
             {
-                await RepoScanAsync(projectId, repositoryId);
+                await RepoScanAsync(projectId, repositoryId, excludedProjects);
             }
 
             if (partTwo)
             {
-                await FileScanAsync(threadCount, forceDetails, projectId, repositoryId);
+                await FileScanAsync(threadCount, forceDetails, projectId, repositoryId, excludedProjects);
             }
 
             if (partThree)
@@ -47,35 +51,40 @@ namespace TfmScanWithToken
 
             if (partFour)
             {
-                await FileDetailsAsync(threadCount, forceDetails, projectId, repositoryId);
+                await FileDetailsAsync(threadCount, forceDetails, projectId, repositoryId, excludedProjects);
             }
 
             if (partFive)
             {
                 await NuGetFeedScan();
             }
-            
+
+            if (partSix)
+            {
+                await GetRuntimeMetrics(projectId, repositoryId, excludedProjects);
+            }
+
 #if DEBUG
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey();
 #endif
         }
 
-        private static async Task RepoScanAsync(string projectId, string repositoryId)
+        private static async Task RepoScanAsync(string projectId, string repositoryId, string[] excludedProjects)
         {
             Console.WriteLine($"Starting Repo Scan at: {DateTime.Now.ToLongTimeString()}");
 
             var scanner = new Scanner();
-            await scanner.ScanAsync(projectId, repositoryId);
+            await scanner.ScanAsync(projectId, repositoryId, excludedProjects);
 
             Console.WriteLine($"Repo Scan complete at: {DateTime.Now.ToLongTimeString()}");
         }
 
-        private static async Task FileScanAsync(int threadCount, bool forceDetails, string projectId, string repositoryId)
+        private static async Task FileScanAsync(int threadCount, bool forceDetails, string projectId, string repositoryId, string[] excludedProjects)
         {
             Console.WriteLine($"Starting File Scan at: {DateTime.Now.ToLongTimeString()}");
 
-            await RepoFileScan.FileProcessor.GetFiles(threadCount, forceDetails, projectId, repositoryId);
+            await FileProcessor.GetFiles(threadCount, forceDetails, projectId, repositoryId, excludedProjects);
 
             Console.WriteLine($"File Scan complete at: {DateTime.Now.ToLongTimeString()}");
         }
@@ -89,11 +98,11 @@ namespace TfmScanWithToken
             Console.WriteLine($"Pipeline Scan complete at: {DateTime.Now.ToLongTimeString()}");
         }
 
-        private static async Task FileDetailsAsync(int threadCount, bool forceDetails, string projectId, string repositoryId)
+        private static async Task FileDetailsAsync(int threadCount, bool forceDetails, string projectId, string repositoryId, string[] excludedProjects)
         {
             Console.WriteLine($"Starting File Details Scan at: {DateTime.Now.ToLongTimeString()}");
 
-            await RepoFileScan.FileDetails.GetDetailsAsync(threadCount, forceDetails, projectId, repositoryId);
+            await RepoFileScan.FileDetails.GetDetailsAsync(threadCount, forceDetails, projectId, repositoryId, excludedProjects);
 
             Console.WriteLine($"File Details Scan complete at: {DateTime.Now.ToLongTimeString()}");
         }
@@ -105,6 +114,15 @@ namespace TfmScanWithToken
             await NuGetScan.Run();
 
             Console.WriteLine($"NuGet Feed Scan complete at: {DateTime.Now.ToLongTimeString()}");
+        }
+
+        private static async Task GetRuntimeMetrics(string projectId, string repositoryId, string[] excludedProjects)
+        {
+            Console.WriteLine($"Starting Runtime Metrics Scan at: {DateTime.Now.ToLongTimeString()}");
+
+            await RuntimeMetricsScan.Run(projectId, repositoryId, excludedProjects);
+
+            Console.WriteLine($"Runtime Metrics Scan complete at: {DateTime.Now.ToLongTimeString()}");
         }
 
         private static int GetTotalThreads(string[] args)
@@ -160,12 +178,16 @@ namespace TfmScanWithToken
                 case "5":
                     partFive = true;
                     break;
+                case "6":
+                    partSix = true;
+                    break;
                 default:
                     partOne = true;
                     partTwo = true;
                     partThree = true;
                     partFour = true;
                     partFive = true;
+                    partSix = true;
                     break;
             }
         }
@@ -178,6 +200,13 @@ namespace TfmScanWithToken
         private static string GetRepositoryId(string[] args)
         {
             return GetCommandLineValue(args, "-r");
+        }
+
+        private static string[] GetExclusions(string[] args)
+        {
+            var exclusionsValue = GetCommandLineValue(args, "-xp");
+            var fields = exclusionsValue?.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            return fields;
         }
 
         private static void GetExtendedLogging(string[] args)
@@ -202,7 +231,16 @@ namespace TfmScanWithToken
             var keyIndex = Array.IndexOf(args, key);
             if (keyIndex >= 0 && args.Length > keyIndex + 1)
             {
-                value = args[keyIndex + 1];
+                value = args[++keyIndex];
+            }
+
+            if (key == "-xp")
+            {
+                // add any additional values
+                while (++keyIndex < args.Length && args[keyIndex].StartsWith(','))
+                {
+                    value += args[keyIndex];
+                }
             }
 
             return value;

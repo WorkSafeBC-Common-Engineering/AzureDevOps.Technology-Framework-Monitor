@@ -2,6 +2,7 @@
 
 using Newtonsoft.Json;
 
+using System;
 using System.IO.Compression;
 using System.Text;
 
@@ -25,6 +26,10 @@ namespace AzureDevOps
 
         private const string fieldPipeline = "{pipeline}";
 
+        private const string fieldRun = "{run}";
+
+        private const string fieldLog = "{log}";
+
         private const string fieldReleaseDefinitionId = "{definitionId}";
 
         private const string fieldApiVersion = "{apiVersion}";
@@ -33,7 +38,7 @@ namespace AzureDevOps
 
         private const string fieldPagingSkip = "{$skip}";
 
-        private const string apiVersion = "api-version=7.0";
+        private const string apiVersion = "api-version=7.1";
 
         private const string getProjectUrl = "https://{baseUrl}/{organization}/_apis/projects/{project}?{apiVersion}";
 
@@ -52,6 +57,10 @@ namespace AzureDevOps
         private const string getPipelinesUrl = "https://{baseUrl}/{organization}/{project}/_apis/pipelines?{apiVersion}";
 
         private const string getPipelineRunsUrl = "https://{baseUrl}/{organization}/{project}/_apis/pipelines/{pipeline}/runs?{apiVersion}";
+
+        private const string getPipelineRunLogsUrl = "https://{baseUrl}/{organization}/{project}/_apis/pipelines/{pipeline}/runs/{run}/logs?{apiVersion}";
+
+        private const string getPipelineRunLogSignedContentUrl = "https://{baseUrl}/{organization}/{project}/_apis/pipelines/{pipeline}/runs/{run}/logs/{log}?$expand=signedContent&{apiVersion}";
 
         private const string getReleasesUrl = "https://vsrm.dev.azure.com/{organization}/{project}/_apis/release/definitions?{apiVersion}";
 
@@ -78,6 +87,10 @@ namespace AzureDevOps
         public string Repository { get; set; } = string.Empty;
 
         public int Pipeline {  get; set; }
+
+        public int Run { get; set; }
+
+        public int Log { get; set; }
 
         public int ReleaseDefinition { get; set; }
 
@@ -151,6 +164,29 @@ namespace AzureDevOps
             var content = await CallApiAsync(GetUrl(getRepositoryUrl));
 
             var repository = JsonConvert.DeserializeObject<AzDoRepository>(content);
+
+            if (repository != null)
+            {
+                Repository = repository.Id;
+                var commitContent = await CallApiAsync(GetUrl(getRepositoryCommitUrl));
+                if (commitContent == string.Empty)
+                {
+                    repository.LastCommitId = string.Empty;
+                }
+
+                var commit = JsonConvert.DeserializeObject<AzDoCommitList>(commitContent);
+                if (commit == null || commit.Value == null || commit.Count == 0)
+                {
+                    repository.LastUpdateDate = string.Empty;
+                }
+                else
+                {
+                    repository.LastUpdateDate = commit?.Value?.Length > 0
+                        ? commit.Value[0].Committer.Date
+                        : string.Empty;
+                }
+            }
+
             return repository; ;
         }
 
@@ -168,24 +204,16 @@ namespace AzureDevOps
             {
                 Repository = repo.Id;
                 var commitContent = await CallApiAsync(GetUrl(getRepositoryCommitUrl));
-                if (commitContent == string.Empty)
+                if (string.IsNullOrEmpty(commitContent))
                 {
                     repo.LastCommitId = string.Empty;
                     continue;
                 }
 
                 var commit = JsonConvert.DeserializeObject<AzDoCommitList>(commitContent);
-
-                if (commit == null || commit.Value == null)
-                {
-                    repo.LastCommitId = string.Empty;
-                }
-                else
-                {
-                    repo.LastCommitId = commit.Count == 0
-                        ? string.Empty
-                        : commit.Value[0].CommitId;
-                }
+                repo.LastUpdateDate = commit?.Value?.Length > 0
+                    ? commit.Value[0].Committer.Date
+                    : string.Empty;
             }
 
             return repositories ?? new AzDoRepositoryList();
@@ -345,6 +373,40 @@ namespace AzureDevOps
             return pipelineRuns ?? new AzDoPipelineRunList();
         }
 
+        async Task<AzDoPipelineRunLogs> IRestApi.GetPipelineRunLogsAsync()
+        {
+            var content = await CallApiAsync(GetUrl(getPipelineRunLogsUrl));
+
+            if (content == string.Empty)
+            {
+                return new AzDoPipelineRunLogs();
+            }
+
+            var pipelineRunLogs = JsonConvert.DeserializeObject<AzDoPipelineRunLogs>(content);
+            return pipelineRunLogs ?? new AzDoPipelineRunLogs();
+        }
+
+        async Task<string> IRestApi.GetPipelineRunLogSignedUrlAsync()
+        {
+            var content = await CallApiAsync(GetUrl(getPipelineRunLogSignedContentUrl));
+            if (content != string.Empty)
+            {
+                var signedLogEntry = JsonConvert.DeserializeObject<Log>(content);
+                if (signedLogEntry != null && signedLogEntry.SignedContent != null)
+                {
+                    return signedLogEntry.SignedContent.Url;
+                }
+            }
+
+            return string.Empty;
+        }
+
+        async Task<string> IRestApi.GetPipelineLogContentAsync(string url)
+        {
+            var content = await CallApiAsync(url);
+            return content;
+        }
+
         #endregion
 
         #region IDisposable Implementation
@@ -398,6 +460,8 @@ namespace AzureDevOps
                               .Replace(fieldRepository, Repository)
                               .Replace(fieldRepositoryBranch, RepositoryBranch)
                               .Replace(fieldPipeline, Pipeline.ToString())
+                              .Replace(fieldRun, Run.ToString())
+                              .Replace(fieldLog, Log.ToString())
                               .Replace(fieldReleaseDefinitionId, ReleaseDefinition.ToString())
                               .Replace(fieldPagingTop, PagingTop.ToString())
                               .Replace(fieldPagingSkip, PagingSkip.ToString());
@@ -597,7 +661,12 @@ namespace AzureDevOps
                         break;
 
                     case "x-ratelimit-reset":
-                        var resetTime = DateTimeOffset.FromUnixTimeSeconds(value);
+                        if (Parameters.Settings.ExtendedLogging)
+                        {
+                            var resetTime = DateTimeOffset.FromUnixTimeSeconds(value);
+                            Console.WriteLine($"ThrottleApi: x-ratelimit-remaining = {resetTime}");
+                        }
+                        
                         break;
                 }
             }
@@ -609,6 +678,11 @@ namespace AzureDevOps
 
             if (Parameters.Settings.ExtendedLogging)
             {
+                if (!Directory.Exists(CheckoutDirectory))
+                {
+                    Directory.CreateDirectory(CheckoutDirectory);
+                }
+
                 var files = Directory.GetFiles(CheckoutDirectory, "*.*", SearchOption.AllDirectories);
                 Console.WriteLine($">>> GetZipContent: List of files, total = {files.Length}");
                 foreach (var file in files)

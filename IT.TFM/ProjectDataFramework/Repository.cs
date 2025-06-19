@@ -45,9 +45,9 @@ namespace ProjectData
 
         public string LastCommitId { get; set; }
 
-        public DateOnly? CreatedOn { get; set; }
+        public DateTime? CreatedOn { get; set; }
 
-        public DateOnly? LastUpdatedOn { get; set; }
+        public DateTime? LastUpdatedOn { get; set; }
 
         public bool NoScan { get; set; }
 

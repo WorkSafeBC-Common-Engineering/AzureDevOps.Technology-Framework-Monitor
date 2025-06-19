@@ -23,6 +23,10 @@
         public bool IsDisabled { get; set; } = false;
 
         public string LastCommitId { get; set; } = string.Empty;
+
+        public string CreationDate { get; set; } = string.Empty;
+
+        public string LastUpdateDate { get; set; } = string.Empty;
     }
 
     public class AzDoRepositoryList

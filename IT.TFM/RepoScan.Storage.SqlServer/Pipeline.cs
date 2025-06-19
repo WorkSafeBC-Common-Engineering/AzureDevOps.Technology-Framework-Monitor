@@ -63,14 +63,13 @@ namespace RepoScan.Storage.SqlServer
                             break;
 
                         case "suppressCD":
-                            pipeline.SuppressCD = value.ToLower() != "false";
+                            pipeline.SuppressCD = !value.Equals("false", StringComparison.CurrentCultureIgnoreCase);
                             break;
                     }
                 }
 
                 writer.SavePipeline(pipeline);
             }
-
         }
 
         void IWritePipeline.Delete(int id)
@@ -86,7 +85,7 @@ namespace RepoScan.Storage.SqlServer
         IEnumerable<YamlPipeline> IReadPipelines.ReadYamlPipelines()
         {
             using var reader = GetReader();
-            var pipelines = reader.GetPipelines(ProjectData.Pipeline.pipelineTypeYaml);
+            var pipelines = reader.GetPipelinesByType(ProjectData.Pipeline.pipelineTypeYaml);
             return pipelines.Select(p => new YamlPipeline
                                    {
                                        PipelineId = p.Id,
@@ -102,7 +101,21 @@ namespace RepoScan.Storage.SqlServer
         IEnumerable<int> IReadPipelines.GetPipelineIds(string projectId)
         {
             using var reader = GetReader();
-            return reader.GetPipelineIdsForProject(projectId).ToArray();
+            return [.. reader.GetPipelineIdsForProject(projectId)];
+        }
+
+        IEnumerable<ProjectData.Pipeline> IReadPipelines.FindPipelines(ProjectData.FileItem file)
+        {
+            using var reader = GetReader();
+            var pipelines = reader.GetPipelines(file.RepositoryId.ToString("D"), file.Path);
+            return pipelines.ToArray().AsEnumerable();
+        }
+
+        IEnumerable<ProjectData.Pipeline> IReadPipelines.GetPipelines(string repositoryId)
+        {
+            using var reader = GetReader();
+            var pipelines = reader.GetPipelines(repositoryId);
+            return pipelines.ToArray().AsEnumerable();
         }
 
         IEnumerable<ProjectData.Pipeline> IReadPipelines.FindPipelines(Guid projectId, Guid repositoryId, string portfolio, string product)
