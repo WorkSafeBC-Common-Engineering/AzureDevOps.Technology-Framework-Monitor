@@ -91,3 +91,6 @@ INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display],
 INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display], [IsTargetVersion], [ReleaseDate], [FrameworkProductId]) VALUES (N'@types/node 7', N'2017-06-30', NULL, N'node 7', 0, N'2016-10-25', NULL)
 INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display], [IsTargetVersion], [ReleaseDate], [FrameworkProductId]) VALUES (N'@types/node 8', N'2019-12-31', NULL, N'node 8', 0, N'2017-05-30', NULL)
 INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display], [IsTargetVersion], [ReleaseDate], [FrameworkProductId]) VALUES (N'@types/node 9', N'2018-06-30', NULL, N'node 9', 0, N'2017-10-01', NULL)
+INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display], [IsTargetVersion], [ReleaseDate], [FrameworkProductId]) VALUES (N'@types/node 22', N'2027-04-30', NULL, N'node 22', 0, NULL, NULL)
+INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display], [IsTargetVersion], [ReleaseDate], [FrameworkProductId]) VALUES (N'@types/node 23', N'2025-06-01', NULL, N'node 23', 0, NULL, NULL)
+INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display], [IsTargetVersion], [ReleaseDate], [FrameworkProductId]) VALUES (N'@types/node 24', N'2028-04-30', NULL, N'node 24', 1, NULL, NULL)
