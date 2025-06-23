@@ -17,15 +17,59 @@
           "query": null
         },
         "credential": {
-          "AuthenticationKind": "Windows",
-          "kind": "SQL",
-          "path": "ln461200;TFMOSS",
-          "Username": "wcbbc\\am56655",
+          "AuthenticationKind": "UsernamePassword",
+          "Username": "SSASUser",
           "EncryptConnection": false
         }
       }
     ],
     "tables": [
+      {
+        "name": "analysis dimFiles",
+        "columns": [
+          {
+            "name": "FileId",
+            "dataType": "int64",
+            "sourceColumn": "FileId"
+          },
+          {
+            "name": "FilePath",
+            "dataType": "string",
+            "sourceColumn": "FilePath"
+          },
+          {
+            "name": "FileUrl",
+            "dataType": "string",
+            "sourceColumn": "FileUrl"
+          },
+          {
+            "name": "FileType",
+            "dataType": "string",
+            "sourceColumn": "FileType"
+          },
+          {
+            "name": "RepositoryId",
+            "dataType": "int64",
+            "sourceColumn": "RepositoryId"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/LN461200;TFMOSS\",",
+                "    analysis_dimFiles = Source{[Schema=\"analysis\",Item=\"dimFiles\"]}[Data]",
+                "in",
+                "    analysis_dimFiles"
+              ]
+            }
+          }
+        ]
+      },
       {
         "name": "analysis dimOrganizations",
         "columns": [
@@ -180,52 +224,6 @@
         ]
       },
       {
-        "name": "analysis dimFiles",
-        "columns": [
-          {
-            "name": "FileId",
-            "dataType": "int64",
-            "sourceColumn": "FileId"
-          },
-          {
-            "name": "FilePath",
-            "dataType": "string",
-            "sourceColumn": "FilePath"
-          },
-          {
-            "name": "FileUrl",
-            "dataType": "string",
-            "sourceColumn": "FileUrl"
-          },
-          {
-            "name": "FileType",
-            "dataType": "string",
-            "sourceColumn": "FileType"
-          },
-          {
-            "name": "RepositoryId",
-            "dataType": "int64",
-            "sourceColumn": "RepositoryId"
-          }
-        ],
-        "partitions": [
-          {
-            "name": "Partition",
-            "dataView": "full",
-            "source": {
-              "type": "m",
-              "expression": [
-                "let",
-                "    Source = #\"SQL/LN461200;TFMOSS\",",
-                "    analysis_dimFiles = Source{[Schema=\"analysis\",Item=\"dimFiles\"]}[Data]",
-                "in",
-                "    analysis_dimFiles"
-              ]
-            }
-          }
-        ]
-      },
-      {
         "name": "analysis factProjectFrameworks",
         "columns": [
           {
@@ -295,29 +293,6 @@
             }
           }
         ]
-      }
-    ],
-    "relationships": [
-      {
-        "name": "099b931c-1d06-4b25-af69-a851ed34b85c",
-        "fromTable": "analysis dimProjects",
-        "fromColumn": "OrganizationId",
-        "toTable": "analysis dimOrganizations",
-        "toColumn": "OrganizationId"
-      },
-      {
-        "name": "b2104b3f-8490-4766-b5f1-7460cbf6ebc8",
-        "fromTable": "analysis dimRepositories",
-        "fromColumn": "ProjectId",
-        "toTable": "analysis dimProjects",
-        "toColumn": "ProjectId"
-      },
-      {
-        "name": "42cacd40-a3e3-451b-b988-3c4885e06cb7",
-        "fromTable": "analysis dimFiles",
-        "fromColumn": "RepositoryId",
-        "toTable": "analysis dimRepositories",
-        "toColumn": "RepositoryId"
       }
     ],
     "annotations": [

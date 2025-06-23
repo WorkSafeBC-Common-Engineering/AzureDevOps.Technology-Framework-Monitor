@@ -104,6 +104,7 @@
     <Build Include="analysis\Views\dimOrganizations.sql" />
     <Build Include="analysis\Views\dimProjects.sql" />
     <Build Include="analysis\Views\dimRepositories.sql" />
+    <Build Include="analysis\Views\factProjectFrameworks.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PostDeployment\PopulateDotNetEOL.sql" />
