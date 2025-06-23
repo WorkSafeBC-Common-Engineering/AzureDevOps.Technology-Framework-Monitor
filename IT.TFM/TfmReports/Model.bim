@@ -1,0 +1,260 @@
+{
+  "name": "SemanticModel",
+  "compatibilityLevel": 1600,
+  "model": {
+    "culture": "en-US",
+    "dataSources": [
+      {
+        "type": "structured",
+        "name": "SQL/LN461200;TFMOSS",
+        "connectionDetails": {
+          "protocol": "tds",
+          "address": {
+            "server": "LN461200",
+            "database": "TFMOSS"
+          },
+          "authentication": null,
+          "query": null
+        },
+        "credential": {
+          "AuthenticationKind": "KerberosS4U",
+          "kind": "SQL",
+          "path": "ln461200;TFMOSS",
+          "EncryptConnection": false,
+          "Username": "wcbbc\\am56655"
+        }
+      }
+    ],
+    "tables": [
+      {
+        "name": "analysis dimOrganizations",
+        "columns": [
+          {
+            "name": "OrganizationId",
+            "dataType": "int64",
+            "sourceColumn": "OrganizationId"
+          },
+          {
+            "name": "OrganizationName",
+            "dataType": "string",
+            "sourceColumn": "OrganizationName"
+          },
+          {
+            "name": "OrganizationUri",
+            "dataType": "string",
+            "sourceColumn": "OrganizationUri"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/LN461200;TFMOSS\",",
+                "    analysis_dimOrganizations = Source{[Schema=\"analysis\",Item=\"dimOrganizations\"]}[Data]",
+                "in",
+                "    analysis_dimOrganizations"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "analysis dimProjects",
+        "columns": [
+          {
+            "name": "ProjectId",
+            "dataType": "int64",
+            "sourceColumn": "ProjectId"
+          },
+          {
+            "name": "ProjectName",
+            "dataType": "string",
+            "sourceColumn": "ProjectName"
+          },
+          {
+            "name": "Abbreviation",
+            "dataType": "string",
+            "sourceColumn": "Abbreviation"
+          },
+          {
+            "name": "Description",
+            "dataType": "string",
+            "sourceColumn": "Description"
+          },
+          {
+            "name": "LastUpdate",
+            "dataType": "dateTime",
+            "sourceColumn": "LastUpdate"
+          },
+          {
+            "name": "Revision",
+            "dataType": "int64",
+            "sourceColumn": "Revision"
+          },
+          {
+            "name": "ProjectUrl",
+            "dataType": "string",
+            "sourceColumn": "ProjectUrl"
+          },
+          {
+            "name": "OrganizationId",
+            "dataType": "int64",
+            "sourceColumn": "OrganizationId"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/LN461200;TFMOSS\",",
+                "    analysis_dimProjects = Source{[Schema=\"analysis\",Item=\"dimProjects\"]}[Data]",
+                "in",
+                "    analysis_dimProjects"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "analysis dimRepositories",
+        "columns": [
+          {
+            "name": "RepositoryId",
+            "dataType": "int64",
+            "sourceColumn": "RepositoryId"
+          },
+          {
+            "name": "RepositoryName",
+            "dataType": "string",
+            "sourceColumn": "RepositoryName"
+          },
+          {
+            "name": "DefaultBranch",
+            "dataType": "string",
+            "sourceColumn": "DefaultBranch"
+          },
+          {
+            "name": "Url",
+            "dataType": "string",
+            "sourceColumn": "Url"
+          },
+          {
+            "name": "Size",
+            "dataType": "int64",
+            "sourceColumn": "Size"
+          },
+          {
+            "name": "LastCommitId",
+            "dataType": "string",
+            "sourceColumn": "LastCommitId"
+          },
+          {
+            "name": "ProjectId",
+            "dataType": "int64",
+            "sourceColumn": "ProjectId"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/LN461200;TFMOSS\",",
+                "    analysis_dimRepositories = Source{[Schema=\"analysis\",Item=\"dimRepositories\"]}[Data]",
+                "in",
+                "    analysis_dimRepositories"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "analysis dimFiles",
+        "columns": [
+          {
+            "name": "FileId",
+            "dataType": "int64",
+            "sourceColumn": "FileId"
+          },
+          {
+            "name": "FilePath",
+            "dataType": "string",
+            "sourceColumn": "FilePath"
+          },
+          {
+            "name": "FileUrl",
+            "dataType": "string",
+            "sourceColumn": "FileUrl"
+          },
+          {
+            "name": "FileType",
+            "dataType": "string",
+            "sourceColumn": "FileType"
+          },
+          {
+            "name": "RepositoryId",
+            "dataType": "int64",
+            "sourceColumn": "RepositoryId"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/LN461200;TFMOSS\",",
+                "    analysis_dimFiles = Source{[Schema=\"analysis\",Item=\"dimFiles\"]}[Data]",
+                "in",
+                "    analysis_dimFiles"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "099b931c-1d06-4b25-af69-a851ed34b85c",
+        "fromTable": "analysis dimProjects",
+        "fromColumn": "OrganizationId",
+        "toTable": "analysis dimOrganizations",
+        "toColumn": "OrganizationId"
+      },
+      {
+        "name": "b2104b3f-8490-4766-b5f1-7460cbf6ebc8",
+        "fromTable": "analysis dimRepositories",
+        "fromColumn": "ProjectId",
+        "toTable": "analysis dimProjects",
+        "toColumn": "ProjectId"
+      },
+      {
+        "name": "42cacd40-a3e3-451b-b988-3c4885e06cb7",
+        "fromTable": "analysis dimFiles",
+        "fromColumn": "RepositoryId",
+        "toTable": "analysis dimRepositories",
+        "toColumn": "RepositoryId"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "ClientCompatibilityLevel",
+        "value": "700"
+      }
+    ]
+  },
+  "id": "SemanticModel"
+}
