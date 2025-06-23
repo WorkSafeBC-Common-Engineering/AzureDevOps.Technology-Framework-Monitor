@@ -86,6 +86,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RuntimeMetricsScanner", "Ru
 EndProject
 Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "TfmReports", "TfmReports\TfmReports.smproj", "{8CE414BB-95B2-4C99-9E03-51BA72086E22}"
 EndProject
+Project("{6870E480-7721-4708-BFB8-9AE898AA21B3}") = "TFMReportDB", "TFMReportDB\TFMReportDB.smproj", "{330A79B1-FBC3-4D49-98A9-D96D618143D8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -480,6 +482,24 @@ Global
 		{8CE414BB-95B2-4C99-9E03-51BA72086E22}.Release|x86.ActiveCfg = Development|x86
 		{8CE414BB-95B2-4C99-9E03-51BA72086E22}.Release|x86.Build.0 = Development|x86
 		{8CE414BB-95B2-4C99-9E03-51BA72086E22}.Release|x86.Deploy.0 = Development|x86
+		{330A79B1-FBC3-4D49-98A9-D96D618143D8}.Debug|Any CPU.ActiveCfg = Development|x86
+		{330A79B1-FBC3-4D49-98A9-D96D618143D8}.Debug|Any CPU.Build.0 = Development|x86
+		{330A79B1-FBC3-4D49-98A9-D96D618143D8}.Debug|Any CPU.Deploy.0 = Development|x86
+		{330A79B1-FBC3-4D49-98A9-D96D618143D8}.Debug|x86.ActiveCfg = Development|x86
+		{330A79B1-FBC3-4D49-98A9-D96D618143D8}.Debug|x86.Build.0 = Development|x86
+		{330A79B1-FBC3-4D49-98A9-D96D618143D8}.Debug|x86.Deploy.0 = Development|x86
+		{330A79B1-FBC3-4D49-98A9-D96D618143D8}.Development|Any CPU.ActiveCfg = Development|x86
+		{330A79B1-FBC3-4D49-98A9-D96D618143D8}.Development|Any CPU.Build.0 = Development|x86
+		{330A79B1-FBC3-4D49-98A9-D96D618143D8}.Development|Any CPU.Deploy.0 = Development|x86
+		{330A79B1-FBC3-4D49-98A9-D96D618143D8}.Development|x86.ActiveCfg = Development|x86
+		{330A79B1-FBC3-4D49-98A9-D96D618143D8}.Development|x86.Build.0 = Development|x86
+		{330A79B1-FBC3-4D49-98A9-D96D618143D8}.Development|x86.Deploy.0 = Development|x86
+		{330A79B1-FBC3-4D49-98A9-D96D618143D8}.Release|Any CPU.ActiveCfg = Development|x86
+		{330A79B1-FBC3-4D49-98A9-D96D618143D8}.Release|Any CPU.Build.0 = Development|x86
+		{330A79B1-FBC3-4D49-98A9-D96D618143D8}.Release|Any CPU.Deploy.0 = Development|x86
+		{330A79B1-FBC3-4D49-98A9-D96D618143D8}.Release|x86.ActiveCfg = Development|x86
+		{330A79B1-FBC3-4D49-98A9-D96D618143D8}.Release|x86.Build.0 = Development|x86
+		{330A79B1-FBC3-4D49-98A9-D96D618143D8}.Release|x86.Deploy.0 = Development|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -518,6 +538,7 @@ Global
 		{C5BD6623-0AB5-458B-AED3-4697070BE3C7} = {0CFDAD52-05D7-491A-88D4-7DBE3EF09173}
 		{59AB1180-1AA9-4406-8D4A-2C3E52E1A159} = {10E88914-F313-43A5-9893-24F5D79F51CB}
 		{8CE414BB-95B2-4C99-9E03-51BA72086E22} = {AE122355-12E2-4890-8041-3B2B307CDDFB}
+		{330A79B1-FBC3-4D49-98A9-D96D618143D8} = {AE122355-12E2-4890-8041-3B2B307CDDFB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {13E06812-4F34-4E3C-8E19-5A26F31CF9C8}

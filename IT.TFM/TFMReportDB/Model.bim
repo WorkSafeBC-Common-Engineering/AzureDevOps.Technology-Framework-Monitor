@@ -17,8 +17,10 @@
           "query": null
         },
         "credential": {
-          "AuthenticationKind": "UsernamePassword",
-          "Username": "SSASUser",
+          "AuthenticationKind": "Windows",
+          "kind": "SQL",
+          "path": "ln461200;TFMOSS",
+          "Username": "wcbbc\\am56655",
           "EncryptConnection": false
         }
       }
@@ -168,62 +170,6 @@
         ]
       },
       {
-        "name": "analysis dimRepositories",
-        "columns": [
-          {
-            "name": "RepositoryId",
-            "dataType": "int64",
-            "sourceColumn": "RepositoryId"
-          },
-          {
-            "name": "RepositoryName",
-            "dataType": "string",
-            "sourceColumn": "RepositoryName"
-          },
-          {
-            "name": "DefaultBranch",
-            "dataType": "string",
-            "sourceColumn": "DefaultBranch"
-          },
-          {
-            "name": "Url",
-            "dataType": "string",
-            "sourceColumn": "Url"
-          },
-          {
-            "name": "Size",
-            "dataType": "int64",
-            "sourceColumn": "Size"
-          },
-          {
-            "name": "LastCommitId",
-            "dataType": "string",
-            "sourceColumn": "LastCommitId"
-          },
-          {
-            "name": "ProjectId",
-            "dataType": "int64",
-            "sourceColumn": "ProjectId"
-          }
-        ],
-        "partitions": [
-          {
-            "name": "Partition",
-            "dataView": "full",
-            "source": {
-              "type": "m",
-              "expression": [
-                "let",
-                "    Source = #\"SQL/LN461200;TFMOSS\",",
-                "    analysis_dimRepositories = Source{[Schema=\"analysis\",Item=\"dimRepositories\"]}[Data]",
-                "in",
-                "    analysis_dimRepositories"
-              ]
-            }
-          }
-        ]
-      },
-      {
         "name": "analysis factProjectFrameworks",
         "columns": [
           {
@@ -293,6 +239,92 @@
             }
           }
         ]
+      },
+      {
+        "name": "analysis dimRepositories",
+        "columns": [
+          {
+            "name": "RepositoryId",
+            "dataType": "int64",
+            "sourceColumn": "RepositoryId"
+          },
+          {
+            "name": "RepositoryName",
+            "dataType": "string",
+            "sourceColumn": "RepositoryName"
+          },
+          {
+            "name": "DefaultBranch",
+            "dataType": "string",
+            "sourceColumn": "DefaultBranch"
+          },
+          {
+            "name": "Url",
+            "dataType": "string",
+            "sourceColumn": "Url"
+          },
+          {
+            "name": "Size",
+            "dataType": "int64",
+            "sourceColumn": "Size"
+          },
+          {
+            "name": "LastCommitId",
+            "dataType": "string",
+            "sourceColumn": "LastCommitId"
+          },
+          {
+            "name": "ProjectId",
+            "dataType": "int64",
+            "sourceColumn": "ProjectId"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/LN461200;TFMOSS\",",
+                "    analysis_dimRepositories = Source{[Schema=\"analysis\",Item=\"dimRepositories\"]}[Data]",
+                "in",
+                "    analysis_dimRepositories"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "9c39b72c-eea0-495d-8a30-5a2d53776b53",
+        "fromTable": "analysis dimProjects",
+        "fromColumn": "OrganizationId",
+        "toTable": "analysis dimOrganizations",
+        "toColumn": "OrganizationId"
+      },
+      {
+        "name": "2c3cebc9-eea0-4c13-bd01-54a774e38995",
+        "fromTable": "analysis dimRepositories",
+        "fromColumn": "ProjectId",
+        "toTable": "analysis dimProjects",
+        "toColumn": "ProjectId"
+      },
+      {
+        "name": "bdf4cb80-0eef-43cc-9327-1ce91a30c57a",
+        "fromTable": "analysis dimFiles",
+        "fromColumn": "RepositoryId",
+        "toTable": "analysis dimRepositories",
+        "toColumn": "RepositoryId"
+      },
+      {
+        "name": "0cd368c7-77c4-4006-bdd2-dc0e048b9555",
+        "fromTable": "analysis factProjectFrameworks",
+        "fromColumn": "FileId",
+        "toTable": "analysis dimFiles",
+        "toColumn": "FileId"
       }
     ],
     "annotations": [
