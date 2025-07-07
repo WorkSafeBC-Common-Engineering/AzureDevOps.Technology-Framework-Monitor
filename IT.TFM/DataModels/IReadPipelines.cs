@@ -11,6 +11,8 @@ namespace RepoScan.DataModels
 
         IEnumerable<ProjectData.Pipeline> FindPipelines(ProjectData.FileItem file);
 
+        IEnumerable<ProjectData.Pipeline> FindPipelines(Guid projectId, Guid repositoryId, string portfolio, string product);
+
         IEnumerable<ProjectData.Pipeline> GetPipelines(string repositoryId);
     }
 }

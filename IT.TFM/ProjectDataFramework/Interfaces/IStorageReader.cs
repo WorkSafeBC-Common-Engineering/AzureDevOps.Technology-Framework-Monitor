@@ -31,8 +31,6 @@ namespace ProjectData.Interfaces
 
         IEnumerable<Pipeline> FindPipelines(string projectId, string repositoryId, string portfolio, string product);
 
-        IEnumerable<Pipeline> FindPipelines(string projectId, string repositoryId, string portfolio, string product);
-
         IEnumerable<int> GetPipelineIdsForProject(string projectId);
 
         IEnumerable<NuGetFeed> GetNuGetFeeds();
