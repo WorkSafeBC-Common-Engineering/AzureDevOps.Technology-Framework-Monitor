@@ -30,6 +30,7 @@ namespace RepoScan.FileLocator
 
                     foreach (var repo in repos)
                     {
+                        Console.WriteLine($"Running Runtime Metrics Scan for {organization} - {project.Name} - {repo.Name}");
                         var metricsScanner = ScannerFactory.GetRuntimeMetricsScanner(scanner, project.Id.ToString("D").ToLower(), repo.Id.ToString("D").ToLower(), repo.Name);
                         await metricsScanner.RunAsync();
                     }
