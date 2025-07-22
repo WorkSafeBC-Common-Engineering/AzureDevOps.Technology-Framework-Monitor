@@ -36,7 +36,6 @@ namespace RepoScan.FileLocator
                     }
                 }
             }
-
         }
 
         #endregion

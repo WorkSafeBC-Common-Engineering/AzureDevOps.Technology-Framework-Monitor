@@ -58,11 +58,13 @@ namespace RuntimeMetricsScanner
                     continue;
                 }
 
+                Console.WriteLine($"Metrics: \tProcessing pipeline: {pipeline.Name} (Run ID: {pipeline.RunId})");
                 var runId = pipeline.RunId.Value;
 
                 var logEntries = await GetLogsAsync(pipeline, runId);
                 if (logEntries == null)
                 {
+                    Console.WriteLine($"Metrics: \tNo log entries found for pipeline: {pipeline.Name} (Run ID: {runId})");
                     continue; // No log entry found for this pipeline run
                 }
 
@@ -79,6 +81,7 @@ namespace RuntimeMetricsScanner
 
                 foreach (var metrics in groupedMetrics)
                 {
+                    Console.WriteLine($"Metrics: \tProject: {metrics.ProjectPath}, Warnings: {metrics.TotalWarnings}, Errors: {metrics.TotalErrors}");
                     await SaveMetricsAsync(repositoryId, metrics );
                 }
             }
