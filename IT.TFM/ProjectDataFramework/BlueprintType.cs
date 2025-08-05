@@ -10,6 +10,8 @@
         NugetPackage = 5,
         UniversalArtifact = 6,
         WebApp = 7,
-        WinAppAppSync = 8
+        WinAppAppSync = 8,
+        Angular = 9,
+        WinService = 10
     }
 }

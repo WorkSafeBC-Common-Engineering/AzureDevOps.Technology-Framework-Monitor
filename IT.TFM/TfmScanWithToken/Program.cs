@@ -66,7 +66,7 @@ namespace TfmScanWithToken
 
 #if DEBUG
             Console.WriteLine("Press any key to exit.");
-            Console.ReadKey();
+             Console.ReadKey();
 #endif
         }
 

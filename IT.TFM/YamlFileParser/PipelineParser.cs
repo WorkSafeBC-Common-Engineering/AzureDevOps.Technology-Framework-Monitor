@@ -529,6 +529,8 @@ namespace YamlFileParser
                 "azure-pipeline-universal-artifact-control.yml" => BlueprintType.UniversalArtifact,
                 "azure-pipeline-webapp-control.yml" => BlueprintType.WebApp,
                 "azure-pipeline-winapp-appsync-control.yml" => BlueprintType.WinAppAppSync,
+                "azure-pipeline-angular-control.yml" => BlueprintType.Angular,
+                "azure-pipeline-win-service-control.yml" => BlueprintType.WinService,
                 _ => BlueprintType.None,
             };
         }
