@@ -187,7 +187,7 @@ namespace TfmScanWithToken
                     partThree = true;
                     partFour = true;
                     partFive = true;
-                    partSix = true;
+                    partSix = false;
                     break;
             }
         }
