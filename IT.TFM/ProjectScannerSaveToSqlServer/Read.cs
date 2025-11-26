@@ -41,7 +41,7 @@ namespace ProjectScannerSaveToSqlServer
                 return null;
             }
 
-            ProjectSource source = (ProjectSource)Enum.Parse(typeof(ProjectSource), dbOrganization.ScannerType.Value);
+            ProjectSource source = Enum.Parse<ProjectSource>(dbOrganization.ScannerType.Value);
             organization = new Organization(source, dbOrganization.Name, dbOrganization.Uri);
 
             Project project;
@@ -182,7 +182,7 @@ namespace ProjectScannerSaveToSqlServer
                     localContext.Database.SetCommandTimeout(300);
                     var file = _compiledFilesById(localContext, mainFile.Id).Result;
 
-                    var fileType = (FileItemType)Enum.Parse(typeof(FileItemType), file.FileType.Value);
+                    var fileType = Enum.Parse<FileItemType>(file.FileType.Value);
 
                     fileItem = new FileItem
                     {
@@ -256,7 +256,7 @@ namespace ProjectScannerSaveToSqlServer
             {
                 FileItem fileItem;
 
-                var fileType = (FileItemType)Enum.Parse(typeof(FileItemType), mainFile.FileType.Value);
+                var fileType = Enum.Parse<FileItemType>(mainFile.FileType.Value);
 
                 fileItem = new FileItem
                 {

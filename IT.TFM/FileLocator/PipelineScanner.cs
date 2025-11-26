@@ -8,6 +8,7 @@ using RepoScan.DataModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RepoScan.FileLocator
@@ -17,7 +18,7 @@ namespace RepoScan.FileLocator
         #region Private Members
 
         private static IEnumerable<YamlPipeline> yamlPipelines = null;
-        private static readonly object pipelineReaderLock = new();
+        private static readonly Lock pipelineReaderLock = new();
 
         private static readonly IWritePipeline writer = StorageFactory.GetPipelineWriter();
 
