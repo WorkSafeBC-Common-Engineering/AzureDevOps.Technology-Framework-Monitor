@@ -12,7 +12,4 @@
   <ItemGroup>
     <ProjectReference Include="..\ProjectDataFramework\ProjectData.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.3" />
-  </ItemGroup>
 </Project>
