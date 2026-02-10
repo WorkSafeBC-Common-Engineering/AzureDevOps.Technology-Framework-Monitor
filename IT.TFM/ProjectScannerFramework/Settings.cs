@@ -18,7 +18,7 @@ namespace ProjectScanner
 
         private const int maxConfigurationFields = 2;
 
-        private static readonly object initLock = new();
+        private static readonly Lock initLock = new();
         private static Dictionary<string, string> scanners;
 
         private static readonly ReaderWriterLockSlim cacheLock = new();
@@ -102,11 +102,11 @@ namespace ProjectScanner
 
             var configuration = scanners[name];
             var fields = configuration.Split(fieldSeparator, StringSplitOptions.None);
-            var enumName = Enum.GetNames(typeof(ProjectSource)).SingleOrDefault(e => e.Equals(fields[0], StringComparison.InvariantCultureIgnoreCase));
+            var enumName = Enum.GetNames<ProjectSource>().SingleOrDefault(e => e.Equals(fields[0], StringComparison.InvariantCultureIgnoreCase));
 
             return enumName == null
                 ? throw new ArgumentException($"Invalid Scanner type for configuration {name} : {configuration}")
-                : (ProjectSource)Enum.Parse(typeof(ProjectSource), enumName);
+                : Enum.Parse<ProjectSource>(enumName);
         }
 
         public static string GetConfigurationData(string name)

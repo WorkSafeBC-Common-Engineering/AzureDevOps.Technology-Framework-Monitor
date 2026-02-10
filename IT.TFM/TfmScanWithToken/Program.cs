@@ -72,57 +72,57 @@ namespace TfmScanWithToken
 
         private static async Task RepoScanAsync(string projectId, string repositoryId, string[] excludedProjects)
         {
-            Console.WriteLine($"Starting Repo Scan at: {DateTime.Now.ToLongTimeString()}");
+            Console.WriteLine($"Starting Repo Scan at: {DateTime.Now:T}");
 
             var scanner = new Scanner();
             await scanner.ScanAsync(projectId, repositoryId, excludedProjects);
 
-            Console.WriteLine($"Repo Scan complete at: {DateTime.Now.ToLongTimeString()}");
+            Console.WriteLine($"Repo Scan complete at: {DateTime.Now:T}");
         }
 
         private static async Task FileScanAsync(int threadCount, bool forceDetails, string projectId, string repositoryId, string[] excludedProjects)
         {
-            Console.WriteLine($"Starting File Scan at: {DateTime.Now.ToLongTimeString()}");
+            Console.WriteLine($"Starting File Scan at: {DateTime.Now:T}");
 
             await FileProcessor.GetFiles(threadCount, forceDetails, projectId, repositoryId, excludedProjects);
 
-            Console.WriteLine($"File Scan complete at: {DateTime.Now.ToLongTimeString()}");
+            Console.WriteLine($"File Scan complete at: {DateTime.Now:T}");
         }
 
         private static void PipelineScan(int threadCount, string repositoryId)
         {
-            Console.WriteLine($"Starting Pipeline Scan at: {DateTime.Now.ToLongTimeString()}");
+            Console.WriteLine($"Starting Pipeline Scan at: {DateTime.Now:T}");
 
             RepoFileScan.PipelineScanner.LinkPipelineToFile(threadCount, repositoryId);
 
-            Console.WriteLine($"Pipeline Scan complete at: {DateTime.Now.ToLongTimeString()}");
+            Console.WriteLine($"Pipeline Scan complete at: {DateTime.Now:T}");
         }
 
         private static async Task FileDetailsAsync(int threadCount, bool forceDetails, string projectId, string repositoryId, string[] excludedProjects)
         {
-            Console.WriteLine($"Starting File Details Scan at: {DateTime.Now.ToLongTimeString()}");
+            Console.WriteLine($"Starting File Details Scan at: {DateTime.Now:T}");
 
             await RepoFileScan.FileDetails.GetDetailsAsync(threadCount, forceDetails, projectId, repositoryId, excludedProjects);
 
-            Console.WriteLine($"File Details Scan complete at: {DateTime.Now.ToLongTimeString()}");
+            Console.WriteLine($"File Details Scan complete at: {DateTime.Now:T}");
         }
 
         private static async Task NuGetFeedScan()
         {
-            Console.WriteLine($"Starting NuGet Feed Scan at: {DateTime.Now.ToLongTimeString()}");
+            Console.WriteLine($"Starting NuGet Feed Scan at: {DateTime.Now:T}");
 
             await NuGetScan.Run();
 
-            Console.WriteLine($"NuGet Feed Scan complete at: {DateTime.Now.ToLongTimeString()}");
+            Console.WriteLine($"NuGet Feed Scan complete at: {DateTime.Now:T}");
         }
 
         private static async Task GetRuntimeMetrics(string projectId, string repositoryId, string[] excludedProjects)
         {
-            Console.WriteLine($"Starting Runtime Metrics Scan at: {DateTime.Now.ToLongTimeString()}");
+            Console.WriteLine($"Starting Runtime Metrics Scan at: {DateTime.Now:T}");
 
             await RuntimeMetricsScan.Run(projectId, repositoryId, excludedProjects);
 
-            Console.WriteLine($"Runtime Metrics Scan complete at: {DateTime.Now.ToLongTimeString()}");
+            Console.WriteLine($"Runtime Metrics Scan complete at: {DateTime.Now:T}");
         }
 
         private static int GetTotalThreads(string[] args)

@@ -255,6 +255,7 @@ namespace AzureDevOps
             var filteredPipelines = new List<AzDoPipeline>();
             foreach (var pipeline in pipelines.Value)
             {
+                Console.WriteLine($">>> Pipeline name: {pipeline.Name}");
                 if (string.IsNullOrEmpty(pipeline.Url))
                 {
                     continue;
