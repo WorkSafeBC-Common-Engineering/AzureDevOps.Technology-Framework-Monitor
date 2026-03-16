@@ -29,6 +29,12 @@ namespace ProjectData
                     MatchOn = ".sln",
                     Exceptions = []
                 },
+                FileItemType.VSXSolution => new FileMatch
+                {
+                    MatchType = MatchType.EndsWith,
+                    MatchOn = ".slnx",
+                    Exceptions = []
+                },
                 FileItemType.VB6Project => new FileMatch
                 {
                     MatchType = MatchType.EndsWith,
@@ -99,6 +105,7 @@ namespace ProjectData
         private static readonly Dictionary<FileItemType, FileMatch> fileMatches = new()
         {
             {FileItemType.VSSolution, FileMatch.MatchOnFile(FileItemType.VSSolution) },
+            {FileItemType.VSXSolution, FileMatch.MatchOnFile(FileItemType.VSXSolution) },
             {FileItemType.VB6Project, FileMatch.MatchOnFile(FileItemType.VB6Project) },
             {FileItemType.CSProject, FileMatch.MatchOnFile(FileItemType.CSProject) },
             {FileItemType.VBProject, FileMatch.MatchOnFile(FileItemType.VBProject) },

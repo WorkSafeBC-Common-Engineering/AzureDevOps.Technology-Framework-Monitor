@@ -4,6 +4,7 @@
     {
         NoMatch,
         VSSolution,
+        VSXSolution,
         CSProject,
         VBProject,
         SqlProject,
