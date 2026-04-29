@@ -4,7 +4,7 @@
     {
         #region Private Members
 
-        private const string envToken = "azdo-pat";
+        private const string envToken = "TFM_AdToken";
 
         private const string envOrg = "azdo-org-name";
 
