@@ -16,4 +16,5 @@ BEGIN
 	INSERT INTO [dbo].[FileTypes] ([Id], [Value]) VALUES (11, N'Nuspec')
 	INSERT INTO [dbo].[FileTypes] ([Id], [Value]) VALUES (12, N'Dll')
 	INSERT INTO [dbo].[FileTypes] ([Id], [Value]) VALUES (13, N'VSXSolution')
+	INSERT INTO [dbo].[FileTypes] ([Id], [Value]) VALUES (14, N'Nvmrc')
 END
