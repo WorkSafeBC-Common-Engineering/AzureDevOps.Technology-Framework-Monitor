@@ -13,8 +13,8 @@ namespace NpmFileParser
         #region Private Members
 
         private const string prefix = "v";
-        private const string versionKey = "Version";
-        private const string majorVersionKey = "MajorVersion";
+        private const string versionKey = "NodeVersion";
+        private const string majorVersionKey = "NodeMajorVersion";
 
         #endregion
 

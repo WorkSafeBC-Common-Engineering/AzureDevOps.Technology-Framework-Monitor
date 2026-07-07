@@ -50,7 +50,7 @@ LEFT JOIN	FilePropertiesPivot FPP ON F.Id = FPP.FileId
 LEFT JOIN	FileReferences FR ON F.Id = FR.FileId AND FR.FileReferenceTypeId = 1
 LEFT JOIN	FileReferences FU ON F.Id = FU.FileId AND FU.FileReferenceTypeId = 2
 LEFT JOIN	FileReferences FN ON F.Id = FN.FileId AND FN.FileReferenceTypeId = 3
-LEFT JOIN	dotNetEndOfLife EOL ON (FPP.TargetFramework = EOL.[Version] OR FPP.TargetFrameworkVersion = EOL.[Version] 
+LEFT JOIN	dotNetEndOfLife EOL ON (FPP.TargetFramework = EOL.[Version] OR FPP.TargetFrameworkVersion = EOL.[Version] OR (FT.Id = 14 AND 'node ' + FPP.NodeMajorVersion = EOL.[Version])
 	-- this is to help with combining 'angular/core [major version]' as we do not need minor version for EOL calculation
 	OR FN.Name + ' ' + LEFT(Fn.Version, abs(charindex('.', Fn.Version) - 1))  = EOL.Version)
 WHERE		P.NoScan = 0
