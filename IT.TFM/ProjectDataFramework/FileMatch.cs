@@ -101,6 +101,42 @@ namespace ProjectData
                     MatchOn = ".nvmrc",
                     Exceptions = []
                 },
+                FileItemType.PythonVersion => new FileMatch
+                {
+                    MatchType = MatchType.Exact,
+                    MatchOn = ".python-version",
+                    Exceptions = []
+                },
+                FileItemType.PythonProjectToml => new FileMatch
+                {
+                    MatchType = MatchType.Exact,
+                    MatchOn = "pyproject.toml",
+                    Exceptions = []
+                },
+                FileItemType.PythonSetupPy => new FileMatch
+                {
+                    MatchType = MatchType.Exact,
+                    MatchOn = "setup.py",
+                    Exceptions = []
+                },
+                FileItemType.PythonSetupCfg => new FileMatch
+                {
+                    MatchType = MatchType.Exact,
+                    MatchOn = "setup.cfg",
+                    Exceptions = []
+                },
+                FileItemType.PythonDocker => new FileMatch
+                {
+                    MatchType = MatchType.Exact,
+                    MatchOn = "Dockerfile",
+                    Exceptions = []
+                },
+                FileItemType.PythonYamlPipeline => new FileMatch
+                {
+                    MatchType = MatchType.EndsWith,
+                    MatchOn = ".yml",
+                    Exceptions = []
+                },
                 _ => throw new ArgumentException("Invalid parameter - value does not exist", nameof(fileType)),
             };
         }
@@ -122,7 +158,13 @@ namespace ProjectData
             {FileItemType.NpmPackage, FileMatch.MatchOnFile(FileItemType.NpmPackage) },
             {FileItemType.YamlPipeline, FileMatch.MatchOnFile(FileItemType.YamlPipeline) },
             {FileItemType.Dll, FileMatch.MatchOnFile(FileItemType.Dll)  },
-            {FileItemType.Nvmrc, FileMatch.MatchOnFile(FileItemType.Nvmrc) }
+            {FileItemType.Nvmrc, FileMatch.MatchOnFile(FileItemType.Nvmrc) },
+            {FileItemType.PythonVersion, FileMatch.MatchOnFile(FileItemType.PythonVersion) },
+            {FileItemType.PythonProjectToml, FileMatch.MatchOnFile(FileItemType.PythonProjectToml) },
+            {FileItemType.PythonSetupPy, FileMatch.MatchOnFile(FileItemType.PythonSetupPy) },
+            {FileItemType.PythonSetupCfg, FileMatch.MatchOnFile(FileItemType.PythonSetupCfg) },
+            {FileItemType.PythonDocker, FileMatch.MatchOnFile(FileItemType.PythonDocker) },
+            {FileItemType.PythonYamlPipeline, FileMatch.MatchOnFile(FileItemType.PythonYamlPipeline) }
         };
 
         public static FileItemType GetMatchedFileType(this string filename)
