@@ -95,6 +95,12 @@ namespace ProjectData
                     MatchOn = ".dll",
                     Exceptions = []
                 },
+                FileItemType.Nvmrc => new FileMatch
+                {
+                    MatchType = MatchType.Exact,
+                    MatchOn = ".nvmrc",
+                    Exceptions = []
+                },
                 _ => throw new ArgumentException("Invalid parameter - value does not exist", nameof(fileType)),
             };
         }
@@ -115,7 +121,8 @@ namespace ProjectData
             {FileItemType.Nuspec, FileMatch.MatchOnFile(FileItemType.Nuspec) },
             {FileItemType.NpmPackage, FileMatch.MatchOnFile(FileItemType.NpmPackage) },
             {FileItemType.YamlPipeline, FileMatch.MatchOnFile(FileItemType.YamlPipeline) },
-            {FileItemType.Dll, FileMatch.MatchOnFile(FileItemType.Dll)  }
+            {FileItemType.Dll, FileMatch.MatchOnFile(FileItemType.Dll)  },
+            {FileItemType.Nvmrc, FileMatch.MatchOnFile(FileItemType.Nvmrc) }
         };
 
         public static FileItemType GetMatchedFileType(this string filename)

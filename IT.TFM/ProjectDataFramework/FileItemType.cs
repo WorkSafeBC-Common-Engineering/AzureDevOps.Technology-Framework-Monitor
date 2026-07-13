@@ -14,6 +14,7 @@
         NpmPackage,
         YamlPipeline,
         Nuspec,
-        Dll
+        Dll,
+        Nvmrc
     }
 }
