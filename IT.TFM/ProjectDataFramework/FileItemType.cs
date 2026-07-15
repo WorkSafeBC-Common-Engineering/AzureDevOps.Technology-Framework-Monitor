@@ -15,6 +15,11 @@
         YamlPipeline,
         Nuspec,
         Dll,
-        Nvmrc
+        Nvmrc,
+        PythonVersion,
+        PythonProjectToml,
+        PythonSetupPy,
+        PythonSetupCfg,
+        PythonDocker
     }
 }
