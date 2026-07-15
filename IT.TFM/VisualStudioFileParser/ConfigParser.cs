@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Xml;
 
@@ -85,9 +86,11 @@ namespace VisualStudioFileParser
 
             int endPos = line.IndexOf('"', startPos + 1);
             
-            return endPos < 0
+            var url = endPos < 0
                 ? line[(startPos + 1)..]
                 : line.Substring(startPos + 1, endPos - startPos - 1);
+
+            return WebUtility.HtmlDecode(url);
         }
 
         private static bool IgnoreThisUrl(string url)
