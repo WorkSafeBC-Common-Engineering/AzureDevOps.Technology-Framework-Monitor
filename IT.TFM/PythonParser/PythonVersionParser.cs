@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace PythonParser
+namespace PythonFileParser
 {
     public class PythonVersionParser : IFileParser
     {
