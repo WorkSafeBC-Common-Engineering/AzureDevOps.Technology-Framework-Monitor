@@ -30,7 +30,7 @@ namespace PythonFileParser
             {
                 if (String.IsNullOrEmpty(content[i]))
                     continue;
-                if (cleanContent.Contains("FROM python:"))
+                if (content[i].Contains("FROM python:"))
                     cleanContent += content[i];
             }
             ParseVersionFile(file, cleanContent);
