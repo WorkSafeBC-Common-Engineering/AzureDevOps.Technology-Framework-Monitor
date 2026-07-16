@@ -53,6 +53,9 @@ namespace PythonFileParser
             if (!file.Path.Contains("pyproject.toml"))
                 return;
 
+            if (String.IsNullOrEmpty(cleanContent) || !cleanContent.Contains(" = "))
+                return;
+
             var versionDetail = cleanContent.Split(" = ")[1].Trim();
 
             //Clear quotes from the versionDetail string, if they exist
