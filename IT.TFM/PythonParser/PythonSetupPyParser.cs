@@ -48,6 +48,9 @@ namespace PythonFileParser
             if (!file.Path.Contains("setup.py"))
                 return;
 
+            if (string.IsNullOrEmpty(cleanContent) || !cleanContent.Contains(">="))
+                return;
+
             var version = cleanContent.Split(">=")[1].Trim();
 
             //Clear quotes and comma from the version string, if they exist
