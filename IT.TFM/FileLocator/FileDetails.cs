@@ -195,23 +195,23 @@ namespace RepoScan.FileLocator
                         writer.Write(fileDetails, forceDetails);
                     }
 
-                    //if (fileInfo.FileType != FileItemType.NoMatch)
-                    //{
-                    //    fileInfo.RepositoryId = repoItem.RepositoryId;
-                    //    var metrics = GetMetrics(fileInfo, currentBasePath);
+                    if (fileInfo.FileType != FileItemType.NoMatch)
+                    {
+                        fileInfo.RepositoryId = repoItem.RepositoryId;
+                        var metrics = GetMetrics(fileInfo, currentBasePath);
 
-                    //    var writer = Storage.StorageFactory.GetStorageWriter();
+                        var writer = Storage.StorageFactory.GetStorageWriter();
 
-                    //    foreach (var projectFile in metrics.Keys)
-                    //    {
-                    //        var projectItem = fileItems.FirstOrDefault(f => f.Path.EndsWith(projectFile, StringComparison.OrdinalIgnoreCase));
-                    //        if (projectItem != null)
-                    //        {
-                    //            var metricsValues = metrics[projectFile];
-                    //            await writer.SaveMetricsAsync(fileInfo, metricsValues, null);
-                    //        }
-                    //    }
-                    //}
+                        foreach (var projectFile in metrics.Keys)
+                        {
+                            var projectItem = fileItems.FirstOrDefault(f => f.Path.EndsWith(projectFile, StringComparison.OrdinalIgnoreCase));
+                            if (projectItem != null)
+                            {
+                                var metricsValues = metrics[projectFile];
+                                await writer.SaveMetricsAsync(fileInfo, metricsValues, null);
+                            }
+                        }
+                    }
 
                     if (Parameters.Settings.ExtendedLogging)
                     {
