@@ -20,7 +20,7 @@ namespace PythonFileParser
 
         void IFileParser.Initialize(object data)
         {
-            throw new NotImplementedException();
+            // no op
         }
 
         void IFileParser.Parse(FileItem file, string[] content)
