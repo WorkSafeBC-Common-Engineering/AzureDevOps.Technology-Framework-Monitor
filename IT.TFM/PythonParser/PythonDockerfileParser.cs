@@ -47,11 +47,6 @@ namespace PythonFileParser
 
         private static void ParseVersionFile(FileItem file, string cleanContent)
         {
-            if (!file.Path.Contains("Dockerfile"))
-            {  
-                return;
-            }
-
             var version = cleanContent.Split(":")[1].Trim();
 
             //This covers the 'AS base', or similar specifiers that may be in the version string
