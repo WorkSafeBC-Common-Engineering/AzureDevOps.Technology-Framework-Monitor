@@ -21,5 +21,5 @@ BEGIN
 	INSERT INTO [dbo].[FileTypes] ([Id], [Value]) VALUES (16, N'PythonProjectToml')
 	INSERT INTO [dbo].[FileTypes] ([Id], [Value]) VALUES (17, N'PythonSetupPy')
 	INSERT INTO [dbo].[FileTypes] ([Id], [Value]) VALUES (18, N'PythonSetupCfg')
-	INSERT INTO [dbo].[FileTypes] ([Id], [Value]) VALUES (19, N'PythonDocker')
+	INSERT INTO [dbo].[FileTypes] ([Id], [Value]) VALUES (19, N'PythonDockerfile')
 END

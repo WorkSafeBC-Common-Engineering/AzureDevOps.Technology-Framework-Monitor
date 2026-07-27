@@ -12,7 +12,7 @@ namespace PythonFileParser
     {
         #region Private Members
 
-        private const string versionKey = "ProjectTomlPythonVersion";
+        private const string versionKey = "PythonVersionProjectToml";
 
         #endregion
 

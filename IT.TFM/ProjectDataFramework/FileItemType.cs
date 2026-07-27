@@ -20,6 +20,6 @@
         PythonProjectToml,
         PythonSetupPy,
         PythonSetupCfg,
-        PythonDocker
+        PythonDockerfile
     }
 }

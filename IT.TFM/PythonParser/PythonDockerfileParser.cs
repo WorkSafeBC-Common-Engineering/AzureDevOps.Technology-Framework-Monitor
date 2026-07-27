@@ -8,11 +8,11 @@ using System.Text;
 
 namespace PythonFileParser
 {
-    public class PythonDockerParser : IFileParser
+    public class PythonDockerfileParser : IFileParser
     {
         #region Private Members
 
-        private const string versionKey = "DockerfilePythonVersion";
+        private const string versionKey = "PythonVersionDockerfile";
 
         #endregion
 

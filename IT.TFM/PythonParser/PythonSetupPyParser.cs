@@ -12,7 +12,7 @@ namespace PythonFileParser
     {
         #region Private Members
 
-        private const string versionKey = "SetupPyPythonVersion";
+        private const string versionKey = "PythonVersionSetupPy";
 
         #endregion
 

@@ -125,7 +125,7 @@ namespace ProjectData
                     MatchOn = "setup.cfg",
                     Exceptions = []
                 },
-                FileItemType.PythonDocker => new FileMatch
+                FileItemType.PythonDockerfile => new FileMatch
                 {
                     MatchType = MatchType.Exact,
                     MatchOn = "Dockerfile",
@@ -157,7 +157,7 @@ namespace ProjectData
             {FileItemType.PythonProjectToml, FileMatch.MatchOnFile(FileItemType.PythonProjectToml) },
             {FileItemType.PythonSetupPy, FileMatch.MatchOnFile(FileItemType.PythonSetupPy) },
             {FileItemType.PythonSetupCfg, FileMatch.MatchOnFile(FileItemType.PythonSetupCfg) },
-            {FileItemType.PythonDocker, FileMatch.MatchOnFile(FileItemType.PythonDocker) }
+            {FileItemType.PythonDockerfile, FileMatch.MatchOnFile(FileItemType.PythonDockerfile) }
         };
 
         public static FileItemType GetMatchedFileType(this string filename)
