@@ -54,7 +54,10 @@ namespace PythonFileParser
 
             file.AddProperty(versionKey, version);
 
-            file.AddProperty(majorVersionKey, version.Split(".")[0]);
+            //This covers versions that have the '-slim', or other suffixes
+            version = version.Contains('-') ? version.Split("-")[0] : version;
+
+            file.AddProperty(majorVersionKey, version);
         }
 
         #endregion

@@ -53,12 +53,12 @@ namespace PythonFileParser
             //This covers the 'AS base', or similar specifiers that may be in the version string
             version = version.Contains(' ') ? version.Split(" ")[0] : version;
 
+            file.AddProperty(versionKey, version);
+
             //This covers versions that have the '-slim', or other suffixes
             version = version.Contains('-') ? version.Split("-")[0] : version;
 
-            file.AddProperty(versionKey, version);
-
-            file.AddProperty(majorVersionKey, version.Split(".")[0]);
+            file.AddProperty(majorVersionKey, version);
         }
 
         #endregion
