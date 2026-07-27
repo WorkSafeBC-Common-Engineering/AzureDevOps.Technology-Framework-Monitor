@@ -13,6 +13,7 @@ namespace PythonFileParser
         #region Private Members
 
         private const string versionKey = "PythonVersion";
+        private const string majorVersionKey = "PythonMajorVersion";
 
         #endregion
 
@@ -52,6 +53,8 @@ namespace PythonFileParser
             var version = cleanContent.Trim();
 
             file.AddProperty(versionKey, version);
+
+            file.AddProperty(majorVersionKey, version.Split(".")[0]);
         }
 
         #endregion

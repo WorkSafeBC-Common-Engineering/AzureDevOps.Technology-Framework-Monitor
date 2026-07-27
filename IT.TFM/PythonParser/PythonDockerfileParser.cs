@@ -13,6 +13,7 @@ namespace PythonFileParser
         #region Private Members
 
         private const string versionKey = "PythonVersionDockerfile";
+        private const string majorVersionKey = "PythonMajorVersionDockerfile";
 
         #endregion
 
@@ -56,6 +57,8 @@ namespace PythonFileParser
             version = version.Contains('-') ? version.Split("-")[0] : version;
 
             file.AddProperty(versionKey, version);
+
+            file.AddProperty(majorVersionKey, version.Split(".")[0]);
         }
 
         #endregion
