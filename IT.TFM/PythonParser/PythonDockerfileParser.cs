@@ -29,9 +29,14 @@ namespace PythonFileParser
             for (int i = 0; i < content.Length; i++)
             {
                 if (string.IsNullOrEmpty(content[i]))
+                {
                     continue;
+                }
+
                 if (content[i].Contains("FROM python:"))
+                {
                     cleanContent += content[i];
+                }
             }
             ParseVersionFile(file, cleanContent);
         }
@@ -43,7 +48,9 @@ namespace PythonFileParser
         private static void ParseVersionFile(FileItem file, string cleanContent)
         {
             if (!file.Path.Contains("Dockerfile"))
+            {  
                 return;
+            }
 
             var version = cleanContent.Split(":")[1].Trim();
 

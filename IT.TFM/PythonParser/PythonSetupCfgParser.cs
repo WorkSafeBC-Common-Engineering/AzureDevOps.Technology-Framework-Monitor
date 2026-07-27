@@ -29,7 +29,10 @@ namespace PythonFileParser
             for (int i = 0; i < content.Length; i++)
             {
                 if (string.IsNullOrEmpty(content[i]))
+                { 
                     continue;
+                }
+
                 if (content[i].Contains("python_requires"))
                 {
                     cleanContent += content[i];
@@ -46,11 +49,15 @@ namespace PythonFileParser
         private static void ParseVersionFile(FileItem file, string cleanContent)
         {
             if (!file.Path.Contains("setup.cfg"))
+            {
                 return;
+            }
 
             if (string.IsNullOrEmpty(cleanContent) || !cleanContent.Contains(">="))
+            {
                 return;
-            
+            }
+
             var version = cleanContent.Split(">=")[1].Trim();
 
             //Clear quotes and comma from the version string, if they exist

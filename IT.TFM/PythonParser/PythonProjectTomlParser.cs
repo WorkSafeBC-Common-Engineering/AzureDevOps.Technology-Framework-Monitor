@@ -29,12 +29,16 @@ namespace PythonFileParser
             for (int i = 0; i < content.Length; i++)
             {
                 if (string.IsNullOrEmpty(content[i]))
+                { 
                     continue;
+                }
+
                 if (content[i].Contains("python_version") || content[i].Contains("PYTHON_VERSION"))
                 {
                     cleanContent += content[i];
                     break;
                 }
+
                 if (content[i].Contains("requires-python"))
                 {
                     cleanContent += content[i];
@@ -51,10 +55,14 @@ namespace PythonFileParser
         private static void ParseVersionFile(FileItem file, string cleanContent)
         {
             if (!file.Path.Contains("pyproject.toml"))
-                return;
+            {  
+               return;
+            }
 
             if (string.IsNullOrEmpty(cleanContent) || !cleanContent.Contains(" = "))
+            {
                 return;
+            }
 
             var versionDetail = cleanContent.Split(" = ")[1].Trim();
 

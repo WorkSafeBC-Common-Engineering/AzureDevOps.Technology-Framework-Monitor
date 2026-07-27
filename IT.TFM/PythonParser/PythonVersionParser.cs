@@ -29,7 +29,10 @@ namespace PythonFileParser
             for (int i = 0; i < content.Length; i++)
             {
                 if (string.IsNullOrEmpty(content[i]))
+                {
                     continue;
+                }
+
                 cleanContent += content[i];
             }
             ParseVersionFile(file, cleanContent);
@@ -42,7 +45,9 @@ namespace PythonFileParser
         private static void ParseVersionFile(FileItem file, string cleanContent)
         {
             if (!file.Path.Contains(".python-version"))
+            {
                 return;
+            }
 
             var version = cleanContent.Trim();
 
