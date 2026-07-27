@@ -28,7 +28,7 @@ namespace PythonFileParser
             var cleanContent = "";
             for (int i = 0; i < content.Length; i++)
             {
-                if (String.IsNullOrEmpty(content[i]))
+                if (string.IsNullOrEmpty(content[i]))
                     continue;
                 if (content[i].Contains("python_requires"))
                 {

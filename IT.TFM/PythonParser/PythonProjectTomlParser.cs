@@ -28,7 +28,7 @@ namespace PythonFileParser
             var cleanContent = "";
             for (int i = 0; i < content.Length; i++)
             {
-                if (String.IsNullOrEmpty(content[i]))
+                if (string.IsNullOrEmpty(content[i]))
                     continue;
                 if (content[i].Contains("python_version") || content[i].Contains("PYTHON_VERSION"))
                 {
@@ -53,7 +53,7 @@ namespace PythonFileParser
             if (!file.Path.Contains("pyproject.toml"))
                 return;
 
-            if (String.IsNullOrEmpty(cleanContent) || !cleanContent.Contains(" = "))
+            if (string.IsNullOrEmpty(cleanContent) || !cleanContent.Contains(" = "))
                 return;
 
             var versionDetail = cleanContent.Split(" = ")[1].Trim();
