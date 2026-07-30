@@ -18,7 +18,10 @@ SELECT		'AzureDevOps' AS ScanSource,
 			FPP.SchemaVersion AS PROP_SchemaVersion, FPP.Sdk AS PROP_Sdk, FPP.TargetFramework AS PROP_TargetFramework,
 			FPP.TargetFrameworkVersion AS PROP_TargetFrameworkVersion, FPP.TargetLanguage AS PROP_TargetLanguage,
 			FPP.ToolsVersion AS PROP_ToolsVersion, FPP.[Type] AS PROP_Type, FPP.VisualStudioVersion AS PROP_VisualStudioVersion,
-			FPP.AzureFunction AS PROP_AzureFunction,
+			FPP.AzureFunction AS PROP_AzureFunction, FPP.PythonMajorVersionDockerfile AS PROP_PythonMajorVersionDockerfile, 
+			FPP.PythonMajorVersionProjectToml AS PROP_PythonMajorVersionProjectToml, FPP.PythonMajorVersionSetupCfg AS PROP_PythonMajorVersionSetupCfg, 
+			FPP.PythonMajorVersionSetupPy AS PROP_PythonMajorVersionSetupPy, FPP.PythonMajorVersion AS PROP_PythonMajorVersion,
+
 			CASE WHEN FPP.AzureFunction LIKE 'v%' THEN 'Y' ELSE '' END AS IsAzureFunction,
 			FPP.[ApiKey Open Secret], FPP.[DB Open Secret],
 			

@@ -26,7 +26,7 @@ namespace PythonFileParser
 
         void IFileParser.Parse(FileItem file, string[] content)
         {
-            var cleanContent = "";
+            var cleanContent = new StringBuilder();
             for (int i = 0; i < content.Length; i++)
             {
                 if (string.IsNullOrEmpty(content[i]))
@@ -36,10 +36,10 @@ namespace PythonFileParser
 
                 if (content[i].Contains("FROM python:"))
                 {
-                    cleanContent += content[i];
+                    cleanContent.Append(content[i]);
                 }
             }
-            ParseVersionFile(file, cleanContent);
+            ParseVersionFile(file, cleanContent.ToString());
         }
 
         #endregion
@@ -48,6 +48,11 @@ namespace PythonFileParser
 
         private static void ParseVersionFile(FileItem file, string cleanContent)
         {
+            if (string.IsNullOrEmpty(cleanContent))
+            {
+                return;
+            }
+
             var version = cleanContent.Split(":")[1].Trim();
 
             //This covers the 'AS base', or similar specifiers that may be in the version string

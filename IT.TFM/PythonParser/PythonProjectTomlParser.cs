@@ -26,7 +26,7 @@ namespace PythonFileParser
 
         void IFileParser.Parse(FileItem file, string[] content)
         {
-            var cleanContent = "";
+            var cleanContent = new StringBuilder();
             for (int i = 0; i < content.Length; i++)
             {
                 if (string.IsNullOrEmpty(content[i]))
@@ -36,17 +36,17 @@ namespace PythonFileParser
 
                 if (content[i].Contains("python_version") || content[i].Contains("PYTHON_VERSION"))
                 {
-                    cleanContent += content[i];
+                    cleanContent.Append(content[i]);
                     break;
                 }
 
                 if (content[i].Contains("requires-python"))
                 {
-                    cleanContent += content[i];
+                    cleanContent.Append(content[i]);
                     break;
                 }
             }
-            ParseVersionFile(file, cleanContent);
+            ParseVersionFile(file, cleanContent.ToString());
         }
 
         #endregion

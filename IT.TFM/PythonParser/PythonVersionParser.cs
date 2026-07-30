@@ -26,7 +26,7 @@ namespace PythonFileParser
 
         void IFileParser.Parse(FileItem file, string[] content)
         {
-            var cleanContent = "";
+            var cleanContent = new StringBuilder();
             for (int i = 0; i < content.Length; i++)
             {
                 if (string.IsNullOrEmpty(content[i]))
@@ -34,9 +34,9 @@ namespace PythonFileParser
                     continue;
                 }
 
-                cleanContent += content[i];
+                cleanContent.Append(content[i]);
             }
-            ParseVersionFile(file, cleanContent);
+            ParseVersionFile(file, cleanContent.ToString());
         }
 
         #endregion
