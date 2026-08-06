@@ -36,5 +36,7 @@ namespace ProjectData.Interfaces
         IEnumerable<NuGetFeed> GetNuGetFeeds();
 
         IEnumerable<FileItem> GetFilesWithProperties(FileItemType fileType, string propertyId, string propertyValue);
+
+        IEnumerable<EolVersion> GetEolVersions();
     }
 }

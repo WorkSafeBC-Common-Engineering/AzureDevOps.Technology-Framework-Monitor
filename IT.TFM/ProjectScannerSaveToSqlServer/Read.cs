@@ -546,11 +546,21 @@ namespace ProjectScannerSaveToSqlServer
                     BlueprintApplicationType = item.BlueprintType?.Value ?? string.Empty,
                     SuppressCD = item.SuppressCD,
                     Portfolio = item.Portfolio,
-                    Product = item.Product
+                    Product = item.Product  
                 });
             }
 
             return pipelines.AsEnumerable();
+        }
+
+        IEnumerable<EolVersion> IStorageReader.GetEolVersions()
+        {
+            var versions = _compiledGetEolVersions(context).ToBlockingEnumerable();
+
+            var eolVersions = versions.Select(v => new EolVersion { Version = v.Version, EolDate = v.EolDate })
+                                      .OrderBy(v => v.Version);
+
+            return eolVersions.AsEnumerable();
         }
 
         #endregion
@@ -673,6 +683,9 @@ namespace ProjectScannerSaveToSqlServer
 
         private static readonly Func<DbContext, IAsyncEnumerable<DataModels.NuGetFeed>> _compiledGetNuGetFeeds
             = EF.CompileAsyncQuery((DbContext context) => context.NuGetFeeds);
+
+        private static readonly Func<DbContext, IAsyncEnumerable<DataModels.EolVersion>> _compiledGetEolVersions
+            = EF.CompileAsyncQuery((DbContext context) => context.EolVersions);
 
         #endregion
     }

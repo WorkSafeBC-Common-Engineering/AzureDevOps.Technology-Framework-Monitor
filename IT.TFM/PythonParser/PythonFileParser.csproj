@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Parser\Parser.csproj" />
     <ProjectReference Include="..\ProjectDataFramework\ProjectData.csproj" />
+    <ProjectReference Include="..\Storage\Storage.csproj" />
   </ItemGroup>
 
 </Project>

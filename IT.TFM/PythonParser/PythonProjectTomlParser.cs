@@ -3,8 +3,7 @@
 using ProjectData;
 
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Text.RegularExpressions;
 
 namespace PythonFileParser
 {
@@ -12,8 +11,8 @@ namespace PythonFileParser
     {
         #region Private Members
 
-        private const string versionKey = "PythonVersionProjectToml";
-        private const string majorVersionKey = "PythonMajorVersionProjectToml";
+        private const string versionKey = "PythonVersionPyProjectToml";
+        private const string majorVersionKey = "PythonVersion";
 
         #endregion
 
@@ -26,59 +25,117 @@ namespace PythonFileParser
 
         void IFileParser.Parse(FileItem file, string[] content)
         {
-            var cleanContent = new StringBuilder();
-            for (int i = 0; i < content.Length; i++)
+            for (var i = 0; i < content.Length; i++)
             {
-                if (string.IsNullOrEmpty(content[i]))
-                { 
+                if (string.IsNullOrWhiteSpace(content[i]))
+                {
                     continue;
                 }
 
-                if (content[i].Contains("python_version") || content[i].Contains("PYTHON_VERSION"))
+                if (TryGetVersionExpression(content[i], out var versionExpression))
                 {
-                    cleanContent.Append(content[i]);
-                    break;
-                }
-
-                if (content[i].Contains("requires-python"))
-                {
-                    cleanContent.Append(content[i]);
+                    ParseVersionFile(file, versionExpression);
                     break;
                 }
             }
-            ParseVersionFile(file, cleanContent.ToString());
         }
 
         #endregion
 
         #region Private Methods
 
-        private static void ParseVersionFile(FileItem file, string cleanContent)
+        private static bool TryGetVersionExpression(string line, out string versionExpression)
         {
-            if (!file.Path.Contains("pyproject.toml"))
-            {  
-               return;
+            versionExpression = string.Empty;
+
+            var separatorIndex = line.IndexOf('=');
+            if (separatorIndex <= 0)
+            {
+                return false;
             }
 
-            if (string.IsNullOrEmpty(cleanContent) || !cleanContent.Contains(" = "))
+            var key = line[..separatorIndex].Trim();
+            if (!IsVersionKey(key))
+            {
+                return false;
+            }
+
+            var rawValue = line[(separatorIndex + 1)..].Trim();
+
+            var commentIndex = rawValue.IndexOf('#');
+            if (commentIndex >= 0)
+            {
+                rawValue = rawValue[..commentIndex].Trim();
+            }
+
+            rawValue = rawValue.Trim('"', '\'');
+            if (string.IsNullOrWhiteSpace(rawValue))
+            {
+                return false;
+            }
+
+            versionExpression = rawValue;
+            return true;
+        }
+
+        private static bool IsVersionKey(string key)
+        {
+            return key.Equals("requires-python", StringComparison.OrdinalIgnoreCase)
+                   || key.Equals("python_version", StringComparison.OrdinalIgnoreCase)
+                   || key.Equals("python", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string ExtractVersion(string versionExpression)
+        {
+            if (string.IsNullOrWhiteSpace(versionExpression))
+            {
+                return string.Empty;
+            }
+
+            var matches = Regex.Matches(versionExpression, @"(?<operator><=|>=|<|>|==|~=|\^)?\s*(?<version>\d+(?:\.\d+){0,2})");
+            if (matches.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            if (matches.Count == 1)
+            {
+                var versionToken = matches[0].Groups["version"].Value;
+                var constraintOperator = matches[0].Groups["operator"].Value;
+
+                if (constraintOperator is "" or "==")
+                {
+                    return versionToken;
+                }
+            }
+
+            var pythonVersion = PythonCommon.GetPythonVersion(versionExpression);
+            return pythonVersion == null ? string.Empty : TrimPythonPrefix(pythonVersion.Version);
+        }
+
+        private static string TrimPythonPrefix(string version)
+        {
+            const string prefix = "python ";
+
+            return version.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
+                ? version[prefix.Length..].Trim()
+                : version.Trim();
+        }
+
+        private static void ParseVersionFile(FileItem file, string versionExpression)
+        {
+            if (string.IsNullOrWhiteSpace(versionExpression))
             {
                 return;
             }
 
-            var versionDetail = cleanContent.Split(" = ")[1].Trim();
+            file.AddProperty(versionKey, versionExpression);
 
-            //Clear quotes from the versionDetail string, if they exist
-            versionDetail = versionDetail.Replace("\"", "");
-            versionDetail = versionDetail.Replace("'", "");
-
-            var version = versionDetail.Contains(',') ? versionDetail.Split(",")[0] : versionDetail;
-
-            //Remove conditional operators from the version string, if they exist
-            version = version.Replace("=", "");
-            version = version.Replace(">", "");
-            version = version.Replace("&gt;", "");
-
-            file.AddProperty(versionKey, version);
+            var version = ExtractVersion(versionExpression);
+            if (string.IsNullOrWhiteSpace(version))
+            {
+                return;
+            }
 
             //This covers versions that have the '-slim', or other suffixes
             version = version.Contains('-') ? version.Split("-")[0] : version;

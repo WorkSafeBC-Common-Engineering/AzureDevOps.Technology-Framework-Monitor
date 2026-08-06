@@ -5,6 +5,7 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
     public partial class ProjectScannerDB(string connection) : DbContext()
     {
+        public virtual DbSet<EolVersion> EolVersions { get; set; }
         public virtual DbSet<FileProperty> FileProperties { get; set; }
         public virtual DbSet<FilePropertyType> FilePropertyTypes { get; set; }
         public virtual DbSet<FileReference> FileReferences { get; set; }
@@ -37,6 +38,14 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<EolVersion>(entity =>
+            {
+                entity.ToTable("dotNetEndOfLife");
+                entity.Property(e => e.EolDate)
+                      .HasColumnName("EOL");
+                entity.HasKey(e => e.Version);
+            });
+
             modelBuilder.Entity<FilePropertyType>()
                 .HasMany(e => e.FileProperties)
                 .WithOne(e => e.FilePropertyType)
