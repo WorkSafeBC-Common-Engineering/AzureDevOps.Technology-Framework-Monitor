@@ -45,6 +45,46 @@ namespace PythonFileParser
             return null;
         }
 
+        internal static string SelectLowestVersionExpression(IReadOnlyList<string> versionExpressions, Func<string, string> extractVersion)
+        {
+            if (versionExpressions.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            if (versionExpressions.Count == 1)
+            {
+                return versionExpressions[0];
+            }
+
+            var selectedVersion = versionExpressions
+                .Select(expression => new
+                {
+                    Expression = expression,
+                    ComparableVersion = TryParseComparableVersion(extractVersion(expression), out var comparableVersion) ? comparableVersion : null
+                })
+                .Where(item => item.ComparableVersion != null)
+                .OrderBy(item => item.ComparableVersion)
+                .FirstOrDefault();
+
+            return selectedVersion?.Expression ?? versionExpressions[0];
+        }
+
+        internal static bool HasInconsistentVersions(IReadOnlyList<string> versionExpressions, Func<string, string> extractVersion)
+        {
+            if (versionExpressions.Count <= 1)
+            {
+                return false;
+            }
+
+            var distinctVersions = versionExpressions
+                .Select(versionExpression => GetNormalizedComparisonVersion(versionExpression, extractVersion))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Count();
+
+            return distinctVersions > 1;
+        }
+
         #endregion
 
         #region Private Methods
@@ -184,6 +224,33 @@ namespace PythonFileParser
             var build = versionParts.Count > 2 ? versionParts[2] : 0;
 
             return new Version(major, minor, build);
+        }
+
+        private static string GetNormalizedComparisonVersion(string versionExpression, Func<string, string> extractVersion)
+        {
+            var extractedVersion = extractVersion(versionExpression);
+            return string.IsNullOrWhiteSpace(extractedVersion)
+                ? versionExpression.Trim()
+                : extractedVersion.Trim();
+        }
+
+        private static bool TryParseComparableVersion(string version, out Version comparableVersion)
+        {
+            comparableVersion = default!;
+
+            if (string.IsNullOrWhiteSpace(version))
+            {
+                return false;
+            }
+
+            var match = Regex.Match(version, @"^\d+(?:\.\d+){0,2}$");
+            if (!match.Success)
+            {
+                return false;
+            }
+
+            comparableVersion = Version.Parse(match.Value);
+            return true;
         }
 
         #endregion

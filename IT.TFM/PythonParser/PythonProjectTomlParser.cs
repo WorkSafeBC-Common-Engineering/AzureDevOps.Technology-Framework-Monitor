@@ -4,7 +4,6 @@ using ProjectData;
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace PythonFileParser
@@ -50,7 +49,10 @@ namespace PythonFileParser
                 }
             }
 
-            ParseVersionFile(file, SelectVersionExpression(versionExpressions), HasInconsistentVersions(versionExpressions));
+            ParseVersionFile(
+                file,
+                PythonCommon.SelectLowestVersionExpression(versionExpressions, ExtractVersion),
+                PythonCommon.HasInconsistentVersions(versionExpressions, ExtractVersion));
         }
 
         #endregion
@@ -155,73 +157,6 @@ namespace PythonFileParser
             return version.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
                 ? version[prefix.Length..].Trim()
                 : version.Trim();
-        }
-
-        private static string SelectVersionExpression(IReadOnlyList<string> versionExpressions)
-        {
-            if (versionExpressions.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            if (versionExpressions.Count == 1)
-            {
-                return versionExpressions[0];
-            }
-
-            var selectedVersion = versionExpressions
-                .Select(expression => new
-                {
-                    Expression = expression,
-                    ComparableVersion = TryParseComparableVersion(ExtractVersion(expression), out var comparableVersion) ? comparableVersion : null
-                })
-                .Where(item => item.ComparableVersion != null)
-                .OrderBy(item => item.ComparableVersion)
-                .FirstOrDefault();
-
-            return selectedVersion?.Expression ?? versionExpressions[0];
-        }
-
-        private static bool TryParseComparableVersion(string version, out Version comparableVersion)
-        {
-            comparableVersion = default!;
-
-            if (string.IsNullOrWhiteSpace(version))
-            {
-                return false;
-            }
-
-            var match = Regex.Match(version, @"^\d+(?:\.\d+){0,2}$");
-            if (!match.Success)
-            {
-                return false;
-            }
-
-            comparableVersion = Version.Parse(match.Value);
-            return true;
-        }
-
-        private static bool HasInconsistentVersions(IReadOnlyList<string> versionExpressions)
-        {
-            if (versionExpressions.Count <= 1)
-            {
-                return false;
-            }
-
-            var distinctVersions = versionExpressions
-                .Select(GetNormalizedComparisonVersion)
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .Count();
-
-            return distinctVersions > 1;
-        }
-
-        private static string GetNormalizedComparisonVersion(string versionExpression)
-        {
-            var extractedVersion = ExtractVersion(versionExpression);
-            return string.IsNullOrWhiteSpace(extractedVersion)
-                ? versionExpression.Trim()
-                : extractedVersion.Trim();
         }
 
         private static void ParseVersionFile(FileItem file, string versionExpression, bool hasInconsistentVersions)
