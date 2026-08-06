@@ -12,6 +12,11 @@ namespace PythonVersionUnitTests
         private const string MajorVersionPropertyKey = "PythonMajorVersionSetupCfg";
         private const string InconsistentVersionPropertyKey = "PythonInconsistentVersion";
 
+        static PythonVersionSetupCfgUnitTests()
+        {
+            PythonVersionTestDataSeeder.SeedPythonVersions();
+        }
+
         [Fact]
         public void Parse_WhenPythonRequiresIsInOptionsSectionWithMinimumVersion_ParsesConstraint()
         {
@@ -24,7 +29,7 @@ namespace PythonVersionUnitTests
                 "python_requires = >=3.10");
 
             Assert.Equal(">=3.10", file.Properties[VersionPropertyKey]);
-            Assert.Equal("3.10", file.Properties[MajorVersionPropertyKey]);
+            Assert.Equal("3.12", file.Properties[MajorVersionPropertyKey]);
             AssertInconsistentVersionFlagIsNotSet(file);
         }
 
@@ -38,7 +43,7 @@ namespace PythonVersionUnitTests
                 "python_requires = >=3.10,<4");
 
             Assert.Equal(">=3.10,<4", file.Properties[VersionPropertyKey]);
-            Assert.Equal("3.10", file.Properties[MajorVersionPropertyKey]);
+            Assert.Equal("3.12", file.Properties[MajorVersionPropertyKey]);
         }
 
         [Fact]
@@ -77,7 +82,7 @@ namespace PythonVersionUnitTests
                 "python_requires = >=3.10,!=3.11.0,<3.14");
 
             Assert.Equal(">=3.10,!=3.11.0,<3.14", file.Properties[VersionPropertyKey]);
-            Assert.Equal("3.10", file.Properties[MajorVersionPropertyKey]);
+            Assert.Equal("3.12", file.Properties[MajorVersionPropertyKey]);
         }
 
         [Fact]

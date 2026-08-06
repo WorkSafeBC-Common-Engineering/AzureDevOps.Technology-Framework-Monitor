@@ -4,7 +4,6 @@ using ProjectData;
 
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 namespace PythonFileParser
 {
@@ -37,7 +36,7 @@ namespace PythonFileParser
                     continue;
                 }
 
-                if (TryGetSectionName(content[i], out var sectionName))
+                if (PythonCommon.TryGetSectionName(content[i], out var sectionName))
                 {
                     currentSection = sectionName;
                     continue;
@@ -51,7 +50,7 @@ namespace PythonFileParser
 
             ParseVersionFile(
                 file,
-                PythonCommon.SelectLowestVersionExpression(versionExpressions, ExtractVersion),
+                PythonCommon.SelectHighestVersionExpression(versionExpressions, ExtractVersion),
                 PythonCommon.HasInconsistentVersions(versionExpressions, ExtractVersion));
         }
 
@@ -59,51 +58,21 @@ namespace PythonFileParser
 
         #region Private Methods
 
-        private static bool TryGetSectionName(string line, out string sectionName)
-        {
-            sectionName = string.Empty;
-
-            var trimmedLine = line.Trim();
-            if (!trimmedLine.StartsWith('[') || !trimmedLine.EndsWith(']'))
-            {
-                return false;
-            }
-
-            sectionName = trimmedLine[1..^1].Trim();
-            return !string.IsNullOrWhiteSpace(sectionName);
-        }
-
         private static bool TryGetVersionExpression(string currentSection, string line, out string versionExpression)
         {
             versionExpression = string.Empty;
 
-            var separatorIndex = line.IndexOf('=');
-            if (separatorIndex <= 0)
+            if (!PythonCommon.TryParseAssignment(line, out var key, out var value))
             {
                 return false;
             }
 
-            var key = line[..separatorIndex].Trim();
             if (!IsVersionKeyForSection(currentSection, key))
             {
                 return false;
             }
 
-            var rawValue = line[(separatorIndex + 1)..].Trim();
-
-            var commentIndex = rawValue.IndexOf('#');
-            if (commentIndex >= 0)
-            {
-                rawValue = rawValue[..commentIndex].Trim();
-            }
-
-            rawValue = rawValue.Trim('"', '\'');
-            if (string.IsNullOrWhiteSpace(rawValue))
-            {
-                return false;
-            }
-
-            versionExpression = rawValue;
+            versionExpression = value;
             return true;
         }
 
@@ -124,39 +93,7 @@ namespace PythonFileParser
 
         private static string ExtractVersion(string versionExpression)
         {
-            if (string.IsNullOrWhiteSpace(versionExpression))
-            {
-                return string.Empty;
-            }
-
-            var matches = Regex.Matches(versionExpression, @"(?<operator><=|>=|<|>|==|~=|\^)?\s*(?<version>\d+(?:\.\d+){0,2})");
-            if (matches.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            if (matches.Count == 1)
-            {
-                var versionToken = matches[0].Groups["version"].Value;
-                var constraintOperator = matches[0].Groups["operator"].Value;
-
-                if (constraintOperator is "" or "==")
-                {
-                    return versionToken;
-                }
-            }
-
-            var pythonVersion = PythonCommon.GetPythonVersion(versionExpression);
-            return pythonVersion == null ? string.Empty : TrimPythonPrefix(pythonVersion.Version);
-        }
-
-        private static string TrimPythonPrefix(string version)
-        {
-            const string prefix = "python ";
-
-            return version.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
-                ? version[prefix.Length..].Trim()
-                : version.Trim();
+            return PythonCommon.ResolveVersionExpression(versionExpression);
         }
 
         private static void ParseVersionFile(FileItem file, string versionExpression, bool hasInconsistentVersions)
@@ -166,23 +103,14 @@ namespace PythonFileParser
                 return;
             }
 
-            file.AddProperty(versionKey, versionExpression);
-
-            if (hasInconsistentVersions)
-            {
-                file.AddProperty(inconsistentVersionKey, bool.TrueString.ToLowerInvariant());
-            }
-
-            var version = ExtractVersion(versionExpression);
-            if (string.IsNullOrWhiteSpace(version))
-            {
-                return;
-            }
-
-            //This covers versions that have the '-slim', or other suffixes
-            version = version.Contains('-') ? version.Split("-")[0] : version;
-
-            file.AddProperty(majorVersionKey, version);
+            PythonCommon.AddVersionProperties(
+                file,
+                versionKey,
+                majorVersionKey,
+                versionExpression,
+                ExtractVersion,
+                hasInconsistentVersions,
+                inconsistentVersionKey);
         }
 
         #endregion

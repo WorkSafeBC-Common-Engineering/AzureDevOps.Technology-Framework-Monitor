@@ -46,7 +46,7 @@ namespace PythonVersionUnitTests
         }
 
         [Fact]
-        public void Parse_WhenFileContainsMultipleDifferentVersions_UsesFirstValidVersionAndSetsInconsistentFlag()
+        public void Parse_WhenFileContainsMultipleDifferentVersions_UsesHighestVersionAndSetsInconsistentFlag()
         {
             var file = CreateFileItem();
 
@@ -93,7 +93,7 @@ namespace PythonVersionUnitTests
         }
 
         [Fact]
-        public void Parse_WhenFileContainsWhitespace_IgnoresWhitespaceAndParsesFirstValidVersion()
+        public void Parse_WhenFileContainsWhitespace_IgnoresWhitespaceAndParsesValidVersion()
         {
             var file = CreateFileItem();
 

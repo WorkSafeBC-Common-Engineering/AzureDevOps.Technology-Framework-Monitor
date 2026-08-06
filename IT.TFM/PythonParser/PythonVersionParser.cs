@@ -4,7 +4,6 @@ using ProjectData;
 
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 namespace PythonFileParser
 {
@@ -44,59 +43,24 @@ namespace PythonFileParser
 
             ParseVersionFile(
                 file,
-                SelectVersionExpression(versionExpressions),
-                PythonCommon.HasInconsistentVersions(versionExpressions, ExtractVersion));
+                PythonCommon.SelectHighestVersionExpression(versionExpressions, PythonCommon.ExtractNormalizedVersion),
+                PythonCommon.HasInconsistentVersions(versionExpressions, PythonCommon.ExtractNormalizedVersion));
         }
 
         #endregion
 
         #region Private Methods
 
-        private static string SelectVersionExpression(IReadOnlyList<string> versionExpressions)
-        {
-            return versionExpressions.Count == 0 ? string.Empty : versionExpressions[0];
-        }
-
         private static bool TryGetVersionExpression(string line, out string versionExpression)
         {
-            versionExpression = string.Empty;
-
             var trimmedLine = line.Trim();
             if (string.IsNullOrWhiteSpace(trimmedLine))
             {
+                versionExpression = string.Empty;
                 return false;
             }
 
-            var match = Regex.Match(trimmedLine, @"\d+(?:\.\d+){0,2}");
-            if (!match.Success)
-            {
-                return false;
-            }
-
-            versionExpression = match.Value;
-            return true;
-        }
-
-        private static string ExtractVersion(string versionExpression)
-        {
-            if (string.IsNullOrWhiteSpace(versionExpression))
-            {
-                return string.Empty;
-            }
-
-            var match = Regex.Match(versionExpression, @"\d+(?:\.\d+){0,2}");
-            if (!match.Success)
-            {
-                return string.Empty;
-            }
-
-            var versionParts = match.Value.Split('.', StringSplitOptions.RemoveEmptyEntries);
-            if (versionParts.Length <= 1)
-            {
-                return versionParts[0];
-            }
-
-            return $"{versionParts[0]}.{versionParts[1]}";
+            return PythonCommon.TryExtractVersionToken(trimmedLine, out versionExpression);
         }
 
         private static void ParseVersionFile(FileItem file, string versionExpression, bool hasInconsistentVersions)
@@ -106,20 +70,15 @@ namespace PythonFileParser
                 return;
             }
 
-            var version = ExtractVersion(versionExpression);
-            if (string.IsNullOrWhiteSpace(version))
-            {
-                return;
-            }
-
-            file.AddProperty(versionKey, version);
-
-            if (hasInconsistentVersions)
-            {
-                file.AddProperty(inconsistentVersionKey, bool.TrueString.ToLowerInvariant());
-            }
-
-            file.AddProperty(majorVersionKey, version);
+            PythonCommon.AddVersionProperties(
+                file,
+                versionKey,
+                majorVersionKey,
+                versionExpression,
+                PythonCommon.ExtractNormalizedVersion,
+                hasInconsistentVersions,
+                inconsistentVersionKey,
+                storeExtractedInVersionKey: true);
         }
 
         #endregion

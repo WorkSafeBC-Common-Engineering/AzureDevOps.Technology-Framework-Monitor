@@ -59,7 +59,7 @@ namespace PythonVersionUnitTests
         }
 
         [Fact]
-        public void Parse_WhenMultiplePythonImagesFound_UsesLowestVersionAndSetsInconsistentFlag()
+        public void Parse_WhenMultiplePythonImagesFound_UsesHighestVersionAndSetsInconsistentFlag()
         {
             var file = CreateFileItem();
 
@@ -68,8 +68,8 @@ namespace PythonVersionUnitTests
                 "FROM alpine:3.20",
                 "FROM python:3.10 AS runtime");
 
-            Assert.Equal("3.10", file.Properties[VersionPropertyKey]);
-            Assert.Equal("3.10", file.Properties[MajorVersionPropertyKey]);
+            Assert.Equal("3.12", file.Properties[VersionPropertyKey]);
+            Assert.Equal("3.12", file.Properties[MajorVersionPropertyKey]);
             AssertInconsistentVersionFlagIsSet(file);
         }
 

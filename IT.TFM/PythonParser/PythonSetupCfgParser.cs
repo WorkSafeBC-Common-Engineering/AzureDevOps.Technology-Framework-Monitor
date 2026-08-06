@@ -4,7 +4,6 @@ using ProjectData;
 
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 namespace PythonFileParser
 {
@@ -37,7 +36,7 @@ namespace PythonFileParser
                     continue;
                 }
 
-                if (TryGetSectionName(content[i], out var sectionName))
+                if (PythonCommon.TryGetSectionName(content[i], out var sectionName))
                 {
                     currentSection = sectionName;
                     continue;
@@ -52,81 +51,30 @@ namespace PythonFileParser
 
             ParseVersionFile(
                 file,
-                PythonCommon.SelectLowestVersionExpression(versionExpressions, ExtractVersion),
-                PythonCommon.HasInconsistentVersions(versionExpressions, ExtractVersion));
+                PythonCommon.SelectHighestVersionExpression(versionExpressions, PythonCommon.ResolveVersionExpression),
+                PythonCommon.HasInconsistentVersions(versionExpressions, PythonCommon.ResolveVersionExpression));
         }
 
         #endregion
 
         #region Private Methods
 
-        private static bool TryGetSectionName(string line, out string sectionName)
-        {
-            sectionName = string.Empty;
-
-            var trimmedLine = line.Trim();
-            if (!trimmedLine.StartsWith('[') || !trimmedLine.EndsWith(']'))
-            {
-                return false;
-            }
-
-            sectionName = trimmedLine[1..^1].Trim();
-            return !string.IsNullOrWhiteSpace(sectionName);
-        }
-
         private static bool TryGetVersionExpression(string line, out string versionExpression)
         {
             versionExpression = string.Empty;
 
-            var separatorIndex = line.IndexOf('=');
-            if (separatorIndex <= 0)
+            if (!PythonCommon.TryParseAssignment(line, out var key, out var value))
             {
                 return false;
             }
 
-            var key = line[..separatorIndex].Trim();
             if (!key.Equals("python_requires", StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
 
-            var rawValue = line[(separatorIndex + 1)..].Trim();
-            var commentIndex = rawValue.IndexOf('#');
-            if (commentIndex >= 0)
-            {
-                rawValue = rawValue[..commentIndex].Trim();
-            }
-
-            rawValue = rawValue.Trim('"', '\'');
-            if (string.IsNullOrWhiteSpace(rawValue))
-            {
-                return false;
-            }
-
-            versionExpression = rawValue;
+            versionExpression = value;
             return true;
-        }
-
-        private static string ExtractVersion(string versionExpression)
-        {
-            if (string.IsNullOrWhiteSpace(versionExpression))
-            {
-                return string.Empty;
-            }
-
-            var match = Regex.Match(versionExpression, @"\d+(?:\.\d+){0,2}");
-            if (!match.Success)
-            {
-                return string.Empty;
-            }
-
-            var versionParts = match.Value.Split('.', StringSplitOptions.RemoveEmptyEntries);
-            if (versionParts.Length <= 1)
-            {
-                return versionParts[0];
-            }
-
-            return $"{versionParts[0]}.{versionParts[1]}";
         }
 
         private static void ParseVersionFile(FileItem file, string versionExpression, bool hasInconsistentVersions)
@@ -141,20 +89,14 @@ namespace PythonFileParser
                 return;
             }
 
-            file.AddProperty(versionKey, versionExpression);
-
-            if (hasInconsistentVersions)
-            {
-                file.AddProperty(inconsistentVersionKey, bool.TrueString.ToLowerInvariant());
-            }
-
-            var version = ExtractVersion(versionExpression);
-            if (string.IsNullOrWhiteSpace(version))
-            {
-                return;
-            }
-
-            file.AddProperty(majorVersionKey, version);
+            PythonCommon.AddVersionProperties(
+                file,
+                versionKey,
+                majorVersionKey,
+                versionExpression,
+                PythonCommon.ResolveVersionExpression,
+                hasInconsistentVersions,
+                inconsistentVersionKey);
         }
 
         #endregion

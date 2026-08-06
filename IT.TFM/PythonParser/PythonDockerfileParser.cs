@@ -47,8 +47,8 @@ namespace PythonFileParser
 
             ParseVersionFile(
                 file,
-                PythonCommon.SelectLowestVersionExpression(versionExpressions, ExtractVersion),
-                PythonCommon.HasInconsistentVersions(versionExpressions, ExtractVersion));
+                PythonCommon.SelectHighestVersionExpression(versionExpressions, PythonCommon.ExtractNormalizedVersion),
+                PythonCommon.HasInconsistentVersions(versionExpressions, PythonCommon.ExtractNormalizedVersion));
         }
 
         #endregion
@@ -123,28 +123,6 @@ namespace PythonFileParser
             return true;
         }
 
-        private static string ExtractVersion(string versionExpression)
-        {
-            if (string.IsNullOrWhiteSpace(versionExpression))
-            {
-                return string.Empty;
-            }
-
-            var match = Regex.Match(versionExpression, @"\d+(?:\.\d+){0,2}");
-            if (!match.Success)
-            {
-                return string.Empty;
-            }
-
-            var versionParts = match.Value.Split('.', StringSplitOptions.RemoveEmptyEntries);
-            if (versionParts.Length <= 1)
-            {
-                return versionParts[0];
-            }
-
-            return $"{versionParts[0]}.{versionParts[1]}";
-        }
-
         private static bool TryGetImageAndTag(string imageReference, out string imageName, out string imageTag)
         {
             imageName = string.Empty;
@@ -196,20 +174,15 @@ namespace PythonFileParser
                 return;
             }
 
-            var version = ExtractVersion(versionExpression);
-            if (string.IsNullOrWhiteSpace(version))
-            {
-                return;
-            }
-
-            file.AddProperty(versionKey, version);
-
-            if (hasInconsistentVersions)
-            {
-                file.AddProperty(inconsistentVersionKey, bool.TrueString.ToLowerInvariant());
-            }
-
-            file.AddProperty(majorVersionKey, version);
+            PythonCommon.AddVersionProperties(
+                file,
+                versionKey,
+                majorVersionKey,
+                versionExpression,
+                PythonCommon.ExtractNormalizedVersion,
+                hasInconsistentVersions,
+                inconsistentVersionKey,
+                storeExtractedInVersionKey: true);
         }
 
         #endregion

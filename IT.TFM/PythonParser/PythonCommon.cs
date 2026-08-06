@@ -1,5 +1,7 @@
 ﻿using Storage;
 
+using ProjectData;
+
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -45,7 +47,7 @@ namespace PythonFileParser
             return null;
         }
 
-        internal static string SelectLowestVersionExpression(IReadOnlyList<string> versionExpressions, Func<string, string> extractVersion)
+        internal static string SelectHighestVersionExpression(IReadOnlyList<string> versionExpressions, Func<string, string> extractVersion)
         {
             if (versionExpressions.Count == 0)
             {
@@ -64,7 +66,7 @@ namespace PythonFileParser
                     ComparableVersion = TryParseComparableVersion(extractVersion(expression), out var comparableVersion) ? comparableVersion : null
                 })
                 .Where(item => item.ComparableVersion != null)
-                .OrderBy(item => item.ComparableVersion)
+                .OrderByDescending(item => item.ComparableVersion)
                 .FirstOrDefault();
 
             return selectedVersion?.Expression ?? versionExpressions[0];
@@ -83,6 +85,141 @@ namespace PythonFileParser
                 .Count();
 
             return distinctVersions > 1;
+        }
+
+        internal static string ExtractNormalizedVersion(string versionExpression)
+        {
+            if (!TryExtractVersionToken(versionExpression, out var versionToken))
+            {
+                return string.Empty;
+            }
+
+            var versionParts = versionToken.Split('.', StringSplitOptions.RemoveEmptyEntries);
+            if (versionParts.Length <= 1)
+            {
+                return versionParts[0];
+            }
+
+            return $"{versionParts[0]}.{versionParts[1]}";
+        }
+
+        internal static string ResolveVersionExpression(string versionExpression)
+        {
+            if (string.IsNullOrWhiteSpace(versionExpression))
+            {
+                return string.Empty;
+            }
+
+            var matchingVersion = GetPythonVersion(versionExpression);
+            if (matchingVersion != null)
+            {
+                return ExtractNormalizedVersionFromRuntimeVersion(matchingVersion.Version);
+            }
+
+            return ExtractLowestSpecifiedVersion(versionExpression);
+        }
+
+        internal static bool TryExtractVersionToken(string value, out string versionToken)
+        {
+            versionToken = string.Empty;
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return false;
+            }
+
+            var match = Regex.Match(value, @"\d+(?:\.\d+){0,2}");
+            if (!match.Success)
+            {
+                return false;
+            }
+
+            versionToken = match.Value;
+            return true;
+        }
+
+        internal static bool TryGetSectionName(string line, out string sectionName)
+        {
+            sectionName = string.Empty;
+
+            var trimmedLine = line.Trim();
+            if (!trimmedLine.StartsWith('[') || !trimmedLine.EndsWith(']'))
+            {
+                return false;
+            }
+
+            sectionName = trimmedLine[1..^1].Trim();
+            return !string.IsNullOrWhiteSpace(sectionName);
+        }
+
+        internal static bool TryParseAssignment(string line, out string key, out string value)
+        {
+            key = string.Empty;
+            value = string.Empty;
+
+            var separatorIndex = line.IndexOf('=');
+            if (separatorIndex <= 0)
+            {
+                return false;
+            }
+
+            key = line[..separatorIndex].Trim();
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                return false;
+            }
+
+            var rawValue = line[(separatorIndex + 1)..].Trim();
+            var commentIndex = rawValue.IndexOf('#');
+            if (commentIndex >= 0)
+            {
+                rawValue = rawValue[..commentIndex].Trim();
+            }
+
+            rawValue = rawValue.Trim('"', '\'');
+            if (string.IsNullOrWhiteSpace(rawValue))
+            {
+                return false;
+            }
+
+            value = rawValue;
+            return true;
+        }
+
+        internal static void AddVersionProperties(
+            FileItem file,
+            string versionKey,
+            string majorVersionKey,
+            string versionExpression,
+            Func<string, string> extractVersion,
+            bool hasInconsistentVersions,
+            string inconsistentVersionKey = "PythonInconsistentVersion",
+            bool storeExtractedInVersionKey = false)
+        {
+            if (string.IsNullOrWhiteSpace(versionExpression))
+            {
+                return;
+            }
+
+            var version = extractVersion(versionExpression);
+            if (storeExtractedInVersionKey && string.IsNullOrWhiteSpace(version))
+            {
+                return;
+            }
+
+            file.AddProperty(versionKey, storeExtractedInVersionKey ? version : versionExpression);
+
+            if (hasInconsistentVersions)
+            {
+                file.AddProperty(inconsistentVersionKey, bool.TrueString.ToLowerInvariant());
+            }
+
+            if (string.IsNullOrWhiteSpace(version))
+            {
+                return;
+            }
+
+            file.AddProperty(majorVersionKey, version);
         }
 
         #endregion
@@ -108,7 +245,7 @@ namespace PythonFileParser
 
         private static bool MatchesExpression(Version candidateVersion, string versionExpression)
         {
-            var matches = Regex.Matches(versionExpression, @"(?<operator><=|>=|<|>|==|~=|\^)?\s*(?<version>\d+(?:\.\d+){0,2})");
+            var matches = Regex.Matches(versionExpression, @"(?<operator><=|>=|<|>|==|!=|~=|\^)?\s*(?<version>\d+(?:\.\d+){0,2})");
             if (matches.Count == 0)
             {
                 return false;
@@ -144,6 +281,7 @@ namespace PythonFileParser
                 ">" => comparison > 0,
                 "<=" => comparison <= 0,
                 "<" => comparison < 0,
+                "!=" => comparison != 0,
                 "~=" => comparison >= 0 && candidateVersion < GetCompatibleUpperBound(versionToken),
                 "^" => comparison >= 0 && candidateVersion < GetCaretUpperBound(versionToken),
                 _ => false
@@ -232,6 +370,39 @@ namespace PythonFileParser
             return string.IsNullOrWhiteSpace(extractedVersion)
                 ? versionExpression.Trim()
                 : extractedVersion.Trim();
+        }
+
+        private static string ExtractLowestSpecifiedVersion(string versionExpression)
+        {
+            var matches = Regex.Matches(versionExpression, @"\d+(?:\.\d+){0,2}");
+            if (matches.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            var selectedVersion = matches
+                .Select(match => ExtractNormalizedVersion(match.Value))
+                .Select(version => new
+                {
+                    Version = version,
+                    ComparableVersion = TryParseComparableVersion(version, out var comparableVersion) ? comparableVersion : null
+                })
+                .Where(item => item.ComparableVersion != null)
+                .OrderBy(item => item.ComparableVersion)
+                .FirstOrDefault();
+
+            return selectedVersion?.Version ?? ExtractNormalizedVersion(matches[0].Value);
+        }
+
+        private static string ExtractNormalizedVersionFromRuntimeVersion(string runtimeVersion)
+        {
+            const string pythonPrefix = "python ";
+
+            var trimmedVersion = runtimeVersion.StartsWith(pythonPrefix, StringComparison.OrdinalIgnoreCase)
+                ? runtimeVersion[pythonPrefix.Length..].Trim()
+                : runtimeVersion.Trim();
+
+            return ExtractNormalizedVersion(trimmedVersion);
         }
 
         private static bool TryParseComparableVersion(string version, out Version comparableVersion)
