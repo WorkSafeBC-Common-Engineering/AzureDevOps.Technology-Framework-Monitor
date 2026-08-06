@@ -26,7 +26,7 @@ namespace PythonVersionUnitTests
         }
 
         [Fact]
-        public void Parse_WhenRequiresPythonHasPlainVersion_AddsVersionAndMajorVersionProperties()
+        public void Parse_WhenRequiresPythonIsWithinProjectSection_AddsVersionAndMajorVersionProperties()
         {
             var file = CreateFileItem();
 
@@ -40,12 +40,28 @@ namespace PythonVersionUnitTests
         }
 
         [Fact]
-        public void Parse_WhenPythonVersionKeyComesFirst_UsesFirstMatchingVersionOnly()
+        public void Parse_WhenRequiresPythonIsOutsideProjectSection_DoesNotAddProperties()
         {
             var file = CreateFileItem();
 
             Parse(file,
+                "[tool.poetry.dependencies]",
+                "requires-python = \"3.9\"",
+                "[build-system]",
+                "requires-python = \"3.12\"");
+
+            Assert.Empty(file.Properties);
+        }
+
+        [Fact]
+        public void Parse_WhenPythonVersionIsWithinPoetryDependenciesSection_UsesFirstMatchingVersionOnly()
+        {
+            var file = CreateFileItem();
+
+            Parse(file,
+                "[tool.poetry.dependencies]",
                 "python_version = \"3.9\"",
+                "[project]",
                 "requires-python = \"3.12\"");
 
             Assert.Equal("3.9", file.Properties[VersionPropertyKey]);
@@ -53,33 +69,53 @@ namespace PythonVersionUnitTests
         }
 
         [Fact]
-        public void Parse_WhenKeyIsPythonInDifferentCasing_ParsesVersion()
+        public void Parse_WhenPythonKeyIsWithinPoetryDependenciesSectionInDifferentCasing_ParsesVersion()
         {
             var file = CreateFileItem();
 
-            Parse(file, "PYTHON = '3.10'");
+            Parse(file,
+                "[tool.poetry.dependencies]",
+                "PYTHON = '3.10'");
 
             Assert.Equal("3.10", file.Properties[VersionPropertyKey]);
             Assert.Equal("3.10", file.Properties[MajorVersionPropertyKey]);
         }
 
         [Fact]
-        public void Parse_WhenRequiresPythonUsesRange_ResolvesHighestMatchingVersionFromMockedReader()
+        public void Parse_WhenPythonIsOutsidePoetryDependenciesSection_DoesNotAddProperties()
         {
             var file = CreateFileItem();
 
-            Parse(file, "requires-python = \">=3.10,<3.12\"");
+            Parse(file,
+                "[project]",
+                "python = \">=3.10,<3.12\"",
+                "[tool.poetry]",
+                "python_version = \"3.11\"");
+
+            Assert.Empty(file.Properties);
+        }
+
+        [Fact]
+        public void Parse_WhenRequiresPythonUsesRangeWithinProjectSection_ResolvesHighestMatchingVersionFromMockedReader()
+        {
+            var file = CreateFileItem();
+
+            Parse(file,
+                "[project]",
+                "requires-python = \">=3.10,<3.12\"");
 
             Assert.Equal(">=3.10,<3.12", file.Properties[VersionPropertyKey]);
             Assert.Equal("3.11", file.Properties[MajorVersionPropertyKey]);
         }
 
         [Fact]
-        public void Parse_WhenVersionExpressionHasNoNumericVersion_AddsOnlyRawVersionProperty()
+        public void Parse_WhenRequiresPythonWithinProjectSectionHasNoNumericVersion_AddsOnlyRawVersionProperty()
         {
             var file = CreateFileItem();
 
-            Parse(file, "requires-python = \"latest\"");
+            Parse(file,
+                "[project]",
+                "requires-python = \"latest\"");
 
             Assert.Equal("latest", file.Properties[VersionPropertyKey]);
             Assert.False(file.Properties.ContainsKey(MajorVersionPropertyKey));
@@ -102,7 +138,9 @@ namespace PythonVersionUnitTests
         {
             var file = CreateFileItem();
 
-            Parse(file, "requires-python = \"\"");
+            Parse(file,
+                "[project]",
+                "requires-python = \"\"");
 
             Assert.Empty(file.Properties);
         }

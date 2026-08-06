@@ -25,6 +25,8 @@ namespace PythonFileParser
 
         void IFileParser.Parse(FileItem file, string[] content)
         {
+            var currentSection = string.Empty;
+
             for (var i = 0; i < content.Length; i++)
             {
                 if (string.IsNullOrWhiteSpace(content[i]))
@@ -32,7 +34,13 @@ namespace PythonFileParser
                     continue;
                 }
 
-                if (TryGetVersionExpression(content[i], out var versionExpression))
+                if (TryGetSectionName(content[i], out var sectionName))
+                {
+                    currentSection = sectionName;
+                    continue;
+                }
+
+                if (TryGetVersionExpression(currentSection, content[i], out var versionExpression))
                 {
                     ParseVersionFile(file, versionExpression);
                     break;
@@ -44,7 +52,21 @@ namespace PythonFileParser
 
         #region Private Methods
 
-        private static bool TryGetVersionExpression(string line, out string versionExpression)
+        private static bool TryGetSectionName(string line, out string sectionName)
+        {
+            sectionName = string.Empty;
+
+            var trimmedLine = line.Trim();
+            if (!trimmedLine.StartsWith('[') || !trimmedLine.EndsWith(']'))
+            {
+                return false;
+            }
+
+            sectionName = trimmedLine[1..^1].Trim();
+            return !string.IsNullOrWhiteSpace(sectionName);
+        }
+
+        private static bool TryGetVersionExpression(string currentSection, string line, out string versionExpression)
         {
             versionExpression = string.Empty;
 
@@ -55,7 +77,7 @@ namespace PythonFileParser
             }
 
             var key = line[..separatorIndex].Trim();
-            if (!IsVersionKey(key))
+            if (!IsVersionKeyForSection(currentSection, key))
             {
                 return false;
             }
@@ -78,11 +100,20 @@ namespace PythonFileParser
             return true;
         }
 
-        private static bool IsVersionKey(string key)
+        private static bool IsVersionKeyForSection(string currentSection, string key)
         {
-            return key.Equals("requires-python", StringComparison.OrdinalIgnoreCase)
-                   || key.Equals("python_version", StringComparison.OrdinalIgnoreCase)
-                   || key.Equals("python", StringComparison.OrdinalIgnoreCase);
+            if (currentSection.Equals("project", StringComparison.OrdinalIgnoreCase))
+            {
+                return key.Equals("requires-python", StringComparison.OrdinalIgnoreCase);
+            }
+
+            if (currentSection.Equals("tool.poetry.dependencies", StringComparison.OrdinalIgnoreCase))
+            {
+                return key.Equals("python_version", StringComparison.OrdinalIgnoreCase)
+                       || key.Equals("python", StringComparison.OrdinalIgnoreCase);
+            }
+
+            return false;
         }
 
         private static string ExtractVersion(string versionExpression)
