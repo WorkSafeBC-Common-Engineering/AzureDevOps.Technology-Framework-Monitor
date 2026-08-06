@@ -714,12 +714,13 @@ namespace YamlFileParser
             string value = parameter;
             if (parameter.StartsWith("${{variables.") && parameter.EndsWith("}}"))
             {
-                value = variables[parameter[13..^2]];
+                variables.TryGetValue(parameter[13..^2], out value!);
+                value ??= string.Empty;
             }
-
-            if (parameter.StartsWith("$(") && parameter.EndsWith(')'))
+            else if (parameter.StartsWith("$(") && parameter.EndsWith(')'))
             {
-                value = variables[parameter[2..^1]];
+                variables.TryGetValue(parameter[2..^1], out value!);
+                value ??= string.Empty;
             }
 
             return value.Replace("\"", string.Empty).Replace("'", string.Empty);

@@ -86,6 +86,63 @@ namespace PythonVersionUnitTests
         }
 
         [Fact]
+        public void Parse_WhenPipelineUsesListFormatVariable_ResolvesVariableValue()
+        {
+            var file = CreateFileItem();
+
+            Parse(file,
+                "variables:",
+                "- name: pythonVersion",
+                "  value: 3.11",
+                "steps:",
+                "- task: UsePythonVersion@0",
+                "  inputs:",
+                "    versionSpec: $(pythonVersion)");
+
+            Assert.Equal("true", file.Properties[TaskDetectedPropertyKey]);
+            Assert.Equal("3.11", file.Properties[VersionPropertyKey]);
+            Assert.Equal("3.11", file.Properties[MajorVersionPropertyKey]);
+            AssertInconsistentVersionFlagIsNotSet(file);
+        }
+
+        [Fact]
+        public void Parse_WhenPipelineUsesTemplateExpressionVariable_ResolvesVariableValue()
+        {
+            var file = CreateFileItem();
+
+            Parse(file,
+                "variables:",
+                "  pythonVersion: 3.10",
+                "steps:",
+                "- task: UsePythonVersion@0",
+                "  inputs:",
+                "    versionSpec: ${{variables.pythonVersion}}");
+
+            Assert.Equal("true", file.Properties[TaskDetectedPropertyKey]);
+            Assert.Equal("3.10", file.Properties[VersionPropertyKey]);
+            Assert.Equal("3.10", file.Properties[MajorVersionPropertyKey]);
+            AssertInconsistentVersionFlagIsNotSet(file);
+        }
+
+        [Fact]
+        public void Parse_WhenVersionSpecReferencesExternalVariable_AddsDetectionPropertyOnly()
+        {
+            var file = CreateFileItem();
+
+            // Variable is not defined in the pipeline file (e.g. from a variable group)
+            Parse(file,
+                "steps:",
+                "- task: UsePythonVersion@0",
+                "  inputs:",
+                "    versionSpec: $(pythonVersionFromVariableGroup)");
+
+            Assert.Equal("true", file.Properties[TaskDetectedPropertyKey]);
+            Assert.False(file.Properties.ContainsKey(VersionPropertyKey));
+            Assert.False(file.Properties.ContainsKey(MajorVersionPropertyKey));
+            AssertInconsistentVersionFlagIsNotSet(file);
+        }
+
+        [Fact]
         public void Parse_WhenPipelineDoesNotUsePythonVersionTask_DoesNotAddPythonProperties()
         {
             var file = CreateFileItem();
