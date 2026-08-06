@@ -19,6 +19,7 @@ namespace PythonVersionUnitTests
     {
         private const string VersionPropertyKey = "PythonVersionPyProjectToml";
         private const string MajorVersionPropertyKey = "PythonVersion";
+        private const string InconsistentVersionPropertyKey = "PythonInconsistentVersion";
 
         static PythonVersionPyProjectTomlUnitTests()
         {
@@ -37,6 +38,7 @@ namespace PythonVersionUnitTests
 
             Assert.Equal("3.11", file.Properties[VersionPropertyKey]);
             Assert.Equal("3.11", file.Properties[MajorVersionPropertyKey]);
+            AssertInconsistentVersionFlagIsNotSet(file);
         }
 
         [Fact]
@@ -54,18 +56,19 @@ namespace PythonVersionUnitTests
         }
 
         [Fact]
-        public void Parse_WhenPythonVersionIsWithinPoetryDependenciesSection_UsesFirstMatchingVersionOnly()
+        public void Parse_WhenMultipleValidVersionsExist_UsesLowestVersion()
         {
             var file = CreateFileItem();
 
             Parse(file,
                 "[tool.poetry.dependencies]",
-                "python_version = \"3.9\"",
+                "python = \"3.12\"",
                 "[project]",
-                "requires-python = \"3.12\"");
+                "requires-python = \"3.9\"");
 
             Assert.Equal("3.9", file.Properties[VersionPropertyKey]);
             Assert.Equal("3.9", file.Properties[MajorVersionPropertyKey]);
+            AssertInconsistentVersionFlagIsSet(file);
         }
 
         [Fact]
@@ -79,6 +82,7 @@ namespace PythonVersionUnitTests
 
             Assert.Equal("3.10", file.Properties[VersionPropertyKey]);
             Assert.Equal("3.10", file.Properties[MajorVersionPropertyKey]);
+            AssertInconsistentVersionFlagIsNotSet(file);
         }
 
         [Fact]
@@ -96,6 +100,18 @@ namespace PythonVersionUnitTests
         }
 
         [Fact]
+        public void Parse_WhenPythonVersionIsWithinPoetryDependenciesSection_DoesNotAddProperties()
+        {
+            var file = CreateFileItem();
+
+            Parse(file,
+                "[tool.poetry.dependencies]",
+                "python_version = \"3.11\"");
+
+            Assert.Empty(file.Properties);
+        }
+
+        [Fact]
         public void Parse_WhenRequiresPythonUsesRangeWithinProjectSection_ResolvesHighestMatchingVersionFromMockedReader()
         {
             var file = CreateFileItem();
@@ -106,6 +122,38 @@ namespace PythonVersionUnitTests
 
             Assert.Equal(">=3.10,<3.12", file.Properties[VersionPropertyKey]);
             Assert.Equal("3.11", file.Properties[MajorVersionPropertyKey]);
+            AssertInconsistentVersionFlagIsNotSet(file);
+        }
+
+        [Fact]
+        public void Parse_WhenMultipleProjectVersionsExist_UsesLowestVersion()
+        {
+            var file = CreateFileItem();
+
+            Parse(file,
+                "[project]",
+                "requires-python = \"3.12\"",
+                "requires-python = \"3.10\"");
+
+            Assert.Equal("3.10", file.Properties[VersionPropertyKey]);
+            Assert.Equal("3.10", file.Properties[MajorVersionPropertyKey]);
+            AssertInconsistentVersionFlagIsSet(file);
+        }
+
+        [Fact]
+        public void Parse_WhenMultipleValidEntriesResolveToSameVersion_DoesNotSetInconsistentVersionProperty()
+        {
+            var file = CreateFileItem();
+
+            Parse(file,
+                "[project]",
+                "requires-python = \">=3.10,<3.12\"",
+                "[tool.poetry.dependencies]",
+                "python = \"3.11\"");
+
+            Assert.Equal(">=3.10,<3.12", file.Properties[VersionPropertyKey]);
+            Assert.Equal("3.11", file.Properties[MajorVersionPropertyKey]);
+            AssertInconsistentVersionFlagIsNotSet(file);
         }
 
         [Fact]
@@ -119,6 +167,7 @@ namespace PythonVersionUnitTests
 
             Assert.Equal("latest", file.Properties[VersionPropertyKey]);
             Assert.False(file.Properties.ContainsKey(MajorVersionPropertyKey));
+            AssertInconsistentVersionFlagIsNotSet(file);
         }
 
         [Fact]
@@ -204,6 +253,16 @@ namespace PythonVersionUnitTests
                 Url = "https://example/pyproject.toml",
                 CommitId = "test-commit"
             };
+        }
+
+        private static void AssertInconsistentVersionFlagIsSet(FileItem file)
+        {
+            Assert.Equal("true", file.Properties[InconsistentVersionPropertyKey]);
+        }
+
+        private static void AssertInconsistentVersionFlagIsNotSet(FileItem file)
+        {
+            Assert.False(file.Properties.ContainsKey(InconsistentVersionPropertyKey));
         }
 
         private static void Parse(FileItem file, params string[] content)

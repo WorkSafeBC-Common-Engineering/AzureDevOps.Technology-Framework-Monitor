@@ -3,6 +3,8 @@
 using ProjectData;
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace PythonFileParser
@@ -13,6 +15,7 @@ namespace PythonFileParser
 
         private const string versionKey = "PythonVersionPyProjectToml";
         private const string majorVersionKey = "PythonVersion";
+        private const string inconsistentVersionKey = "PythonInconsistentVersion";
 
         #endregion
 
@@ -26,6 +29,7 @@ namespace PythonFileParser
         void IFileParser.Parse(FileItem file, string[] content)
         {
             var currentSection = string.Empty;
+            var versionExpressions = new List<string>();
 
             for (var i = 0; i < content.Length; i++)
             {
@@ -42,10 +46,11 @@ namespace PythonFileParser
 
                 if (TryGetVersionExpression(currentSection, content[i], out var versionExpression))
                 {
-                    ParseVersionFile(file, versionExpression);
-                    break;
+                    versionExpressions.Add(versionExpression);
                 }
             }
+
+            ParseVersionFile(file, SelectVersionExpression(versionExpressions), HasInconsistentVersions(versionExpressions));
         }
 
         #endregion
@@ -109,8 +114,7 @@ namespace PythonFileParser
 
             if (currentSection.Equals("tool.poetry.dependencies", StringComparison.OrdinalIgnoreCase))
             {
-                return key.Equals("python_version", StringComparison.OrdinalIgnoreCase)
-                       || key.Equals("python", StringComparison.OrdinalIgnoreCase);
+                return key.Equals("python", StringComparison.OrdinalIgnoreCase);
             }
 
             return false;
@@ -153,7 +157,74 @@ namespace PythonFileParser
                 : version.Trim();
         }
 
-        private static void ParseVersionFile(FileItem file, string versionExpression)
+        private static string SelectVersionExpression(IReadOnlyList<string> versionExpressions)
+        {
+            if (versionExpressions.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            if (versionExpressions.Count == 1)
+            {
+                return versionExpressions[0];
+            }
+
+            var selectedVersion = versionExpressions
+                .Select(expression => new
+                {
+                    Expression = expression,
+                    ComparableVersion = TryParseComparableVersion(ExtractVersion(expression), out var comparableVersion) ? comparableVersion : null
+                })
+                .Where(item => item.ComparableVersion != null)
+                .OrderBy(item => item.ComparableVersion)
+                .FirstOrDefault();
+
+            return selectedVersion?.Expression ?? versionExpressions[0];
+        }
+
+        private static bool TryParseComparableVersion(string version, out Version comparableVersion)
+        {
+            comparableVersion = default!;
+
+            if (string.IsNullOrWhiteSpace(version))
+            {
+                return false;
+            }
+
+            var match = Regex.Match(version, @"^\d+(?:\.\d+){0,2}$");
+            if (!match.Success)
+            {
+                return false;
+            }
+
+            comparableVersion = Version.Parse(match.Value);
+            return true;
+        }
+
+        private static bool HasInconsistentVersions(IReadOnlyList<string> versionExpressions)
+        {
+            if (versionExpressions.Count <= 1)
+            {
+                return false;
+            }
+
+            var distinctVersions = versionExpressions
+                .Select(GetNormalizedComparisonVersion)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Count();
+
+            return distinctVersions > 1;
+        }
+
+        private static string GetNormalizedComparisonVersion(string versionExpression)
+        {
+            var extractedVersion = ExtractVersion(versionExpression);
+            return string.IsNullOrWhiteSpace(extractedVersion)
+                ? versionExpression.Trim()
+                : extractedVersion.Trim();
+        }
+
+        private static void ParseVersionFile(FileItem file, string versionExpression, bool hasInconsistentVersions)
         {
             if (string.IsNullOrWhiteSpace(versionExpression))
             {
@@ -161,6 +232,11 @@ namespace PythonFileParser
             }
 
             file.AddProperty(versionKey, versionExpression);
+
+            if (hasInconsistentVersions)
+            {
+                file.AddProperty(inconsistentVersionKey, bool.TrueString.ToLowerInvariant());
+            }
 
             var version = ExtractVersion(versionExpression);
             if (string.IsNullOrWhiteSpace(version))
