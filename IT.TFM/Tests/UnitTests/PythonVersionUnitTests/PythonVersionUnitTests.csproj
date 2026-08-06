@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\PythonParser\PythonFileParser.csproj" />
+    <ProjectReference Include="..\..\..\YamlFileParser\YamlFileParser.csproj" />
   </ItemGroup>
 
   <ItemGroup>
