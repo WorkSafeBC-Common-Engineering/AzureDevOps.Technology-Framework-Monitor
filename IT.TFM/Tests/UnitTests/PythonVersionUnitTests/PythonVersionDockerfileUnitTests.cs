@@ -224,6 +224,17 @@ namespace PythonVersionUnitTests
             Assert.Empty(file.Properties);
         }
 
+        [Fact]
+        public void Parse_WhenFromPythonHasMinorVersionEndingInZero_PreservesTrailingZero()
+        {
+            var file = CreateFileItem();
+
+            Parse(file, "FROM python:3.10");
+
+            AssertVersion(file, "3.10");
+            AssertInconsistentVersionFlagIsNotSet(file);
+        }
+
         private static FileItem CreateFileItem()
         {
             return new FileItem
