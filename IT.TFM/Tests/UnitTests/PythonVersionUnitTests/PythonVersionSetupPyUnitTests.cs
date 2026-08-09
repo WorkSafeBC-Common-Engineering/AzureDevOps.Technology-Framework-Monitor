@@ -30,7 +30,7 @@ namespace PythonVersionUnitTests
                 ")");
 
             Assert.Equal(">=3.10", file.Properties[VersionPropertyKey]);
-            Assert.Equal("3.12", file.Properties[MajorVersionPropertyKey]);
+            Assert.Equal("3.14", file.Properties[MajorVersionPropertyKey]);
             AssertInconsistentVersionFlagIsNotSet(file);
         }
 
@@ -45,7 +45,7 @@ namespace PythonVersionUnitTests
                 ")");
 
             Assert.Equal(">=3.10,<4", file.Properties[VersionPropertyKey]);
-            Assert.Equal("3.12", file.Properties[MajorVersionPropertyKey]);
+            Assert.Equal("3.14", file.Properties[MajorVersionPropertyKey]);
         }
 
         [Fact]
@@ -87,7 +87,7 @@ namespace PythonVersionUnitTests
                 ")");
 
             Assert.Equal(">=3.11", file.Properties[VersionPropertyKey]);
-            Assert.Equal("3.12", file.Properties[MajorVersionPropertyKey]);
+            Assert.Equal("3.14", file.Properties[MajorVersionPropertyKey]);
         }
 
         [Fact]

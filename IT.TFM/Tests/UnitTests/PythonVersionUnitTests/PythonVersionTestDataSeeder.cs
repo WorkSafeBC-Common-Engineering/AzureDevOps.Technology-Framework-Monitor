@@ -37,6 +37,19 @@ namespace PythonVersionUnitTests
             var mockReader = new Mock<IStorageReader>();
             mockReader.Setup(reader => reader.GetEolVersions()).Returns(new List<EolVersion>
             {
+                new() { Version = "python 2.6", EolDate = new DateOnly(2013, 10, 29) },
+                new() { Version = "python 2.7", EolDate = new DateOnly(2020, 01, 01) },
+                new() { Version = "python 3.0", EolDate = new DateOnly(2009, 06, 27) },
+                new() { Version = "python 3.1", EolDate = new DateOnly(2012, 04, 09) },
+                new() { Version = "python 3.13", EolDate = new DateOnly(2029, 10, 31) },
+                new() { Version = "python 3.14", EolDate = new DateOnly(2030, 10, 31) },
+                new() { Version = "python 3.2", EolDate = new DateOnly(2016, 02, 20) },
+                new() { Version = "python 3.3", EolDate = new DateOnly(2017, 09, 29) },
+                new() { Version = "python 3.4", EolDate = new DateOnly(2019, 03, 18) },
+                new() { Version = "python 3.5", EolDate = new DateOnly(2020, 09, 30) },
+                new() { Version = "python 3.6", EolDate = new DateOnly(2021, 12, 23) },
+                new() { Version = "python 3.7", EolDate = new DateOnly(2023, 06, 27) },
+                new() { Version = "python 3.8", EolDate = new DateOnly(2024, 10, 07) },
                 new() { Version = "python 3.9", EolDate = new DateOnly(2025, 10, 31) },
                 new() { Version = "python 3.10", EolDate = new DateOnly(2026, 10, 31) },
                 new() { Version = "python 3.11", EolDate = new DateOnly(2027, 10, 31) },
