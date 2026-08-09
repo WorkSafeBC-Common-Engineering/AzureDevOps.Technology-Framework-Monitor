@@ -235,11 +235,24 @@ namespace PythonFileParser
 
             var reader = StorageFactory.GetStorageReader();
             var versions = reader.GetEolVersions()
-                                 .Where(v => v.Version.StartsWith("python", StringComparison.OrdinalIgnoreCase));
+                                 .Where(v => v.Version.StartsWith("python", StringComparison.OrdinalIgnoreCase))
+                                 .Select(v => new
+                                 {
+                                     Version = v,
+                                     ParsedVersion = ParseVersion(v.Version)
+                                 })
+                                 .OrderBy(v => v.ParsedVersion is null ? 1 : 0)
+                                 .ThenBy(v => v.ParsedVersion);
 
-            foreach (var v in versions)
+            foreach (var version in versions)
             {
-                _pythonVersions.Add(v.Version, new PythonVersion { Version = v.Version, EolDate = v.EolDate });
+                _pythonVersions.Add(
+                    version.Version.Version,
+                    new PythonVersion
+                    {
+                        Version = version.Version.Version,
+                        EolDate = version.Version.EolDate
+                    });
             }
         }
 

@@ -91,6 +91,21 @@ namespace PythonVersionUnitTests
         }
 
         [Fact]
+        public void Parse_WhenPythonRequiresUsesSingleQuotesWithTrailingComma_ParsesConstraint()
+        {
+            var file = CreateFileItem();
+
+            Parse(file,
+                "setup(",
+                "    python_requires='>=3.6',",
+                ")");
+
+            Assert.Equal(">=3.6", file.Properties[VersionPropertyKey]);
+            Assert.Equal("3.14", file.Properties[MajorVersionPropertyKey]);
+            AssertInconsistentVersionFlagIsNotSet(file);
+        }
+
+        [Fact]
         public void Parse_WhenPythonRequiresUsesVariableValue_DoesNotAddProperties()
         {
             var file = CreateFileItem();

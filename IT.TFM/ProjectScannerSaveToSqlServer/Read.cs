@@ -555,10 +555,9 @@ namespace ProjectScannerSaveToSqlServer
 
         IEnumerable<EolVersion> IStorageReader.GetEolVersions()
         {
-            var versions = _compiledGetEolVersions(context).ToBlockingEnumerable();
+            var versions = context.EolVersions.AsNoTracking().ToArray();
 
-            var eolVersions = versions.Select(v => new EolVersion { Version = v.Version, EolDate = v.EolDate })
-                                      .OrderBy(v => v.Version);
+            var eolVersions = versions.Select(v => new EolVersion { Version = v.Version, EolDate = v.EolDate });
 
             return eolVersions.AsEnumerable();
         }

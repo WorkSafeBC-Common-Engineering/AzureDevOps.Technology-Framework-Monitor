@@ -8,6 +8,6 @@ namespace ProjectScannerSaveToSqlServer.DataModels
     {
         public string Version { get; set; } = string.Empty;
 
-        public DateOnly EolDate { get; set; } = DateOnly.MinValue;
+        public DateOnly? EolDate { get; set; }
     }
 }
