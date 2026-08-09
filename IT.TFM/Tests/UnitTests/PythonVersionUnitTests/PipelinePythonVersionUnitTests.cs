@@ -9,8 +9,8 @@ namespace PythonVersionUnitTests
     public class PipelinePythonVersionUnitTests
     {
         private const string TaskDetectedPropertyKey = "UsesPythonVersionTask";
-        private const string VersionPropertyKey = "PythonVersionPipeline";
-        private const string MajorVersionPropertyKey = "PythonMajorVersionPipeline";
+        private const string VersionPropertyKey = "PythonVersion";
+        private const string MajorVersionPropertyKey = "PythonMajorVersion";
         private const string InconsistentVersionPropertyKey = "PythonInconsistentVersion";
 
         [Fact]

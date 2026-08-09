@@ -9,14 +9,6 @@ namespace PythonFileParser
 {
     public class PythonProjectTomlParser : IFileParser
     {
-        #region Private Members
-
-        private const string versionKey = "PythonVersionPyProjectToml";
-        private const string majorVersionKey = "PythonVersion";
-        private const string inconsistentVersionKey = "PythonInconsistentVersion";
-
-        #endregion
-
         #region IFileParser Implementation
 
         void IFileParser.Initialize(object data)
@@ -105,12 +97,9 @@ namespace PythonFileParser
 
             PythonCommon.AddVersionProperties(
                 file,
-                versionKey,
-                majorVersionKey,
                 versionExpression,
                 ExtractVersion,
-                hasInconsistentVersions,
-                inconsistentVersionKey);
+                hasInconsistentVersions);
         }
 
         #endregion

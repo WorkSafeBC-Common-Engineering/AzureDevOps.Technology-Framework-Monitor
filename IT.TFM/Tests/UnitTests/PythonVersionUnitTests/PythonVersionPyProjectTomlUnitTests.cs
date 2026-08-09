@@ -8,8 +8,8 @@ namespace PythonVersionUnitTests
 {
     public class PythonVersionPyProjectTomlUnitTests
     {
-        private const string VersionPropertyKey = "PythonVersionPyProjectToml";
-        private const string MajorVersionPropertyKey = "PythonVersion";
+        private const string VersionPropertyKey = "PythonVersion";
+        private const string MajorVersionPropertyKey = "PythonMajorVersion";
         private const string InconsistentVersionPropertyKey = "PythonInconsistentVersion";
 
         static PythonVersionPyProjectTomlUnitTests()

@@ -12,6 +12,10 @@ namespace PythonFileParser
     {
         #region Private Members
 
+        internal const string VersionKey = "PythonVersion";
+        internal const string MajorVersionKey = "PythonMajorVersion";
+        internal const string InconsistentVersionKey = "PythonInconsistentVersion";
+
         private static readonly Dictionary<string, PythonVersion> _pythonVersions = [];
 
         #endregion
@@ -188,12 +192,9 @@ namespace PythonFileParser
 
         internal static void AddVersionProperties(
             FileItem file,
-            string versionKey,
-            string majorVersionKey,
             string versionExpression,
             Func<string, string> extractVersion,
             bool hasInconsistentVersions,
-            string inconsistentVersionKey = "PythonInconsistentVersion",
             bool storeExtractedInVersionKey = false)
         {
             if (string.IsNullOrWhiteSpace(versionExpression))
@@ -207,11 +208,11 @@ namespace PythonFileParser
                 return;
             }
 
-            file.AddProperty(versionKey, storeExtractedInVersionKey ? version : versionExpression);
+            file.AddProperty(VersionKey, storeExtractedInVersionKey ? version : versionExpression);
 
             if (hasInconsistentVersions)
             {
-                file.AddProperty(inconsistentVersionKey, bool.TrueString.ToLowerInvariant());
+                file.AddProperty(InconsistentVersionKey, bool.TrueString.ToLowerInvariant());
             }
 
             if (string.IsNullOrWhiteSpace(version))
@@ -219,7 +220,7 @@ namespace PythonFileParser
                 return;
             }
 
-            file.AddProperty(majorVersionKey, version);
+            file.AddProperty(MajorVersionKey, version);
         }
 
         #endregion

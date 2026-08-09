@@ -8,8 +8,8 @@ namespace PythonVersionUnitTests
 {
     public class PythonVersionSetupPyUnitTests
     {
-        private const string VersionPropertyKey = "PythonVersionSetupPy";
-        private const string MajorVersionPropertyKey = "PythonMajorVersionSetupPy";
+        private const string VersionPropertyKey = "PythonVersion";
+        private const string MajorVersionPropertyKey = "PythonMajorVersion";
         private const string InconsistentVersionPropertyKey = "PythonInconsistentVersion";
 
         static PythonVersionSetupPyUnitTests()

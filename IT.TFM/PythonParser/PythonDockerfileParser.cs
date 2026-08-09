@@ -10,14 +10,6 @@ namespace PythonFileParser
 {
     public class PythonDockerfileParser : IFileParser
     {
-        #region Private Members
-
-        private const string versionKey = "PythonVersionDockerfile";
-        private const string majorVersionKey = "PythonMajorVersionDockerfile";
-        private const string inconsistentVersionKey = "PythonInconsistentVersion";
-
-        #endregion
-
         #region IFileParser Implementation
 
         void IFileParser.Initialize(object data)
@@ -176,12 +168,9 @@ namespace PythonFileParser
 
             PythonCommon.AddVersionProperties(
                 file,
-                versionKey,
-                majorVersionKey,
                 versionExpression,
                 PythonCommon.ExtractNormalizedVersion,
                 hasInconsistentVersions,
-                inconsistentVersionKey,
                 storeExtractedInVersionKey: true);
         }
 

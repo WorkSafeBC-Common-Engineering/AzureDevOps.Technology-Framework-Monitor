@@ -8,8 +8,8 @@ namespace PythonVersionUnitTests
 {
     public class PythonVersionDockerfileUnitTests
     {
-        private const string VersionPropertyKey = "PythonVersionDockerfile";
-        private const string MajorVersionPropertyKey = "PythonMajorVersionDockerfile";
+        private const string VersionPropertyKey = "PythonVersion";
+        private const string MajorVersionPropertyKey = "PythonMajorVersion";
         private const string InconsistentVersionPropertyKey = "PythonInconsistentVersion";
 
         [Fact]

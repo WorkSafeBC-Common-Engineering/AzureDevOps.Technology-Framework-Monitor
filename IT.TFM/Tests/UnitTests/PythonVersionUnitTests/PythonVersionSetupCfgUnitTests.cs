@@ -8,8 +8,8 @@ namespace PythonVersionUnitTests
 {
     public class PythonVersionSetupCfgUnitTests
     {
-        private const string VersionPropertyKey = "PythonVersionSetupCfg";
-        private const string MajorVersionPropertyKey = "PythonMajorVersionSetupCfg";
+        private const string VersionPropertyKey = "PythonVersion";
+        private const string MajorVersionPropertyKey = "PythonMajorVersion";
         private const string InconsistentVersionPropertyKey = "PythonInconsistentVersion";
 
         static PythonVersionSetupCfgUnitTests()

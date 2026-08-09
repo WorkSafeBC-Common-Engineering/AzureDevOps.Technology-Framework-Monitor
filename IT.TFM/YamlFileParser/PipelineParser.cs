@@ -18,8 +18,8 @@ namespace YamlFileParser
         private const string v1TemplateRepo = "/AzureDevOps.Automation.Pipeline.Templates";
         private const string v2TemplateRepo = "/AzureDevOps.Automation.Pipeline.Templates.v2";
         private const string pythonTaskDetectedKey = "UsesPythonVersionTask";
-        private const string pythonVersionPropertyKey = "PythonVersionPipeline";
-        private const string pythonMajorVersionPropertyKey = "PythonMajorVersionPipeline";
+        private const string pythonVersionPropertyKey = "PythonVersion";
+        private const string pythonMajorVersionPropertyKey = "PythonMajorVersion";
         private const string inconsistentPythonVersionKey = "PythonInconsistentVersion";
 
         #endregion

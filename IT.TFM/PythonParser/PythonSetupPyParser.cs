@@ -10,14 +10,6 @@ namespace PythonFileParser
 {
     public class PythonSetupPyParser : IFileParser
     {
-        #region Private Members
-
-        private const string versionKey = "PythonVersionSetupPy";
-        private const string majorVersionKey = "PythonMajorVersionSetupPy";
-        private const string inconsistentVersionKey = "PythonInconsistentVersion";
-
-        #endregion
-
         #region IFileParser Implementation
 
         void IFileParser.Initialize(object data)
@@ -117,12 +109,9 @@ namespace PythonFileParser
 
             PythonCommon.AddVersionProperties(
                 file,
-                versionKey,
-                majorVersionKey,
                 versionExpression,
                 PythonCommon.ResolveVersionExpression,
-                hasInconsistentVersions,
-                inconsistentVersionKey);
+                hasInconsistentVersions);
         }
 
         private static int CountOccurrences(string value, char character)
