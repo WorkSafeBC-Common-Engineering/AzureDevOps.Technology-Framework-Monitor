@@ -234,7 +234,7 @@ namespace PythonFileParser
                 return;
             }
 
-            var reader = StorageFactory.GetStorageReader();
+            using var reader = StorageFactory.GetStorageReader();
             var versions = reader.GetEolVersions()
                                  .Where(v => v.Version.StartsWith("python", StringComparison.OrdinalIgnoreCase))
                                  .Select(v => new
