@@ -18,13 +18,10 @@ SELECT		'AzureDevOps' AS ScanSource,
 			FPP.SchemaVersion AS PROP_SchemaVersion, FPP.Sdk AS PROP_Sdk, FPP.TargetFramework AS PROP_TargetFramework,
 			FPP.TargetFrameworkVersion AS PROP_TargetFrameworkVersion, FPP.TargetLanguage AS PROP_TargetLanguage,
 			FPP.ToolsVersion AS PROP_ToolsVersion, FPP.[Type] AS PROP_Type, FPP.VisualStudioVersion AS PROP_VisualStudioVersion,
-			FPP.AzureFunction AS PROP_AzureFunction, FPP.PythonMajorVersionDockerfile AS PROP_PythonMajorVersionDockerfile, 
-			FPP.PythonMajorVersionProjectToml AS PROP_PythonMajorVersionProjectToml, FPP.PythonMajorVersionSetupCfg AS PROP_PythonMajorVersionSetupCfg, 
-			FPP.PythonMajorVersionSetupPy AS PROP_PythonMajorVersionSetupPy, FPP.PythonMajorVersion AS PROP_PythonMajorVersion,
-
+			FPP.AzureFunction AS PROP_AzureFunction,
 			CASE WHEN FPP.AzureFunction LIKE 'v%' THEN 'Y' ELSE '' END AS IsAzureFunction,
 			FPP.[ApiKey Open Secret], FPP.[DB Open Secret],
-			
+
 			EOL.[Display] AS [Package Version],
 			CASE WHEN EOL.EOL IS NOT NULL AND EOL.EOL <= GETDATE() THEN 'YES' ELSE '' END AS [Package - EOL],
 			EOL.EOL AS [Package - Date EOL],
@@ -53,14 +50,15 @@ LEFT JOIN	FilePropertiesPivot FPP ON F.Id = FPP.FileId
 LEFT JOIN	FileReferences FR ON F.Id = FR.FileId AND FR.FileReferenceTypeId = 1
 LEFT JOIN	FileReferences FU ON F.Id = FU.FileId AND FU.FileReferenceTypeId = 2
 LEFT JOIN	FileReferences FN ON F.Id = FN.FileId AND FN.FileReferenceTypeId = 3
-LEFT JOIN	dotNetEndOfLife EOL ON (FPP.TargetFramework = EOL.[Version] OR FPP.TargetFrameworkVersion = EOL.[Version] OR (FT.Id = 14 AND 'node ' + FPP.NodeMajorVersion = EOL.[Version])
+LEFT JOIN	dotNetEndOfLife EOL ON (FPP.TargetFramework = EOL.[Version] 
+	OR		FPP.TargetFrameworkVersion = EOL.[Version]
+	OR		(FT.Id = 14 AND 'node ' + FPP.NodeMajorVersion = EOL.[Version])
+	OR		(FT.Id BETWEEN 15 AND 19 AND 'python ' + FPP.PythonMajorVersion = EOL.[Version])
+	OR		(FT.Id = 10 AND 'python ' + FPP.PythonMajorVersion = EOL.[Version]) -- YAML files
+
 	-- this is to help with combining 'angular/core [major version]' as we do not need minor version for EOL calculation
-	OR FN.Name + ' ' + LEFT(Fn.Version, abs(charindex('.', Fn.Version) - 1))  = EOL.Version)
+	OR		FN.Name + ' ' + LEFT(Fn.Version, abs(charindex('.', Fn.Version) - 1))  = EOL.Version)
 WHERE		P.NoScan = 0
 	AND		R.NoScan = 0
 	AND		P.Deleted = 0
 	AND		R.Deleted = 0
-
-
-
-	
