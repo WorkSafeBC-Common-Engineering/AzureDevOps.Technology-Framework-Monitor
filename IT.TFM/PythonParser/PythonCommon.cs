@@ -17,6 +17,7 @@ namespace PythonFileParser
         internal const string InconsistentVersionKey = "PythonInconsistentVersion";
 
         private static readonly Dictionary<string, PythonVersion> _pythonVersions = [];
+        private static readonly object _pythonVersionsLock = new();
 
         #endregion
 
@@ -234,26 +235,34 @@ namespace PythonFileParser
                 return;
             }
 
-            using var reader = StorageFactory.GetStorageReader();
-            var versions = reader.GetEolVersions()
-                                 .Where(v => v.Version.StartsWith("python", StringComparison.OrdinalIgnoreCase))
-                                 .Select(v => new
-                                 {
-                                     Version = v,
-                                     ParsedVersion = ParseVersion(v.Version)
-                                 })
-                                 .OrderBy(v => v.ParsedVersion is null ? 1 : 0)
-                                 .ThenBy(v => v.ParsedVersion);
-
-            foreach (var version in versions)
+            lock (_pythonVersionsLock)
             {
-                _pythonVersions.Add(
-                    version.Version.Version,
-                    new PythonVersion
-                    {
-                        Version = version.Version.Version,
-                        EolDate = version.Version.EolDate
-                    });
+                if (_pythonVersions.Count > 0)
+                {
+                    return;
+                }
+
+                using var reader = StorageFactory.GetStorageReader();
+                var versions = reader.GetEolVersions()
+                                     .Where(v => v.Version.StartsWith("python", StringComparison.OrdinalIgnoreCase))
+                                     .Select(v => new
+                                     {
+                                         Version = v,
+                                         ParsedVersion = ParseVersion(v.Version)
+                                     })
+                                     .OrderBy(v => v.ParsedVersion is null ? 1 : 0)
+                                     .ThenBy(v => v.ParsedVersion);
+
+                foreach (var version in versions)
+                {
+                    _pythonVersions.Add(
+                        version.Version.Version,
+                        new PythonVersion
+                        {
+                            Version = version.Version.Version,
+                            EolDate = version.Version.EolDate
+                        });
+                }
             }
         }
 
