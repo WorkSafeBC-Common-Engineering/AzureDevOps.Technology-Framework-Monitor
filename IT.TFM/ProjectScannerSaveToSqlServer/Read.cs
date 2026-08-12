@@ -683,9 +683,6 @@ namespace ProjectScannerSaveToSqlServer
         private static readonly Func<DbContext, IAsyncEnumerable<DataModels.NuGetFeed>> _compiledGetNuGetFeeds
             = EF.CompileAsyncQuery((DbContext context) => context.NuGetFeeds);
 
-        private static readonly Func<DbContext, IAsyncEnumerable<DataModels.EolVersion>> _compiledGetEolVersions
-            = EF.CompileAsyncQuery((DbContext context) => context.EolVersions);
-
         #endregion
     }
 }
