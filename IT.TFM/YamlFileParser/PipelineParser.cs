@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace YamlFileParser
 {
@@ -16,6 +17,10 @@ namespace YamlFileParser
         private static readonly char[] variableSeparator = [':'];
         private const string v1TemplateRepo = "/AzureDevOps.Automation.Pipeline.Templates";
         private const string v2TemplateRepo = "/AzureDevOps.Automation.Pipeline.Templates.v2";
+        private const string pythonTaskDetectedKey = "UsesPythonVersionTask";
+        private const string pythonVersionPropertyKey = "PythonVersion";
+        private const string pythonMajorVersionPropertyKey = "PythonMajorVersion";
+        private const string inconsistentPythonVersionKey = "PythonInconsistentVersion";
 
         #endregion
 
@@ -210,6 +215,290 @@ namespace YamlFileParser
                     }
                     break;
             }
+
+            ParseUsePythonVersionTasks(cleanContent, variables, file);
+        }
+
+        private static void ParseUsePythonVersionTasks(string[] content, Dictionary<string, string> variables, FileItem file)
+        {
+            List<string> versionExpressions = [];
+            var hasUsePythonVersionTask = false;
+
+            for (var index = 0; index < content.Length; index++)
+            {
+                if (!TryGetTaskName(content[index], out var taskName, out var taskIndentation))
+                {
+                    continue;
+                }
+
+                if (!IsUsePythonVersionTask(taskName))
+                {
+                    continue;
+                }
+
+                hasUsePythonVersionTask = true;
+
+                if (TryGetTaskVersionExpression(content, index, taskIndentation, variables, out var versionExpression))
+                {
+                    versionExpressions.Add(versionExpression);
+                }
+            }
+
+            if (!hasUsePythonVersionTask)
+            {
+                return;
+            }
+
+            file.AddProperty(pythonTaskDetectedKey, bool.TrueString.ToLowerInvariant());
+
+            var selectedVersionExpression = SelectHighestVersionExpression(versionExpressions);
+            AddPythonVersionProperties(file, selectedVersionExpression, HasInconsistentVersions(versionExpressions));
+        }
+
+        private static void AddPythonVersionProperties(FileItem file, string versionExpression, bool hasInconsistentVersions)
+        {
+            if (string.IsNullOrWhiteSpace(versionExpression))
+            {
+                return;
+            }
+
+            var normalizedVersion = ExtractNormalizedVersion(versionExpression);
+            if (string.IsNullOrWhiteSpace(normalizedVersion))
+            {
+                return;
+            }
+
+            file.AddProperty(pythonVersionPropertyKey, versionExpression);
+
+            if (hasInconsistentVersions)
+            {
+                file.AddProperty(inconsistentPythonVersionKey, bool.TrueString.ToLowerInvariant());
+            }
+
+            file.AddProperty(pythonMajorVersionPropertyKey, normalizedVersion);
+        }
+
+        private static bool TryGetTaskName(string line, out string taskName, out int taskIndentation)
+        {
+            taskName = string.Empty;
+            taskIndentation = 0;
+
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                return false;
+            }
+
+            taskIndentation = GetIndentation(line);
+            var trimmedLine = line.Trim();
+            const string listTaskPrefix = "- task:";
+            const string taskPrefix = "task:";
+
+            if (trimmedLine.StartsWith(listTaskPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                taskName = trimmedLine[listTaskPrefix.Length..].Trim().Trim('"', '\'');
+                return !string.IsNullOrWhiteSpace(taskName);
+            }
+
+            if (trimmedLine.StartsWith(taskPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                taskName = trimmedLine[taskPrefix.Length..].Trim().Trim('"', '\'');
+                return !string.IsNullOrWhiteSpace(taskName);
+            }
+
+            return false;
+        }
+
+        private static bool IsUsePythonVersionTask(string taskName)
+        {
+            return taskName.Equals("UsePythonVersion", StringComparison.OrdinalIgnoreCase)
+                || taskName.StartsWith("UsePythonVersion@", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool TryGetTaskVersionExpression(string[] content, int taskIndex, int taskIndentation, Dictionary<string, string> variables, out string versionExpression)
+        {
+            versionExpression = string.Empty;
+            var inInputsSection = false;
+            var inputsIndentation = 0;
+
+            for (var index = taskIndex + 1; index < content.Length; index++)
+            {
+                var line = content[index];
+                if (string.IsNullOrWhiteSpace(line))
+                {
+                    continue;
+                }
+
+                var indentation = GetIndentation(line);
+                if (indentation <= taskIndentation)
+                {
+                    break;
+                }
+
+                var trimmedLine = line.Trim();
+                if (!inInputsSection)
+                {
+                    if (trimmedLine.Equals("inputs:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        inInputsSection = true;
+                        inputsIndentation = indentation;
+                    }
+
+                    continue;
+                }
+
+                if (indentation <= inputsIndentation)
+                {
+                    break;
+                }
+
+                if (!TryParseYamlField(trimmedLine, out var key, out var value))
+                {
+                    continue;
+                }
+
+                if (!key.Equals("versionSpec", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                versionExpression = GetParameterValue(value, variables);
+                return !string.IsNullOrWhiteSpace(versionExpression);
+            }
+
+            return false;
+        }
+
+        private static bool TryParseYamlField(string line, out string key, out string value)
+        {
+            key = string.Empty;
+            value = string.Empty;
+
+            var fields = line.Split(variableSeparator, 2, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            if (fields.Length != 2)
+            {
+                return false;
+            }
+
+            key = fields[0];
+            value = fields[1];
+            return !string.IsNullOrWhiteSpace(key);
+        }
+
+        private static string SelectHighestVersionExpression(IReadOnlyList<string> versionExpressions)
+        {
+            if (versionExpressions.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            if (versionExpressions.Count == 1)
+            {
+                return versionExpressions[0];
+            }
+
+            var selectedVersion = versionExpressions
+                .Select(expression => new
+                {
+                    Expression = expression,
+                    ComparableVersion = TryCreateComparableVersion(ExtractNormalizedVersion(expression), out var comparableVersion) ? comparableVersion : null
+                })
+                .Where(item => item.ComparableVersion != null)
+                .OrderByDescending(item => item.ComparableVersion)
+                .FirstOrDefault();
+
+            return selectedVersion?.Expression ?? versionExpressions[0];
+        }
+
+        private static bool HasInconsistentVersions(IReadOnlyList<string> versionExpressions)
+        {
+            if (versionExpressions.Count <= 1)
+            {
+                return false;
+            }
+
+            var distinctVersions = versionExpressions
+                .Select(GetNormalizedComparisonVersion)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Count();
+
+            return distinctVersions > 1;
+        }
+
+        private static string GetNormalizedComparisonVersion(string versionExpression)
+        {
+            var extractedVersion = ExtractNormalizedVersion(versionExpression);
+            return string.IsNullOrWhiteSpace(extractedVersion)
+                ? versionExpression.Trim()
+                : extractedVersion.Trim();
+        }
+
+        private static string ExtractNormalizedVersion(string versionExpression)
+        {
+            if (!TryExtractVersionToken(versionExpression, out var versionToken))
+            {
+                return string.Empty;
+            }
+
+            var versionParts = versionToken.Split('.', StringSplitOptions.RemoveEmptyEntries);
+            if (versionParts.Length <= 1)
+            {
+                return versionParts[0];
+            }
+
+            return $"{versionParts[0]}.{versionParts[1]}";
+        }
+
+        private static bool TryExtractVersionToken(string value, out string versionToken)
+        {
+            versionToken = string.Empty;
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return false;
+            }
+
+            var match = Regex.Match(value, @"\d+(?:\.\d+){0,2}");
+            if (!match.Success)
+            {
+                return false;
+            }
+
+            versionToken = match.Value;
+            return true;
+        }
+
+        private static bool TryCreateComparableVersion(string version, out Version comparableVersion)
+        {
+            comparableVersion = default!;
+
+            if (string.IsNullOrWhiteSpace(version))
+            {
+                return false;
+            }
+
+            var versionParts = version.Split('.', StringSplitOptions.RemoveEmptyEntries);
+            if (!int.TryParse(versionParts[0], out var major))
+            {
+                return false;
+            }
+
+            var minor = versionParts.Length > 1 && int.TryParse(versionParts[1], out var parsedMinor)
+                ? parsedMinor
+                : 0;
+
+            comparableVersion = new Version(major, minor);
+            return true;
+        }
+
+        private static int GetIndentation(string line)
+        {
+            var indentation = 0;
+            while (indentation < line.Length && char.IsWhiteSpace(line[indentation]))
+            {
+                indentation++;
+            }
+
+            return indentation;
         }
 
         private static string[] StripComments(string[] content)
@@ -425,12 +714,13 @@ namespace YamlFileParser
             string value = parameter;
             if (parameter.StartsWith("${{variables.") && parameter.EndsWith("}}"))
             {
-                value = variables[parameter[13..^2]];
+                variables.TryGetValue(parameter[13..^2], out value!);
+                value ??= string.Empty;
             }
-
-            if (parameter.StartsWith("$(") && parameter.EndsWith(')'))
+            else if (parameter.StartsWith("$(") && parameter.EndsWith(')'))
             {
-                value = variables[parameter[2..^1]];
+                variables.TryGetValue(parameter[2..^1], out value!);
+                value ??= string.Empty;
             }
 
             return value.Replace("\"", string.Empty).Replace("'", string.Empty);

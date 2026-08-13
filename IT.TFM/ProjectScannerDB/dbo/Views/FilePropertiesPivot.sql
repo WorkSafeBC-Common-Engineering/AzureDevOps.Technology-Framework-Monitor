@@ -3,7 +3,7 @@ AS
 SELECT		Id AS FileId, AndroidApp, DBSchemaProvider, Error, ExeName32, FileFormat, iOSApp,
 						  MajorVersion, MinimumVisualStudioVersion, MinorVersion, OutputType,
 						  ProjectVersion, RevisionVersion, SchemaVersion, Sdk, TargetFramework,
-						  TargetFrameworkVersion, NodeMajorVersion, TargetLanguage, ToolsVersion, [Type], VisualStudioVersion,
+						  TargetFrameworkVersion, NodeMajorVersion, PythonMajorVersion, TargetLanguage, ToolsVersion, [Type], VisualStudioVersion,
 						  [ApiKey Open Secret], [DB Open Secret], AzureFunction
 FROM		(	SELECT		F.Id, FP.Name, ISNULL(FP.Value, '') AS Value
 				FROM		Files F
@@ -15,6 +15,6 @@ PIVOT
 				FOR [Name] IN (	AndroidApp, DBSchemaProvider, Error, ExeName32, FileFormat, iOSApp,
 								MajorVersion, MinimumVisualStudioVersion, MinorVersion, OutputType,
 								ProjectVersion, RevisionVersion, SchemaVersion, Sdk, TargetFramework,
-								TargetFrameworkVersion, NodeMajorVersion, TargetLanguage, ToolsVersion, [Type], VisualStudioVersion,
+								TargetFrameworkVersion, NodeMajorVersion, PythonMajorVersion, TargetLanguage, ToolsVersion, [Type], VisualStudioVersion,
 								[ApiKey Open Secret], [DB Open Secret], AzureFunction)
 			) AS PivotTable

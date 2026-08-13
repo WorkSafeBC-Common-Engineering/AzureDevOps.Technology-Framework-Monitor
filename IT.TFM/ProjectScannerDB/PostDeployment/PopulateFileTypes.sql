@@ -17,4 +17,9 @@ BEGIN
 	INSERT INTO [dbo].[FileTypes] ([Id], [Value]) VALUES (12, N'Dll')
 	INSERT INTO [dbo].[FileTypes] ([Id], [Value]) VALUES (13, N'VSXSolution')
 	INSERT INTO [dbo].[FileTypes] ([Id], [Value]) VALUES (14, N'Nvmrc')
+	INSERT INTO [dbo].[FileTypes] ([Id], [Value]) VALUES (15, N'PythonVersion')
+	INSERT INTO [dbo].[FileTypes] ([Id], [Value]) VALUES (16, N'PythonProjectToml')
+	INSERT INTO [dbo].[FileTypes] ([Id], [Value]) VALUES (17, N'PythonSetupPy')
+	INSERT INTO [dbo].[FileTypes] ([Id], [Value]) VALUES (18, N'PythonSetupCfg')
+	INSERT INTO [dbo].[FileTypes] ([Id], [Value]) VALUES (19, N'PythonDockerfile')
 END

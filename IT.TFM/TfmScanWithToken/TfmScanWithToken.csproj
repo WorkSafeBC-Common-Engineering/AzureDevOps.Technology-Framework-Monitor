@@ -22,6 +22,7 @@
     <ProjectReference Include="..\OpenSecretsDetection\OpenSecretsDetection.csproj" />
     <ProjectReference Include="..\ParameterSettings\Parameters.csproj" />
     <ProjectReference Include="..\ProjectScannerSaveToSqlServer\ProjectScannerSaveToSqlServer.csproj" />
+    <ProjectReference Include="..\PythonParser\PythonFileParser.csproj" />
     <ProjectReference Include="..\ReportsRefresh\ReportsRefresh.csproj" />
     <ProjectReference Include="..\RepoScan.Storage.SqlServer\RepoScan.Storage.SqlServer.csproj" />
     <ProjectReference Include="..\RuntimeMetricsScanner\RuntimeMetricsScanner.csproj" />

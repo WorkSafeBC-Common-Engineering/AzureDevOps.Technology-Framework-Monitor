@@ -546,11 +546,20 @@ namespace ProjectScannerSaveToSqlServer
                     BlueprintApplicationType = item.BlueprintType?.Value ?? string.Empty,
                     SuppressCD = item.SuppressCD,
                     Portfolio = item.Portfolio,
-                    Product = item.Product
+                    Product = item.Product  
                 });
             }
 
             return pipelines.AsEnumerable();
+        }
+
+        IEnumerable<EolVersion> IStorageReader.GetEolVersions()
+        {
+            var versions = context.EolVersions.AsNoTracking().ToArray();
+
+            var eolVersions = versions.Select(v => new EolVersion { Version = v.Version, EolDate = v.EolDate });
+
+            return eolVersions.AsEnumerable();
         }
 
         #endregion
