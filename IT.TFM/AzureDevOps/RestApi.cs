@@ -620,23 +620,22 @@ namespace AzureDevOps
                     continue;
                 }
 
-                var headerValue = header.Value?.ToString();
-
                 if (Parameters.Settings.ExtendedLogging)
                 {
                     if (headerName.StartsWith("x-ratelimit") || headerName.Equals("retry-after"))
                     {
+                        var headerValue = header.Value != null ? string.Join(" | ", header.Value) : null;
                         Console.WriteLine($"Azure API Throttling: {headerName} = {headerValue ?? "<null>"}");
                     }
                 }
 
-                if (headerValue == null)
+                if (header.Value == null || !header.Value.Any())
                 {
                     // invalid value, skip for now
                     continue;
                 }
 
-                if (!int.TryParse(headerValue, out int value))
+                if (!decimal.TryParse(header.Value.First(), out decimal value))
                 {
                     // unable to parse value - skipping
                     continue;
@@ -645,7 +644,7 @@ namespace AzureDevOps
                 switch (headerName)
                 {
                     case "retry-after":
-                        Thread.Sleep(value * 1000);
+                        Thread.Sleep((int)(value * 1000));
                         break;
 
                     case "x-ratelimit-resource":
@@ -664,8 +663,8 @@ namespace AzureDevOps
                     case "x-ratelimit-reset":
                         if (Parameters.Settings.ExtendedLogging)
                         {
-                            var resetTime = DateTimeOffset.FromUnixTimeSeconds(value);
-                            Console.WriteLine($"ThrottleApi: x-ratelimit-remaining = {resetTime}");
+                            var resetTime = DateTimeOffset.FromUnixTimeSeconds((long)value);
+                            Console.WriteLine($"ThrottleApi: x-ratelimit-reset = {resetTime}");
                         }
                         
                         break;
