@@ -125,6 +125,7 @@ INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display],
 INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display], [IsTargetVersion], [ReleaseDate], [FrameworkProductId]) VALUES (N'node 22', N'2027-04-30', NULL, N'node 22', 0, NULL, NULL)
 INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display], [IsTargetVersion], [ReleaseDate], [FrameworkProductId]) VALUES (N'node 23', N'2025-06-01', NULL, N'node 23', 0, NULL, NULL)
 INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display], [IsTargetVersion], [ReleaseDate], [FrameworkProductId]) VALUES (N'node 24', N'2028-04-30', NULL, N'node 24', 1, NULL, NULL)
+INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display], [IsTargetVersion], [ReleaseDate], [FrameworkProductId]) VALUES (N'python 1.51', N'1999-04-13', NULL, N'python 1.51', 0, NULL, NULL)
 INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display], [IsTargetVersion], [ReleaseDate], [FrameworkProductId]) VALUES (N'python 2.6', N'2013-10-29', NULL, N'python 2.6', 0, NULL, NULL)
 INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display], [IsTargetVersion], [ReleaseDate], [FrameworkProductId]) VALUES (N'python 2.7', N'2020-01-01', NULL, N'python 2.7', 0, NULL, NULL)
 INSERT INTO [dbo].[dotNetEndOfLife] ([Version], [EOL], [ExtendedEOL], [Display], [IsTargetVersion], [ReleaseDate], [FrameworkProductId]) VALUES (N'python 3.0', N'2009-06-27', NULL, N'python 3.0', 0, NULL, NULL)
