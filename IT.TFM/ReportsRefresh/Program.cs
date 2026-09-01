@@ -1,7 +1,7 @@
 using System.Data;
 using Microsoft.Data.SqlClient;
 
-const int sqlExecuteTimeout = 3600;  // 3600 seconds = 30 minutes
+const int sqlExecuteTimeout = 7200;  // 7200 seconds = 2 hours
 const string sqlUpdate = "dbo.UpdateReports";
 const string sqlCleanup = "dbo.CleanupReports";
 const string sqlEmptyAITable = "TRUNCATE TABLE [dbo].[AIQueryTable]";
