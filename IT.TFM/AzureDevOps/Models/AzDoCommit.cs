@@ -13,7 +13,7 @@
 
         public string Email { get; set; } = string.Empty;
 
-        public string Date { get; set; }
+        public string Date { get; set; } = string.Empty;
     }
 
     internal class AzDoCommitList
