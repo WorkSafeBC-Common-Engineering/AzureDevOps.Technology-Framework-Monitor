@@ -1,6 +1,6 @@
 **Progress**: 6/12 tasks complete <progress value="50" max="100"></progress> 50%
 **Status**: Not Started
-**Status**: In Progress - Task 05.04-tier-three
+**Status**: In Progress - Task 05.05-tier-four-tests
 **Status**: In Progress - Task 05-library-consolidation
 
 ## Tasks
@@ -9,8 +9,8 @@
 - ✅ 02-lightweight-apps: Upgrade TfmExport and ReportsRefresh ([Content](tasks/02-lightweight-apps/task.md), [Progress](tasks/02-lightweight-apps/progress-details.md))
 - ✅ 03-token-scanner-app: Upgrade TfmScanWithToken ([Content](tasks/03-token-scanner-app/task.md), [Progress](tasks/03-token-scanner-app/progress-details.md))
   - ✅ 05.02-tier-one: Consolidate tier-one libraries to .NET 11 ([Content](tasks/05.02-tier-one/task.md), [Progress](tasks/05.02-tier-one/progress-details.md))
-  - ✅ 05.04-tier-three: Consolidate tier-three libraries to .NET 11 ([Content](tasks/05.04-tier-three/task.md), [Progress](tasks/05.04-tier-three/progress-details.md))
-  - 🔄 05.04-tier-three: Consolidate tier-three libraries to .NET 11 ([Content](tasks/05.04-tier-three/task.md))
+  - ✅ 05.05-tier-four-tests: Consolidate final libraries and retarget Python tests ([Content](tasks/05.05-tier-four-tests/task.md), [Progress](tasks/05.05-tier-four-tests/progress-details.md))
+  - 🔄 05.05-tier-four-tests: Consolidate final libraries and retarget Python tests ([Content](tasks/05.05-tier-four-tests/task.md))
   - ✅ 05.03-tier-two: Consolidate tier-two libraries to .NET 11 ([Content](tasks/05.03-tier-two/task.md), [Progress](tasks/05.03-tier-two/progress-details.md))
   - 🔲 05.03-tier-two: Consolidate tier-two libraries to .NET 11
   - 🔲 05.04-tier-three: Consolidate tier-three libraries to .NET 11
