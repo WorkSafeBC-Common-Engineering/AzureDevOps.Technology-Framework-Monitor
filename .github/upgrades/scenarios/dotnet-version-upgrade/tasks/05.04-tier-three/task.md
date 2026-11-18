@@ -13,6 +13,12 @@ Remove the temporary .NET 10 target from tier-three libraries after tier-two val
 - `IT.TFM\NuGetFileParser\NuGetFileParser.csproj`
 - `IT.TFM\OpenSecretsDetection\OpenSecretsDetection.csproj`
 
+## Research Findings
+- Confirmed all eight project files declare `<TargetFrameworks>net11.0;net10.0</TargetFrameworks>` directly. The repository has no central `Directory.Build.props` TFM override.
+- These projects depend on tier-0, tier-1, and tier-2 projects, all of which now build with only `net11.0`. `PythonFileParser` and `YamlFileParser` are also the production projects used by the final Python test tier.
+- A scan of all eight source directories found no .NET-version-specific conditional compilation. No TFM-conditioned items were found; package references and other project metadata remain unchanged.
+- Existing assessment API/package findings are outside this TFM-only change. There are no package updates or API edits planned.
+
 ## Steps
 1. Change each multi-targeting declaration from `net11.0;net10.0` to singular `<TargetFramework>net11.0</TargetFramework>`.
 2. Restore and build the eight projects after tiers 0 through 2 have passed.

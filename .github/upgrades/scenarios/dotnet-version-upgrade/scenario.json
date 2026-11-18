@@ -3,7 +3,7 @@
   "operationId": "56d528bf-78b0-4bdc-aa08-e09d991c43c7",
   "description": "Upgrade .NET projects to newer .NET versions, including guidance on current release status, support lifecycle (LTS/STS), and recommended upgrade targets.",
   "startTime": "2026-11-18T20:56:43.3193904Z",
-  "lastUpdateTime": "2026-11-18T22:31:52.1859961Z",
+  "lastUpdateTime": "2026-11-18T22:33:32.5314509Z",
   "properties": {
     "orphanedTaskIds": [
       "04.04-scanner-integrations"
@@ -22,7 +22,8 @@
       "05-library-consolidation": "InProgress",
       "05.01-foundation": "Completed",
       "05.02-tier-one": "Completed",
-      "05.03-tier-two": "Completed"
+      "05.03-tier-two": "Completed",
+      "05.04-tier-three": "Completed"
     }
   },
   "folderPath": ""
