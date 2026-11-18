@@ -16,6 +16,12 @@ Remove the temporary .NET 10 target from all tier-one libraries after foundation
 - `IT.TFM\ProjectScannerSaveToSqlServer\ProjectScannerSaveToSqlServer.csproj`
 - `IT.TFM\CodeFileFiltering\FileFiltering.csproj`
 
+## Research Findings
+- Confirmed all 11 project files declare `<TargetFrameworks>net11.0;net10.0</TargetFrameworks>` directly. The root has no `Directory.Build.props`; project references from this tier resolve to the already-validated tier-0 projects.
+- `VisualStudioMetricsScanner.csproj` has a `CopyMetricsExe` post-build target; preserve it unchanged. No TFM-conditioned items or .NET-version-specific source conditionals were found.
+- Package references are intentionally unchanged, including existing NuGet, EF Core, SQL client, and ConfigurationManager references. Assessment summaries were already reviewed; potential API/package findings are outside this TFM-only consolidation.
+- Tier 0 (`Parameters`, `ConfidentialSettings`, and `ProjectData`) now targets only `net11.0` and builds successfully.
+
 ## Steps
 1. Change each multi-targeting declaration from `net11.0;net10.0` to singular `<TargetFramework>net11.0</TargetFramework>`.
 2. Restore and build the tier-one projects after tier 0 has passed.
