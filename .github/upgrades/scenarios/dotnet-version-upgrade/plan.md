@@ -9,11 +9,11 @@
 **Top-Down (Application-First)** — Applications are upgraded first, shared libraries are multi-targeted temporarily, then consolidated.
 **Rationale**: The 32-project solution has a deep dependency graph, and the assessment identifies source-incompatible and behavioral-change APIs across projects. Incremental application-first work supports validation at each boundary.
 
-**Applications and tests**: `TfmExport` has no project dependencies; `ReportsRefresh` depends on `ConfidentialSettings`; `TfmScanWithToken` depends on 19 projects. `PythonVersionUnitTests` tests `PythonFileParser` and `YamlFileParser` and will move with those libraries.
+**Applications and tests**: `TfmExport` has no project dependencies; `ReportsRefresh` depends on `ConfidentialSettings` and is also referenced by `TfmScanWithToken`, so it temporarily supports both `net10.0` and `net11.0`; `TfmScanWithToken` depends on 19 projects. `PythonVersionUnitTests` tests `PythonFileParser` and `YamlFileParser` and will move with those libraries.
 
 **Libraries**: The remaining 27 .NET libraries are upgraded in dependency order. Multi-targeting (`net10.0;net11.0`) is retained only during the transition so both old- and new-target consumers can build.
 
-**Phase 2 trigger**: Begin library consolidation after all application projects target .NET 11 and every shared library has a validated `net11.0` target. Remove `net10.0` from libraries and upgrade the Python parser test project before final validation.
+**Phase 2 trigger**: Begin library consolidation after all application projects target .NET 11 and every shared library has a validated `net11.0` target. Remove `net10.0` from libraries and from `ReportsRefresh`, then upgrade the Python parser test project before final validation.
 
 ## Upgrade Options
 
@@ -35,9 +35,9 @@ Confirm the .NET 11 SDK, repository SDK configuration, and solution build prereq
 
 ### 02-lightweight-apps: Upgrade TfmExport and ReportsRefresh
 
-Retarget `TfmExport` and `ReportsRefresh` to `net11.0`. `TfmExport` has no project dependencies; `ReportsRefresh` references `ConfidentialSettings`, which remains on its current target during the application phase. The assessment reports no API compatibility incidents for these applications, but flags package-version recommendations; verify actual .NET 11 package compatibility rather than applying a suggested downgrade without evidence.
+Retarget `TfmExport` to `net11.0`. `TfmExport` has no project dependencies. `ReportsRefresh` references `ConfidentialSettings` and is also consumed by `TfmScanWithToken`, which remains on `net10.0` until the next application task; therefore, keep `ReportsRefresh` multi-targeted as `net11.0;net10.0` during the transition. The assessment reports no API compatibility incidents for these applications, but flags package-version recommendations; verify actual .NET 11 package compatibility rather than applying a suggested downgrade without evidence.
 
-**Done when**: Both applications target `net11.0`, their dependency references resolve, and their projects build successfully with relevant package changes applied.
+**Done when**: `TfmExport` targets `net11.0`; `ReportsRefresh` builds for both `net11.0` and `net10.0`; the .NET 10 consumer resolves its project reference; and relevant package changes are validated.
 
 ### 03-token-scanner-app: Upgrade TfmScanWithToken
 
@@ -53,7 +53,7 @@ Upgrade the 27 shared libraries in dependency order while retaining `net10.0` co
 
 ### 05-library-consolidation: Consolidate libraries and upgrade Python parser tests
 
-After all application projects and shared library `net11.0` targets are validated, remove the temporary `net10.0` targets from libraries. Retarget `PythonVersionUnitTests` with `PythonFileParser` and `YamlFileParser`, run the affected tests, and remove only TFM-specific conditional code that is demonstrably obsolete. Preserve other conditional-compilation symbols and their existing behavior. Record Central Package Management as a post-migration recommendation: “All projects are now SDK-style and on a single TFM — CPM can be added cleanly without VersionOverride friction.” This recommendation applies to the .NET package-consuming projects; the SQL database project remains outside NuGet TFM management.
+After all application projects and shared library `net11.0` targets are validated, remove the temporary `net10.0` targets from libraries and from `ReportsRefresh`. Retarget `PythonVersionUnitTests` with `PythonFileParser` and `YamlFileParser`, run the affected tests, and remove only TFM-specific conditional code that is demonstrably obsolete. Preserve other conditional-compilation symbols and their existing behavior. Record Central Package Management as a post-migration recommendation: “All projects are now SDK-style and on a single TFM — CPM can be added cleanly without VersionOverride friction.” This recommendation applies to the .NET package-consuming projects; the SQL database project remains outside NuGet TFM management.
 
 **Done when**: All .NET application, library, and test projects target only `net11.0`; affected tests pass; no required non-TFM conditional behavior has been removed; the deferred CPM recommendation is documented.
 

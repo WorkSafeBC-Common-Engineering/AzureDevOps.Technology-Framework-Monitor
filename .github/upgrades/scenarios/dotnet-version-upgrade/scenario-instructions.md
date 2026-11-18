@@ -26,8 +26,8 @@
 
 ### Execution Constraints
 - Upgrade entry-point applications before consolidating shared libraries.
-- Keep shared libraries on their current target until application upgrades are validated; multi-target only if a real consumer compatibility requirement is found.
-- Consolidate remaining library targets after all applications are upgraded.
+- Keep shared libraries on their current target until application upgrades are validated; multi-target only when a real consumer compatibility requirement is found. `ReportsRefresh` temporarily supports both `net10.0` and `net11.0` because `TfmScanWithToken` initially targets `net10.0`.
+- Consolidate remaining library targets and remove the temporary `net10.0` target from `ReportsRefresh` after all applications are upgraded.
 - Update and run tests alongside the projects they exercise, then validate the full solution.
 - Preserve non-TFM conditional compilation and document unresolved purpose rather than removing it.
 
