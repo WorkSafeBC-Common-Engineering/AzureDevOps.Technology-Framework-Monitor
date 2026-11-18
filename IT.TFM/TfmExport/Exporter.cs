@@ -6,9 +6,11 @@ namespace TfmExport
     {
         #region Private Members
 
-        private StreamWriter file;
-        
-        private SqlConnection db;
+        private StreamWriter? file;
+        private SqlConnection? db;
+
+        private StreamWriter Output => file ?? throw new InvalidOperationException("Exporter has not been initialized.");
+        private SqlConnection Connection => db ?? throw new InvalidOperationException("Exporter has not been initialized.");
 
         private const int blockSize = 50;
 
@@ -31,28 +33,28 @@ namespace TfmExport
 
         public void Clear(List<TfmTable> tables)
         {
-            file.WriteLine("-- Clearing Tables");
+            Output.WriteLine("-- Clearing Tables");
             foreach (var table in tables)
             {
                 Console.WriteLine($"Clearing {table.Name}...");
                 Truncate(table);
             }
 
-            file.WriteLine("GO");
-            file.WriteLine();
+            Output.WriteLine("GO");
+            Output.WriteLine();
             Console.WriteLine();
         }
 
         public void Run(List<TfmTable> tables)
         {
-            file.WriteLine("-- Exporting Tables");
+            Output.WriteLine("-- Exporting Tables");
 
             foreach (var table in tables)
             {
                 Delete(table);
             }
 
-            file.WriteLine();
+            Output.WriteLine();
 
             var reverseTables = tables.ToArray().Reverse();
             foreach (var table in reverseTables)
@@ -73,17 +75,17 @@ namespace TfmExport
                     IdentityInsert(table, false);
                 }
 
-                file.WriteLine();
+                Output.WriteLine();
             }
             Console.WriteLine();
         }
 
         public void Close()
         {
-            db.Close();
+            Connection.Close();
 
-            file.Flush();
-            file.Close();
+            Output.Flush();
+            Output.Close();
         }
 
         #endregion
@@ -92,28 +94,28 @@ namespace TfmExport
 
         private void Truncate(TfmTable table)
         {
-            file.WriteLine($"TRUNCATE TABLE {table.Name};");
+            Output.WriteLine($"TRUNCATE TABLE {table.Name};");
         }
 
         private void Delete(TfmTable table)
         {
-            file.WriteLine($"DELETE FROM {table.Name};\nGO");
+            Output.WriteLine($"DELETE FROM {table.Name};\nGO");
         }
 
         private void IdentityInsert(TfmTable table, bool on)
         {
-            file.WriteLine($"SET IDENTITY_INSERT {table.Name} {(on ? "ON" : "OFF")};\nGO");
+            Output.WriteLine($"SET IDENTITY_INSERT {table.Name} {(on ? "ON" : "OFF")};\nGO");
         }
 
         private void GetColumns(TfmTable table)
         {
             var command = $"SELECT c.name AS COLUMN_NAME, t.name AS DATA_TYPE FROM sys.columns c JOIN sys.types t ON c.user_type_id = t.user_type_id WHERE c.object_id = OBJECT_ID('dbo.{table.Name}');";
 
-            using SqlCommand sqlCommand = new(command, db);
+            using SqlCommand sqlCommand = new(command, Connection);
             using SqlDataReader reader = sqlCommand.ExecuteReader();
             if (reader.HasRows)
             {
-                file.WriteLine($"-- Columns for {table.Name}");
+                Output.WriteLine($"-- Columns for {table.Name}");
                 while (reader.Read())
                 {
                     var columnName = reader.GetString(0);
@@ -127,17 +129,17 @@ namespace TfmExport
         {
             var columns = string.Join(", ", table.Columns.Select(c => c.Name));
             var command = $"SELECT {columns} FROM {table.Name}";
-            using SqlCommand sqlCommand = new(command, db);
+            using SqlCommand sqlCommand = new(command, Connection);
             using SqlDataReader reader = sqlCommand.ExecuteReader();
             if (reader.HasRows)
             {
-                file.WriteLine($"-- Inserting data into {table.Name}");
+                Output.WriteLine($"-- Inserting data into {table.Name}");
                 var currentRow = 0;
                 while (reader.Read())
                 {
                     if (++currentRow % blockSize == 0)
                     {
-                        file.WriteLine("GO");
+                        Output.WriteLine("GO");
                     }
 
                     var values = new List<string>();
@@ -162,10 +164,10 @@ namespace TfmExport
                         values.Add(value);
                     }
                     var row = string.Join(", ", values);
-                    file.WriteLine($"INSERT INTO {table.Name} ({columns}) VALUES ({row});");
+                    Output.WriteLine($"INSERT INTO {table.Name} ({columns}) VALUES ({row});");
                 }
 
-                file.WriteLine("GO");
+                Output.WriteLine("GO");
             }
         }
 

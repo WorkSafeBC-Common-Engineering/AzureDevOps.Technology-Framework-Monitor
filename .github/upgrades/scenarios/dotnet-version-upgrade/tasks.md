@@ -1,6 +1,6 @@
-**Status**: Not Started
-**Status**: In Progress - Task 05-library-consolidation
-**Status**: In Progress - Task 05-library-consolidation
+**Progress**: 9/9 tasks complete <progress value="100" max="100"></progress> 100%
+**Progress**: 8/10 tasks complete <progress value="80" max="100"></progress> 80%
+**Status**: In Progress - Task 06-full-validation
 **Status**: In Progress - Task 05-library-consolidation
 
 ## Tasks
@@ -10,8 +10,8 @@
 - ✅ 03-token-scanner-app: Upgrade TfmScanWithToken ([Content](tasks/03-token-scanner-app/task.md), [Progress](tasks/03-token-scanner-app/progress-details.md))
   - ✅ 05.02-tier-one: Consolidate tier-one libraries to .NET 11 ([Content](tasks/05.02-tier-one/task.md), [Progress](tasks/05.02-tier-one/progress-details.md))
   - ✅ 05.05-tier-four-tests: Consolidate final libraries and retarget Python tests ([Content](tasks/05.05-tier-four-tests/task.md), [Progress](tasks/05.05-tier-four-tests/progress-details.md))
-- ✅ 05-library-consolidation: Consolidate libraries and upgrade Python parser tests ([Content](tasks/05-library-consolidation/task.md), [Progress](tasks/05-library-consolidation/progress-details.md))
-- ✅ 05-library-consolidation: Consolidate libraries and upgrade Python parser tests ([Content](tasks/05-library-consolidation/task.md), [Progress](tasks/05-library-consolidation/progress-details.md))
+- ✅ 06-full-validation: Build and test the complete solution ([Content](tasks/06-full-validation/task.md), [Progress](tasks/06-full-validation/progress-details.md))
+- 🔄 06-full-validation: Build and test the complete solution ([Content](tasks/06-full-validation/task.md))
   - ✅ 05.04-tier-three: Consolidate tier-three libraries to .NET 11 ([Content](tasks/05.04-tier-three/task.md), [Progress](tasks/05.04-tier-three/progress-details.md))
   - 🔲 05.04-tier-three: Consolidate tier-three libraries to .NET 11
   - 🔲 05.05-tier-four-tests: Consolidate final libraries and retarget Python tests
