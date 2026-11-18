@@ -1,83 +1,57 @@
-﻿using Microsoft.Practices.Unity.Configuration;
-
-using System;
-using System.Configuration;
-
-using Unity;
-
+﻿using ProjectData;
 
 namespace RepoScan.DataModels
 {
     public static class StorageFactory
     {
-        #region Private Members
-
-        private const string configurationSection = "unity";
-        private const string dependencyInjectionContainer = "RepoStorageContainer";
-
-        private static readonly IUnityContainer _container;
-
-        #endregion
-
-        #region Constructors
-
-        static StorageFactory()
-        {
-            _container = new UnityContainer();
-            UnityConfigurationSection section = (UnityConfigurationSection)ConfigurationManager.GetSection(configurationSection);
-            section.Configure(_container, dependencyInjectionContainer);
-        }
-
-        #endregion
-
         public static IReadFileDetails GetFileDetailsReader()
         {
-            return _container.Resolve<IReadFileDetails>();
+            return ServiceProviderAccessor.GetRequiredService<IReadFileDetails>();
         }
 
         public static IReadFileItem GetFileItemReader()
         {
-            return _container.Resolve<IReadFileItem>();
+            return ServiceProviderAccessor.GetRequiredService<IReadFileItem>();
         }
 
         public static IReadRepoList GetRepoListReader()
         {
-            return _container.Resolve<IReadRepoList>();
+            return ServiceProviderAccessor.GetRequiredService<IReadRepoList>();
         }
 
         public static IWriteFileDetails GetFileDetailsWriter()
         {
-            return _container.Resolve<IWriteFileDetails>();
+            return ServiceProviderAccessor.GetRequiredService<IWriteFileDetails>();
         }
 
         public static IWriteFileItem GetFileItemWriter()
         {
-            return _container.Resolve<IWriteFileItem>();
+            return ServiceProviderAccessor.GetRequiredService<IWriteFileItem>();
         }
 
         public static IWriteRepoList GetRepoListWriter()
         {
-            return _container.Resolve<IWriteRepoList>();
+            return ServiceProviderAccessor.GetRequiredService<IWriteRepoList>();
         }
 
         public static IReadPipelines GetPipelineReader()
         {
-            return _container.Resolve<IReadPipelines>();
+            return ServiceProviderAccessor.GetRequiredService<IReadPipelines>();
         }
 
         public static IWritePipeline GetPipelineWriter()
         {
-            return _container.Resolve<IWritePipeline>();
+            return ServiceProviderAccessor.GetRequiredService<IWritePipeline>();
         }
 
         public static IReadNuGet GetNuGetReader()
         {
-            return _container.Resolve<IReadNuGet>();
+            return ServiceProviderAccessor.GetRequiredService<IReadNuGet>();
         }
 
         public static IWriteNuGet GetNuGetWriter()
         {
-            return _container.Resolve<IWriteNuGet>();
+            return ServiceProviderAccessor.GetRequiredService<IWriteNuGet>();
         }
     }
 }

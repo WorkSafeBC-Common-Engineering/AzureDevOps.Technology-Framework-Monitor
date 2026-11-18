@@ -1,5 +1,6 @@
 ﻿using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
+using ProjectData;
 using RepoScan.FileLocator;
 
 using System;
@@ -25,6 +26,8 @@ namespace TfmScanWithToken
 
         static async Task Main(string[] args)
         {
+            ServiceProviderAccessor.Initialize(ServiceRegistration.CreateProvider());
+
             var threadCount = GetTotalThreads(args);
             var forceDetails = GetForceDetails(args);
             var excludedProjects = GetExclusions(args);
