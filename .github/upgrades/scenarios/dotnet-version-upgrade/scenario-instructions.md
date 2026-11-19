@@ -39,3 +39,6 @@
 ## User Preferences
 ### Execution Style
 - Upgrade every project in the solution to .NET 11; use judgment to keep or change existing edits as necessary.
+
+## Key Decisions Log
+- The user approved reconciling the recorded task states and correcting the progress tracker after final validation.
