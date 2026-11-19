@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace PythonFileParser
 {
-    internal class PythonCommon
+    internal partial class PythonCommon
     {
         #region Private Members
 
@@ -17,7 +17,7 @@ namespace PythonFileParser
         internal const string InconsistentVersionKey = "PythonInconsistentVersion";
 
         private static readonly Dictionary<string, PythonVersion> _pythonVersions = [];
-        private static readonly object _pythonVersionsLock = new();
+        private static readonly Lock _pythonVersionsLock = new();
 
         #endregion
 
@@ -133,7 +133,7 @@ namespace PythonFileParser
                 return false;
             }
 
-            var match = Regex.Match(value, @"\d+(?:\.\d+){0,2}");
+            var match = MyRegex.Match(value);
             if (!match.Success)
             {
                 return false;
@@ -268,7 +268,7 @@ namespace PythonFileParser
 
         private static bool MatchesExpression(Version candidateVersion, string versionExpression)
         {
-            var matches = Regex.Matches(versionExpression, @"(?<operator><=|>=|<|>|==|!=|~=|\^)?\s*(?<version>\d+(?:\.\d+){0,2})");
+            var matches = MyRegex1.Matches(versionExpression);
             if (matches.Count == 0)
             {
                 return false;
@@ -352,7 +352,7 @@ namespace PythonFileParser
 
         private static Version? ParseVersion(string versionValue)
         {
-            var match = Regex.Match(versionValue, @"\d+(?:\.\d+){0,2}");
+            var match = MyRegex2.Match(versionValue);
             if (!match.Success)
             {
                 return null;
@@ -378,7 +378,7 @@ namespace PythonFileParser
             return versionParts;
         }
 
-        private static Version BuildVersion(IReadOnlyList<int> versionParts)
+        private static Version BuildVersion(List<int> versionParts)
         {
             var major = versionParts.Count > 0 ? versionParts[0] : 0;
             var minor = versionParts.Count > 1 ? versionParts[1] : 0;
@@ -397,7 +397,7 @@ namespace PythonFileParser
 
         private static string ExtractLowestSpecifiedVersion(string versionExpression)
         {
-            var matches = Regex.Matches(versionExpression, @"\d+(?:\.\d+){0,2}");
+            var matches = MyRegex3.Matches(versionExpression);
             if (matches.Count == 0)
             {
                 return string.Empty;
@@ -437,7 +437,7 @@ namespace PythonFileParser
                 return false;
             }
 
-            var match = Regex.Match(version, @"^\d+(?:\.\d+){0,2}$");
+            var match = MyRegex4.Match(version);
             if (!match.Success)
             {
                 return false;
@@ -446,6 +446,21 @@ namespace PythonFileParser
             comparableVersion = Version.Parse(match.Value);
             return true;
         }
+
+        [GeneratedRegex(@"\d+(?:\.\d+){0,2}")]
+        private static partial Regex MyRegex { get; }
+
+        [GeneratedRegex(@"(?<operator><=|>=|<|>|==|!=|~=|\^)?\s*(?<version>\d+(?:\.\d+){0,2})")]
+        private static partial Regex MyRegex1 { get; }
+
+        [GeneratedRegex(@"\d+(?:\.\d+){0,2}")]
+        private static partial Regex MyRegex2 { get; }
+
+        [GeneratedRegex(@"\d+(?:\.\d+){0,2}")]
+        private static partial Regex MyRegex3 { get; }
+
+        [GeneratedRegex(@"^\d+(?:\.\d+){0,2}$")]
+        private static partial Regex MyRegex4 { get; }
 
         #endregion
     }

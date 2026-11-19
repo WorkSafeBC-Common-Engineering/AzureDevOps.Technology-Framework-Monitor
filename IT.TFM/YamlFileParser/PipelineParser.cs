@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace YamlFileParser
 {
-    public class PipelineParser : IFileParser
+    public partial class PipelineParser : IFileParser
     {
         #region Private Members
 
@@ -384,7 +384,7 @@ namespace YamlFileParser
             return !string.IsNullOrWhiteSpace(key);
         }
 
-        private static string SelectHighestVersionExpression(IReadOnlyList<string> versionExpressions)
+        private static string SelectHighestVersionExpression(List<string> versionExpressions)
         {
             if (versionExpressions.Count == 0)
             {
@@ -409,7 +409,7 @@ namespace YamlFileParser
             return selectedVersion?.Expression ?? versionExpressions[0];
         }
 
-        private static bool HasInconsistentVersions(IReadOnlyList<string> versionExpressions)
+        private static bool HasInconsistentVersions(List<string> versionExpressions)
         {
             if (versionExpressions.Count <= 1)
             {
@@ -457,7 +457,7 @@ namespace YamlFileParser
                 return false;
             }
 
-            var match = Regex.Match(value, @"\d+(?:\.\d+){0,2}");
+            var match = MyRegex.Match(value);
             if (!match.Success)
             {
                 return false;
@@ -847,6 +847,9 @@ namespace YamlFileParser
 
             return string.Empty;
         }
+
+        [GeneratedRegex(@"\d+(?:\.\d+){0,2}")]
+        private static partial Regex MyRegex { get; }
 
         #endregion
     }

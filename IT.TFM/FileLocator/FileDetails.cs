@@ -187,8 +187,8 @@ namespace RepoScan.FileLocator
                             References = fileData.References,
                             UrlReferences = fileData.UrlReferences,
                             PackageReferences = fileData.PackageReferences,
-                            Properties = new SerializableDictionary<string, string>(fileData.Properties),
-                            FilteredItems = new SerializableDictionary<string, string>(fileData.FilteredItems)
+                            Properties = [with(fileData.Properties)],
+                            FilteredItems = [with(fileData.FilteredItems)]
                         };
 
                         IWriteFileDetails writer = StorageFactory.GetFileDetailsWriter();

@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace PythonFileParser
 {
-    public class PythonDockerfileParser : IFileParser
+    public partial class PythonDockerfileParser : IFileParser
     {
         #region IFileParser Implementation
 
@@ -47,9 +47,9 @@ namespace PythonFileParser
 
         #region Private Methods
 
-        private static bool TryAddArgValue(string line, IDictionary<string, string> args)
+        private static bool TryAddArgValue(string line, Dictionary<string, string> args)
         {
-            var argMatch = Regex.Match(line, @"^\s*arg\s+(?<name>[A-Za-z_][A-Za-z0-9_]*)\s*=\s*(?<value>.+?)\s*$", RegexOptions.IgnoreCase);
+            var argMatch = MyRegex.Match(line);
             if (!argMatch.Success)
             {
                 return false;
@@ -88,7 +88,7 @@ namespace PythonFileParser
                 trimmedLine = trimmedLine[..commentIndex].Trim();
             }
 
-            var fromMatch = Regex.Match(trimmedLine, @"^\s*from(?:\s+--[^\s]+)*\s+(?<image>[^\s]+)", RegexOptions.IgnoreCase);
+            var fromMatch = MyRegex1.Match(trimmedLine);
             if (!fromMatch.Success)
             {
                 return false;
@@ -137,20 +137,20 @@ namespace PythonFileParser
 
         private static bool IsPythonImage(string imageName)
         {
-            return Regex.IsMatch(imageName, @"(^|[\/\-_\.])python([\/\-_\.]|$)", RegexOptions.IgnoreCase);
+            return MyRegex2.IsMatch(imageName);
         }
 
         private static string ResolveTagVariables(string tag, IReadOnlyDictionary<string, string> args)
         {
             var resolvedTag = tag;
 
-            resolvedTag = Regex.Replace(resolvedTag, @"\$\{(?<name>[A-Za-z_][A-Za-z0-9_]*)\}", match =>
+            resolvedTag = MyRegex3.Replace(resolvedTag, match =>
             {
                 var name = match.Groups["name"].Value;
                 return args.TryGetValue(name, out var value) ? value : match.Value;
             });
 
-            resolvedTag = Regex.Replace(resolvedTag, @"\$(?<name>[A-Za-z_][A-Za-z0-9_]*)", match =>
+            resolvedTag = MyRegex4.Replace(resolvedTag, match =>
             {
                 var name = match.Groups["name"].Value;
                 return args.TryGetValue(name, out var value) ? value : match.Value;
@@ -173,6 +173,21 @@ namespace PythonFileParser
                 hasInconsistentVersions,
                 storeExtractedInVersionKey: true);
         }
+
+        [GeneratedRegex(@"^\s*arg\s+(?<name>[A-Za-z_][A-Za-z0-9_]*)\s*=\s*(?<value>.+?)\s*$", RegexOptions.IgnoreCase, "en-US")]
+        private static partial Regex MyRegex { get; }
+
+        [GeneratedRegex(@"^\s*from(?:\s+--[^\s]+)*\s+(?<image>[^\s]+)", RegexOptions.IgnoreCase, "en-US")]
+        private static partial Regex MyRegex1 { get; }
+
+        [GeneratedRegex(@"(^|[\/\-_\.])python([\/\-_\.]|$)", RegexOptions.IgnoreCase, "en-US")]
+        private static partial Regex MyRegex2 { get; }
+
+        [GeneratedRegex(@"\$\{(?<name>[A-Za-z_][A-Za-z0-9_]*)\}")]
+        private static partial Regex MyRegex3 { get; }
+
+        [GeneratedRegex(@"\$(?<name>[A-Za-z_][A-Za-z0-9_]*)")]
+        private static partial Regex MyRegex4 { get; }
 
         #endregion
     }

@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace PythonFileParser
 {
-    public class PythonSetupPyParser : IFileParser
+    public partial class PythonSetupPyParser : IFileParser
     {
         #region IFileParser Implementation
 
@@ -65,7 +65,7 @@ namespace PythonFileParser
 
         private static bool TryEnterSetupCall(string line, ref int setupCallDepth)
         {
-            var setupMatch = Regex.Match(line, @"\bsetup\s*\(", RegexOptions.IgnoreCase);
+            var setupMatch = MyRegex.Match(line);
             if (!setupMatch.Success)
             {
                 return false;
@@ -79,7 +79,7 @@ namespace PythonFileParser
         {
             versionExpression = string.Empty;
 
-            var match = Regex.Match(line, @"\bpython_requires\s*=\s*([""'])(?<value>.*?)\1", RegexOptions.IgnoreCase);
+            var match = MyRegex1.Match(line);
             if (!match.Success)
             {
                 return false;
@@ -128,6 +128,12 @@ namespace PythonFileParser
 
             return count;
         }
+
+        [GeneratedRegex(@"\bsetup\s*\(", RegexOptions.IgnoreCase, "en-US")]
+        private static partial Regex MyRegex { get; }
+
+        [GeneratedRegex(@"\bpython_requires\s*=\s*([""'])(?<value>.*?)\1", RegexOptions.IgnoreCase, "en-US")]
+        private static partial Regex MyRegex1 { get; }
 
         #endregion
     }
