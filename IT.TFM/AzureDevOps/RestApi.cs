@@ -571,7 +571,7 @@ namespace AzureDevOps
                         Logger.LogInformation("CallApiAsync - unzipContent: extract files to {CheckoutDirectory}", CheckoutDirectory);
                     }
 
-                    GetZipContent(response.Content.ReadAsStream());
+                    await GetZipContentAsync(response.Content.ReadAsStream());
 
                     if (Parameters.Settings.ExtendedLogging)
                     {
@@ -681,9 +681,9 @@ namespace AzureDevOps
             }
         }
 
-        private void GetZipContent(Stream zipStream)
+        private async Task GetZipContentAsync(Stream zipStream)
         {
-            ZipFile.ExtractToDirectory(zipStream, CheckoutDirectory, true);
+            await ZipFile.ExtractToDirectoryAsync(zipStream, CheckoutDirectory, true);
 
             if (Parameters.Settings.ExtendedLogging)
             {
