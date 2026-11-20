@@ -1,4 +1,4 @@
-﻿using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 using ProjectData;
 using RepoScan.FileLocator;
@@ -11,7 +11,7 @@ using RepoFileScan = RepoScan.FileLocator;
 
 namespace TfmScanWithToken
 {
-    static class Program
+    internal static class Program
     {
         #region Private Members
 
@@ -26,7 +26,8 @@ namespace TfmScanWithToken
 
         static async Task Main(string[] args)
         {
-            ServiceProviderAccessor.Initialize(ServiceRegistration.CreateProvider());
+            using var provider = ServiceRegistration.CreateProvider();
+            ServiceProviderAccessor.Initialize(provider);
 
             var threadCount = GetTotalThreads(args);
             var forceDetails = GetForceDetails(args);
@@ -39,22 +40,22 @@ namespace TfmScanWithToken
 
             if (partOne)
             {
-                await RepoScanAsync(projectId, repositoryId, excludedProjects);
+                await RepoScanAsync(provider.GetRequiredService<Scanner>(), projectId, repositoryId, excludedProjects);
             }
 
             if (partTwo)
             {
-                await FileScanAsync(threadCount, forceDetails, projectId, repositoryId, excludedProjects);
+                await FileScanAsync(provider.GetRequiredService<FileProcessor>(), threadCount, forceDetails, projectId, repositoryId, excludedProjects);
             }
 
             if (partThree)
             {
-                PipelineScan(threadCount, repositoryId);
+                PipelineScan(provider.GetRequiredService<RepoFileScan.PipelineScanner>(), threadCount, repositoryId);
             }
 
             if (partFour)
             {
-                await FileDetailsAsync(threadCount, forceDetails, projectId, repositoryId, excludedProjects);
+                await FileDetailsAsync(provider.GetRequiredService<RepoFileScan.FileDetails>(), threadCount, forceDetails, projectId, repositoryId, excludedProjects);
             }
 
             if (partFive)
@@ -64,7 +65,7 @@ namespace TfmScanWithToken
 
             if (partSix)
             {
-                await GetRuntimeMetrics(projectId, repositoryId, excludedProjects);
+                await GetRuntimeMetrics(provider.GetRequiredService<RuntimeMetricsScan>(), projectId, repositoryId, excludedProjects);
             }
 
 #if DEBUG
@@ -73,39 +74,38 @@ namespace TfmScanWithToken
 #endif
         }
 
-        private static async Task RepoScanAsync(string projectId, string repositoryId, string[] excludedProjects)
+        private static async Task RepoScanAsync(Scanner scanner, string projectId, string repositoryId, string[] excludedProjects)
         {
             Console.WriteLine($"Starting Repo Scan at: {DateTime.Now:T}");
 
-            var scanner = new Scanner();
             await scanner.ScanAsync(projectId, repositoryId, excludedProjects);
 
             Console.WriteLine($"Repo Scan complete at: {DateTime.Now:T}");
         }
 
-        private static async Task FileScanAsync(int threadCount, bool forceDetails, string projectId, string repositoryId, string[] excludedProjects)
+        private static async Task FileScanAsync(FileProcessor fileProcessor, int threadCount, bool forceDetails, string projectId, string repositoryId, string[] excludedProjects)
         {
             Console.WriteLine($"Starting File Scan at: {DateTime.Now:T}");
 
-            await FileProcessor.GetFiles(threadCount, forceDetails, projectId, repositoryId, excludedProjects);
+            await fileProcessor.GetFiles(threadCount, forceDetails, projectId, repositoryId, excludedProjects);
 
             Console.WriteLine($"File Scan complete at: {DateTime.Now:T}");
         }
 
-        private static void PipelineScan(int threadCount, string repositoryId)
+        private static void PipelineScan(RepoFileScan.PipelineScanner pipelineScanner, int threadCount, string repositoryId)
         {
             Console.WriteLine($"Starting Pipeline Scan at: {DateTime.Now:T}");
 
-            RepoFileScan.PipelineScanner.LinkPipelineToFile(threadCount, repositoryId);
+            pipelineScanner.LinkPipelineToFile(threadCount, repositoryId);
 
             Console.WriteLine($"Pipeline Scan complete at: {DateTime.Now:T}");
         }
 
-        private static async Task FileDetailsAsync(int threadCount, bool forceDetails, string projectId, string repositoryId, string[] excludedProjects)
+        private static async Task FileDetailsAsync(RepoFileScan.FileDetails fileDetails, int threadCount, bool forceDetails, string projectId, string repositoryId, string[] excludedProjects)
         {
             Console.WriteLine($"Starting File Details Scan at: {DateTime.Now:T}");
 
-            await RepoFileScan.FileDetails.GetDetailsAsync(threadCount, forceDetails, projectId, repositoryId, excludedProjects);
+            await fileDetails.GetDetailsAsync(threadCount, forceDetails, projectId, repositoryId, excludedProjects);
 
             Console.WriteLine($"File Details Scan complete at: {DateTime.Now:T}");
         }
@@ -119,11 +119,11 @@ namespace TfmScanWithToken
             Console.WriteLine($"NuGet Feed Scan complete at: {DateTime.Now:T}");
         }
 
-        private static async Task GetRuntimeMetrics(string projectId, string repositoryId, string[] excludedProjects)
+        private static async Task GetRuntimeMetrics(RuntimeMetricsScan runtimeMetricsScan, string projectId, string repositoryId, string[] excludedProjects)
         {
             Console.WriteLine($"Starting Runtime Metrics Scan at: {DateTime.Now:T}");
 
-            await RuntimeMetricsScan.Run(projectId, repositoryId, excludedProjects);
+            await runtimeMetricsScan.Run(projectId, repositoryId, excludedProjects);
 
             Console.WriteLine($"Runtime Metrics Scan complete at: {DateTime.Now:T}");
         }

@@ -8,6 +8,11 @@ namespace NuGetFileParser
 {
     public class NuspecParser : Parser.ParseXmlFile, IFileParser
     {
+        public NuspecParser(Microsoft.Extensions.Logging.ILogger<NuspecParser> logger, Parser.XmlParserSettings settings)
+            : base(logger, settings)
+        {
+        }
+
         #region Private Members
         
         private const string xmlNuspecPackage = "package";

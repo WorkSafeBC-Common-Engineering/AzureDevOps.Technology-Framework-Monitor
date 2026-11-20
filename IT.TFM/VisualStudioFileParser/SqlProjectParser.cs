@@ -6,6 +6,11 @@ namespace VisualStudioFileParser
 {
     class SqlProjectParser : Parser.ParseXmlFile, IFileParser
     {
+        public SqlProjectParser(Microsoft.Extensions.Logging.ILogger<SqlProjectParser> logger, Parser.XmlParserSettings settings)
+            : base(logger, settings)
+        {
+        }
+
         #region IFileParser Implementation
 
         void IFileParser.Initialize(object data)

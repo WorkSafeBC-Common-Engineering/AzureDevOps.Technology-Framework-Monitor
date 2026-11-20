@@ -13,6 +13,15 @@ namespace ProjectScannerSaveToSqlServer
 {
     public class Read : DbCore, IStorageReader
     {
+        private readonly Microsoft.Extensions.Logging.ILogger<FileItem> fileLogger;
+
+        public Read(Microsoft.Extensions.Logging.ILogger<Read> logger, Microsoft.Extensions.Logging.ILogger<FileItem> fileLogger)
+            : base(logger)
+        {
+            ArgumentNullException.ThrowIfNull(fileLogger);
+            this.fileLogger = fileLogger;
+        }
+
         #region Private Members
 
         private Organization organization = null;
@@ -184,7 +193,7 @@ namespace ProjectScannerSaveToSqlServer
 
                     var fileType = Enum.Parse<FileItemType>(file.FileType.Value);
 
-                    fileItem = new FileItem
+                    fileItem = new FileItem(fileLogger)
                     {
                         Id = file.FileId,
                         FileType = fileType,
@@ -258,7 +267,7 @@ namespace ProjectScannerSaveToSqlServer
 
                 var fileType = Enum.Parse<FileItemType>(mainFile.FileType.Value);
 
-                fileItem = new FileItem
+                fileItem = new FileItem(fileLogger)
                 {
                     Id = mainFile.FileId,
                     FileType = fileType,
@@ -331,7 +340,7 @@ namespace ProjectScannerSaveToSqlServer
             {
                 FileItem fileItem;
 
-                fileItem = new FileItem
+                fileItem = new FileItem(fileLogger)
                 {
                     Id = mainFile.FileId,
                     FileType = FileItemType.YamlPipeline,
@@ -491,14 +500,24 @@ namespace ProjectScannerSaveToSqlServer
 
             var files = properties.Select(p => p.File)
                                   .Distinct()
-                                  .Select(f => new FileItem
+                                  .Select(f => new
+                                  {
+                                      f.FileId,
+                                      f.Path,
+                                      f.Url,
+                                      f.Id,
+                                      f.Repository.RepositoryId,
+                                      f.CommitId
+                                  })
+                                  .AsEnumerable()
+                                  .Select(f => new FileItem(fileLogger)
                                   {
                                       Id = f.FileId,
                                       FileType = fileType,
                                       Path = f.Path,
                                       Url = f.Url,
                                       StorageId = f.Id,
-                                      RepositoryId = new Guid(f.Repository.RepositoryId),                                      
+                                      RepositoryId = new Guid(f.RepositoryId),
                                       CommitId = f.CommitId
                                   })
                                   .ToArray();

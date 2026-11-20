@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 
 namespace TfmExport
 {
@@ -8,6 +9,7 @@ namespace TfmExport
 
         private StreamWriter? file;
         private SqlConnection? db;
+        private readonly ILogger<Exporter> logger;
 
         private StreamWriter Output => file ?? throw new InvalidOperationException("Exporter has not been initialized.");
         private SqlConnection Connection => db ?? throw new InvalidOperationException("Exporter has not been initialized.");
@@ -17,6 +19,12 @@ namespace TfmExport
         #endregion
 
         #region Public Methods
+
+        public Exporter(ILogger<Exporter> logger)
+        {
+            ArgumentNullException.ThrowIfNull(logger);
+            this.logger = logger;
+        }
 
         public void Initialize(string outputFile, string dbConnection)
         {
@@ -36,13 +44,12 @@ namespace TfmExport
             Output.WriteLine("-- Clearing Tables");
             foreach (var table in tables)
             {
-                Console.WriteLine($"Clearing {table.Name}...");
+                logger.LogInformation("Clearing {TableName}...", table.Name);
                 Truncate(table);
             }
 
             Output.WriteLine("GO");
             Output.WriteLine();
-            Console.WriteLine();
         }
 
         public void Run(List<TfmTable> tables)
@@ -59,7 +66,7 @@ namespace TfmExport
             var reverseTables = tables.ToArray().Reverse();
             foreach (var table in reverseTables)
             {
-                Console.WriteLine($"Exporting {table.Name}...");
+                logger.LogInformation("Exporting {TableName}...", table.Name);
 
                 if (table.HasIdentity)
                 {
@@ -77,7 +84,6 @@ namespace TfmExport
 
                 Output.WriteLine();
             }
-            Console.WriteLine();
         }
 
         public void Close()

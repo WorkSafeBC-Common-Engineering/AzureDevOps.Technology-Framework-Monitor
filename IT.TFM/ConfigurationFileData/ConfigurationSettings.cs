@@ -5,46 +5,56 @@ using System.Configuration;
 using System.IO;
 using System.Xml;
 
+using Microsoft.Extensions.Logging;
+
 namespace ConfigurationFileData
 {
-    public static class ConfigurationSettings
+    public class ConfigurationSettings
     {
-        public static string[] LoadConfigurationValues(string file, string section)
+        private readonly ILogger<ConfigurationSettings> Logger;
+
+        public ConfigurationSettings(ILogger<ConfigurationSettings> logger)
+        {
+            ArgumentNullException.ThrowIfNull(logger);
+            Logger = logger;
+        }
+
+        public string[] LoadConfigurationValues(string file, string section)
         {
             if (Parameters.Settings.ExtendedLogging)
             {
-                Console.WriteLine($"=> LoadConfigurationValues: file={file}, section={section}");
+                Logger.LogInformation("LoadConfigurationValues: file={File}, section={Section}", file, section);
             }
 
             var configuration = GetConfiguration(file);
 
             if (Parameters.Settings.ExtendedLogging)
             {
-                Console.WriteLine($"=> LoadConfigurationValues: configuration loaded = {configuration != null}");
+                Logger.LogInformation("LoadConfigurationValues: configuration loaded = {ConfigurationLoaded}", configuration != null);
             }
 
             if ( configuration != null )
             {
                 if (Parameters.Settings.ExtendedLogging)
                 {
-                    Console.WriteLine($"=> LoadConfigurationValues: configuration has file = {configuration.HasFile}");
-                    Console.WriteLine($"=> LoadConfigurationValues: configuration file path = {configuration.FilePath}");
-                    Console.WriteLine($"=> LoadConfigurationValues: configuration file exists = {File.Exists(configuration.FilePath)}");
-                    Console.WriteLine($"=> LoadConfigurationValues: configuration file path = {configuration.FilePath}");
+                    Logger.LogInformation("LoadConfigurationValues: configuration has file = {HasFile}", configuration.HasFile);
+                    Logger.LogInformation("LoadConfigurationValues: configuration file path = {FilePath}", configuration.FilePath);
+                    Logger.LogInformation("LoadConfigurationValues: configuration file exists = {FileExists}", File.Exists(configuration.FilePath));
+                    Logger.LogInformation("LoadConfigurationValues: configuration file path = {FilePath}", configuration.FilePath);
                 }
 
                 foreach (string key in configuration.Sections.Keys)
                 {
                     if (Parameters.Settings.ExtendedLogging)
                     {
-                        Console.WriteLine($"\t=> LoadConfigurationValues: configuration section key = {key}:");
+                        Logger.LogInformation("LoadConfigurationValues: configuration section key = {Key}", key);
                     }
 
                     var value = configuration.Sections[key];
 
                     if (Parameters.Settings.ExtendedLogging)
                     {
-                        Console.WriteLine($"\t=> LoadConfigurationValues: configuration section type = {value.GetType()}:");
+                        Logger.LogInformation("LoadConfigurationValues: configuration section type = {SectionType}", value.GetType());
                     }
                 }
             }
@@ -52,13 +62,13 @@ namespace ConfigurationFileData
             return GetSectionValues(section, configuration);
         }
 
-        public static Dictionary<string, string> LoadConfigurationDictionary(string file, string section)
+        public Dictionary<string, string> LoadConfigurationDictionary(string file, string section)
         {
             var configuration = GetConfiguration(file);
             return GetSectionDictionary(section, configuration);
         }
 
-        public static ConfigurationSection GetSection(string file, string sectionName)
+        public ConfigurationSection GetSection(string file, string sectionName)
         {
             var configuration = GetConfiguration(file);
             return configuration.GetSection(sectionName);
@@ -76,13 +86,13 @@ namespace ConfigurationFileData
             return ConfigurationManager.OpenMappedExeConfiguration(configFileMap, ConfigurationUserLevel.None);
         }
 
-        private static string[] GetSectionValues(string sectionName, Configuration configuration)
+        private string[] GetSectionValues(string sectionName, Configuration configuration)
         {
             var configData = GetSectionData(sectionName, configuration);
 
             if (Parameters.Settings.ExtendedLogging)
             {
-                Console.WriteLine($"=> GetSectionValues: configData loaded = {configData != null}");
+                Logger.LogInformation("GetSectionValues: configData loaded = {ConfigDataLoaded}", configData != null);
             }
 
             var values = new List<string>();
@@ -94,7 +104,7 @@ namespace ConfigurationFileData
             return [.. values];
         }
 
-        private static Dictionary<string, string> GetSectionDictionary(string sectionName, Configuration configuration)
+        private Dictionary<string, string> GetSectionDictionary(string sectionName, Configuration configuration)
         {
             var dictionaryData = new Dictionary<string, string>();
 
@@ -108,20 +118,20 @@ namespace ConfigurationFileData
             return dictionaryData;
         }
 
-        private static NameValueCollection GetSectionData(string sectionName, Configuration configuration)
+        private NameValueCollection GetSectionData(string sectionName, Configuration configuration)
         {
             var section = configuration.GetSection(sectionName);
 
             if (Parameters.Settings.ExtendedLogging)
             {
-                Console.WriteLine($"=> GetSectionData: section loaded = {section != null}");
+                Logger.LogInformation("GetSectionData: section loaded = {SectionLoaded}", section != null);
             }
 
             string sectionRawXml = section.SectionInformation.GetRawXml();
 
             if (Parameters.Settings.ExtendedLogging)
             {
-                Console.WriteLine($"=> GetSectionData: sectionRawXml = {sectionRawXml}");
+                Logger.LogInformation("GetSectionData: sectionRawXml = {SectionRawXml}", sectionRawXml);
             }
 
             var sectionXmlDoc = new XmlDocument();
@@ -129,7 +139,7 @@ namespace ConfigurationFileData
 
             if (Parameters.Settings.ExtendedLogging)
             {
-                Console.WriteLine($"=> GetSectionData: sectionXmlDoc loaded");
+                Logger.LogInformation("GetSectionData: sectionXmlDoc loaded");
             }
 
             var handler = new NameValueSectionHandler();
@@ -137,7 +147,7 @@ namespace ConfigurationFileData
 
             if (Parameters.Settings.ExtendedLogging)
             {
-                Console.WriteLine($"=> GetSectionData: configParserSection loaded = {configParserSection != null}");
+                Logger.LogInformation("GetSectionData: configParserSection loaded = {ConfigParserSectionLoaded}", configParserSection != null);
             }
 
             return configParserSection;

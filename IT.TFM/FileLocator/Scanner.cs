@@ -9,6 +9,14 @@ namespace RepoScan.FileLocator
 {
     public class Scanner
     {
+        private readonly PipelineScanner pipelineScanner;
+
+        public Scanner(PipelineScanner pipelineScanner)
+        {
+            ArgumentNullException.ThrowIfNull(pipelineScanner);
+            this.pipelineScanner = pipelineScanner;
+        }
+
         #region Private Members
 
         private readonly Guid scanId = Guid.NewGuid();
@@ -73,9 +81,9 @@ namespace RepoScan.FileLocator
                         repoOnly = true;
                     }
 
-                    await PipelineScanner.ScanAsync(scanner, project.Id, repositoryId);
+                    await pipelineScanner.ScanAsync(scanner, project.Id, repositoryId);
 
-                    await PipelineScanner.ScanReleasesAsync(scanner, project.Id, repositoryId);
+                    await pipelineScanner.ScanReleasesAsync(scanner, project.Id, repositoryId);
                 }
             }
         }

@@ -1,4 +1,6 @@
-﻿using ProjectData;
+﻿using Microsoft.Extensions.Logging;
+
+using ProjectData;
 using ProjectData.Interfaces;
 
 using System.Diagnostics;
@@ -9,6 +11,14 @@ namespace VisualStudioMetricsScanner
     public class MetricsScanner : IMetricsScanner
     {
         #region Private Members
+
+        private readonly ILogger<MetricsScanner> Logger;
+
+        public MetricsScanner(ILogger<MetricsScanner> logger)
+        {
+            ArgumentNullException.ThrowIfNull(logger);
+            Logger = logger;
+        }
 
         private const string metricsFile = "metrics.xml";
 
@@ -24,7 +34,7 @@ namespace VisualStudioMetricsScanner
 
         Dictionary<string, Metrics> IMetricsScanner.Get(FileItem file, string basePath)
         {
-            Console.WriteLine($"Getting metrics for {file.Path}");
+            Logger.LogInformation("Getting metrics for {FilePath}", file.Path);
             SetMetricsPath(basePath);
 
             GenerateMetricsFile($"{basePath}{file.Path}");
@@ -33,7 +43,7 @@ namespace VisualStudioMetricsScanner
 
             if (metrics.Count == 0)
             {
-                Console.WriteLine($"\t>>> Unable to retrieving metrics");
+                Logger.LogWarning("Unable to retrieve metrics for {FilePath}", file.Path);
             }
 
             return metrics;
@@ -82,14 +92,14 @@ namespace VisualStudioMetricsScanner
                     }
                     catch (IOException ioException)
                     {
-                        Console.WriteLine($"Error reading metrics file: {ioException.Message} - retries left {retries}");
+                        Logger.LogWarning(ioException, "Error reading metrics file: {ErrorMessage} - retries left {RetriesLeft}", ioException.Message, retries);
                         Thread.Sleep(1000);
                     }
                 } while (retries-- >= 0);
 
                 if (!readSuccessful)
                 {
-                    Console.WriteLine("Failed to read metrics file after multiple attempts.");
+                    Logger.LogError("Failed to read metrics file after multiple attempts.");
                     return metricsList;
                 }
 
@@ -167,7 +177,7 @@ namespace VisualStudioMetricsScanner
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error getting metrics for current file: {ex}");
+                Logger.LogError(ex, "Error getting metrics for current file");
             }
             finally
             {

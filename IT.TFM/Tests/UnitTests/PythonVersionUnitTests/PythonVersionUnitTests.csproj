@@ -24,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\PythonParser\PythonFileParser.csproj" />
     <ProjectReference Include="..\..\..\YamlFileParser\YamlFileParser.csproj" />
+    <ProjectReference Include="..\..\..\TfmScanWithToken\TfmScanWithToken.csproj" />
   </ItemGroup>
 
   <ItemGroup>

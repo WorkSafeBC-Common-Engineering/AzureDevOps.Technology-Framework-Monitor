@@ -1,4 +1,6 @@
-﻿using ProjectData;
+﻿using Microsoft.Extensions.Logging;
+
+using ProjectData;
 
 using System;
 using System.Collections.Generic;
@@ -11,19 +13,21 @@ namespace Parser
     {
         #region Private Members
 
-        private const string configurationFile = "Parser.dll.config";
-        private const string sectionIgnoreFileRefs = "FileReferences-Ignore";
+        private readonly ILogger Logger;
 
         private static readonly string[] fileRefPunctuation = [" ", ",", "."];
-        private static readonly string[] ignoreFileRefs;
+        private readonly XmlParserSettings settings;
 
         protected Dictionary<string, string> buildProperties;
 
         #endregion
 
-        static ParseXmlFile()
+        protected ParseXmlFile(ILogger logger, XmlParserSettings settings)
         {
-            ignoreFileRefs = ConfigurationFileData.ConfigurationSettings.LoadConfigurationValues(configurationFile, sectionIgnoreFileRefs);
+            ArgumentNullException.ThrowIfNull(logger);
+            ArgumentNullException.ThrowIfNull(settings);
+            Logger = logger;
+            this.settings = settings;
         }
 
         #region Protected Members
@@ -242,7 +246,7 @@ namespace Parser
             return string.Join("/", newFields);
         }
 
-        protected static bool ValidReference(string reference)
+        protected bool ValidReference(string reference)
         {
             if (reference == null)
             {
@@ -251,7 +255,7 @@ namespace Parser
 
             var refValue = reference.Trim();
 
-            foreach (var fileRef in ignoreFileRefs)
+            foreach (var fileRef in settings.IgnoredFileReferences)
             {
                 if (refValue.Equals(fileRef, System.StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -275,7 +279,7 @@ namespace Parser
         /// </summary>
         /// <param name="node"></param>
         /// <returns>Null if no version found, else returns the version # as string.</returns>
-        protected static string GetHintPathVersion(XmlNode node)
+        protected string GetHintPathVersion(XmlNode node)
         {
             var childNodes = node.ChildNodes;
             foreach (XmlNode childNode in childNodes)
@@ -289,7 +293,7 @@ namespace Parser
 
                 if (Parameters.Settings.ExtendedLogging)
                 {
-                    Console.WriteLine($"\t>>> Using HintPath: {path}");
+                    Logger.LogInformation("Using HintPath: {HintPath}", path);
                 }
 
                 var fields = path.Split(pathSeparator, System.StringSplitOptions.RemoveEmptyEntries | System.StringSplitOptions.TrimEntries);
@@ -308,13 +312,13 @@ namespace Parser
             return null;
         }
 
-        private static string ExtractVersionFromHintPathSegment(string segment)
+        private string ExtractVersionFromHintPathSegment(string segment)
         {
             string version = null;
 
             if (Parameters.Settings.ExtendedLogging)
             {
-                Console.WriteLine($"\t>>> Getting Package Version from HintPath segment: {segment}");
+                Logger.LogInformation("Getting Package Version from HintPath segment: {Segment}", segment);
             }
 
             var fields = segment.Split(hintPathVersionSeparator, System.StringSplitOptions.RemoveEmptyEntries | System.StringSplitOptions.TrimEntries);
@@ -332,7 +336,7 @@ namespace Parser
 
             if (Parameters.Settings.ExtendedLogging)
             {
-                Console.WriteLine($"\t>>> Getting Package Version from HintPath, version = {version}");
+                Logger.LogInformation("Getting Package Version from HintPath, version = {Version}", version);
             }
             return version;
         }

@@ -9,6 +9,10 @@ namespace VisualStudioFileParser
 {
     class SolutionXParser : Parser.ParseXmlFile, IFileParser
     {
+        public SolutionXParser(Microsoft.Extensions.Logging.ILogger<SolutionXParser> logger, Parser.XmlParserSettings settings)
+            : base(logger, settings)
+        {
+        }
 
         #region Private Members
 

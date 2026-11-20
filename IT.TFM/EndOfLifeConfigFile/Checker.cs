@@ -16,15 +16,16 @@ namespace EndOfLifeConfigFile
         private const string configurationSection_DotNet = "EOLChecker-DotNet";
         private const string configurationSection_Component = "EOLChecker-Component";
 
-        private static readonly Dictionary<string, DateTime> eolDotNetList;
-        private static readonly Dictionary<string, DateTime> eolComponentList;
+        private readonly Lazy<Dictionary<string, DateTime>> eolDotNetList;
+        private readonly Lazy<Dictionary<string, DateTime>> eolComponentList;
 
         #endregion
 
-        static Checker()
+        public Checker(ConfigurationSettings configurationSettings)
         {
-            eolDotNetList = LoadEol(configurationSection_DotNet);
-            eolComponentList = LoadEol(configurationSection_Component);
+            ArgumentNullException.ThrowIfNull(configurationSettings);
+            eolDotNetList = new Lazy<Dictionary<string, DateTime>>(() => LoadEol(configurationSettings, configurationSection_DotNet));
+            eolComponentList = new Lazy<Dictionary<string, DateTime>>(() => LoadEol(configurationSettings, configurationSection_Component));
         }
 
         #region IEndOfLifeChecker
@@ -46,11 +47,11 @@ namespace EndOfLifeConfigFile
 
         #region Private Methods
 
-        private static Dictionary<string, DateTime> LoadEol(string configurationSection)
+        private static Dictionary<string, DateTime> LoadEol(ConfigurationSettings configurationSettings, string configurationSection)
         {
             var eolList = new Dictionary<string, DateTime>();
 
-            var eolDictionaryValues = ConfigurationSettings.LoadConfigurationDictionary(configurationFile, configurationSection);
+            var eolDictionaryValues = configurationSettings.LoadConfigurationDictionary(configurationFile, configurationSection);
             foreach (var pair in eolDictionaryValues)
             {
                 var dateValue = pair.Value;
@@ -65,12 +66,12 @@ namespace EndOfLifeConfigFile
             return eolList;
         }
 
-        private static DateTime? GetDate(ComponentTypeEnum componentType, string version)
+        private DateTime? GetDate(ComponentTypeEnum componentType, string version)
         {
             return componentType switch
             {
-                ComponentTypeEnum.DotNet => GetDate(eolDotNetList, version),
-                ComponentTypeEnum.Component => GetDate(eolComponentList, version),
+                ComponentTypeEnum.DotNet => GetDate(eolDotNetList.Value, version),
+                ComponentTypeEnum.Component => GetDate(eolComponentList.Value, version),
                 _ => null,
             };
         }

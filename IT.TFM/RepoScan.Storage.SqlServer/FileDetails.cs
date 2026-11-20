@@ -8,12 +8,20 @@ namespace RepoScan.Storage.SqlServer
 {
     public class FileDetails : IWriteFileDetails
     {
+        private readonly Microsoft.Extensions.Logging.ILogger<ProjectData.FileItem> fileLogger;
+
+        public FileDetails(Microsoft.Extensions.Logging.ILogger<ProjectData.FileItem> fileLogger)
+        {
+            System.ArgumentNullException.ThrowIfNull(fileLogger);
+            this.fileLogger = fileLogger;
+        }
+
         #region IWriteFileDetails Implementation
 
         void IWriteFileDetails.Write(DataModels.FileDetails item, bool forceDetails)
         {
             using var writer = GetWriter();
-            var fileItem = new ProjectData.FileItem
+            var fileItem = new ProjectData.FileItem(fileLogger)
             {
                 Id = item.Id,
                 Url = item.Url,
@@ -53,7 +61,7 @@ namespace RepoScan.Storage.SqlServer
         void IWriteFileDetails.Delete(DataModels.FileDetails item)
         {
             using var writer = GetWriter();
-            var fileItem = new ProjectData.FileItem
+            var fileItem = new ProjectData.FileItem(fileLogger)
             {
                 Id = item.Id,
                 Url = item.Url,

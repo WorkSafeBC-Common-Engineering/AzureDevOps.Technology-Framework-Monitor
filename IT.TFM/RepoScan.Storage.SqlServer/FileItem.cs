@@ -9,6 +9,14 @@ namespace RepoScan.Storage.SqlServer
 {
     public class FileItem : IReadFileItem, IWriteFileItem
     {
+        private readonly Microsoft.Extensions.Logging.ILogger<ProjectData.FileItem> fileLogger;
+
+        public FileItem(Microsoft.Extensions.Logging.ILogger<ProjectData.FileItem> fileLogger)
+        {
+            System.ArgumentNullException.ThrowIfNull(fileLogger);
+            this.fileLogger = fileLogger;
+        }
+
         #region IReadFileItem Implementation
 
         IEnumerable<DataModels.FileItem> IReadFileItem.Read()
@@ -119,7 +127,7 @@ namespace RepoScan.Storage.SqlServer
         {
             using var writer = GetWriter();
 
-            var fileItem = new ProjectData.FileItem
+            var fileItem = new ProjectData.FileItem(fileLogger)
             {
                 Id = item.Id,
                 FileType = item.FileType,
@@ -135,7 +143,7 @@ namespace RepoScan.Storage.SqlServer
         {
             using var writer = GetWriter();
 
-            var fileItem = new ProjectData.FileItem
+            var fileItem = new ProjectData.FileItem(fileLogger)
             {
                 Id = item.Id,
             };

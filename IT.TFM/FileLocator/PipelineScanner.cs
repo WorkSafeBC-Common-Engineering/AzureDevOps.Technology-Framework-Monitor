@@ -1,4 +1,6 @@
-﻿using ProjectData;
+﻿using Microsoft.Extensions.Logging;
+
+using ProjectData;
 using ProjectData.Interfaces;
 
 using ProjectScanner;
@@ -13,20 +15,26 @@ using System.Threading.Tasks;
 
 namespace RepoScan.FileLocator
 {
-    public static class PipelineScanner
+    public class PipelineScanner
     {
         #region Private Members
 
-        private static IEnumerable<YamlPipeline> yamlPipelines = null;
-        private static readonly Lock pipelineReaderLock = new();
+        private readonly ILogger<PipelineScanner> Logger;
 
-        private static readonly IWritePipeline writer = StorageFactory.GetPipelineWriter();
+        private IEnumerable<YamlPipeline> yamlPipelines = null;
+        private readonly Lock pipelineReaderLock = new();
+
+        public PipelineScanner(ILogger<PipelineScanner> logger)
+        {
+            ArgumentNullException.ThrowIfNull(logger);
+            Logger = logger;
+        }
 
         #endregion
 
         #region Public Methods
 
-        public static async Task ScanAsync(IScanner scanner, Guid projectId, string repositoryId)
+        public async Task ScanAsync(IScanner scanner, Guid projectId, string repositoryId)
         {
             var pipelineReader = StorageFactory.GetPipelineReader();
             var pipelineIds = new List<int>(pipelineReader.GetPipelineIds(projectId.ToString()));
@@ -54,7 +62,7 @@ namespace RepoScan.FileLocator
             }
         }
 
-        public static void LinkPipelineToFile(int totalThreads, string repositoryId)
+        public void LinkPipelineToFile(int totalThreads, string repositoryId)
         {
             Settings.Initialize();
 
@@ -87,7 +95,7 @@ namespace RepoScan.FileLocator
             }
         }
 
-        public static async Task ScanReleasesAsync(IScanner scanner, Guid projectId, string repositoryId)
+        public async Task ScanReleasesAsync(IScanner scanner, Guid projectId, string repositoryId)
         {
             var releases = await scanner.Releases(projectId, repositoryId);
             var pipelineWriter = StorageFactory.GetPipelineWriter();
@@ -103,7 +111,7 @@ namespace RepoScan.FileLocator
 
         #region Private Methods
 
-        private static void LinkYamlPipeline(string repositoryId, string filePath)
+        private void LinkYamlPipeline(string repositoryId, string filePath)
         {
             lock (pipelineReaderLock)
             {
@@ -116,7 +124,7 @@ namespace RepoScan.FileLocator
 
             if (Parameters.Settings.ExtendedLogging)
             {
-                Console.WriteLine($"Link Yaml Pipeline: Repository ID: {repositoryId}, Path: {filePath}");
+                Logger.LogInformation("Link Yaml Pipeline: Repository ID: {RepositoryId}, Path: {FilePath}", repositoryId, filePath);
             }
 
             // It is possible that multiple pipelines can be created from the same YAML file, so need to process each case
@@ -124,11 +132,12 @@ namespace RepoScan.FileLocator
                                                   && p.RepositoryId.Equals(repositoryId, StringComparison.InvariantCultureIgnoreCase)
                                                   && p.Path.Equals(filePath, StringComparison.InvariantCultureIgnoreCase));
 
+            var writer = StorageFactory.GetPipelineWriter();
             foreach (var pipeline in pipelines)
             {
                 if (Parameters.Settings.ExtendedLogging)
                 {
-                    Console.WriteLine($"Pipeline to File match: {pipeline}");
+                    Logger.LogInformation("Pipeline to File match: {Pipeline}", pipeline);
                 }
 
                 writer.LinkToFile(pipeline.PipelineId, pipeline.RepositoryId, filePath);

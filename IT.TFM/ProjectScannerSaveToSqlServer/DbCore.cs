@@ -1,4 +1,6 @@
-﻿using ProjectScannerSaveToSqlServer.DataModels;
+﻿using Microsoft.Extensions.Logging;
+
+using ProjectScannerSaveToSqlServer.DataModels;
 
 using System;
 using System.Diagnostics;
@@ -9,6 +11,14 @@ namespace ProjectScannerSaveToSqlServer
     public abstract class DbCore : IDisposable
     {
         #region Protected Members
+
+        protected ILogger Logger { get; }
+
+        protected DbCore(ILogger logger)
+        {
+            ArgumentNullException.ThrowIfNull(logger);
+            Logger = logger;
+        }
 
         // File Reference Type IDs
         protected const int RefTypeFile = 1;
@@ -43,7 +53,7 @@ namespace ProjectScannerSaveToSqlServer
             Interlocked.Increment(ref instanceCount);
             if (Parameters.Settings.ExtendedLogging)
             {
-                Console.WriteLine($"\t >>> DbCore - Initialize: {instanceId}, count = {Interlocked.Read(ref instanceCount)}");
+                Logger.LogInformation("DbCore - Initialize: {InstanceId}, count = {InstanceCount}", instanceId, Interlocked.Read(ref instanceCount));
             }
 
             connection = configuration;
@@ -61,8 +71,8 @@ namespace ProjectScannerSaveToSqlServer
             var st1 = new StackTrace(new StackFrame(true));
             if (Parameters.Settings.ExtendedLogging)
             {
-                Console.WriteLine($"Stack Trace for Main: {st1}");
-                Console.WriteLine(st.ToString());
+                Logger.LogInformation("Stack Trace for Main: {StackTrace}", st1);
+                Logger.LogInformation("{StackTrace}", st);
             }
 
             context.Dispose();
@@ -78,13 +88,18 @@ namespace ProjectScannerSaveToSqlServer
 
         public void Dispose()
         {
-            ((IDisposable)context).Dispose();
+            if (instanceId == Guid.Empty)
+            {
+                return;
+            }
+
+            context?.Dispose();
             GC.SuppressFinalize(this);
 
             Interlocked.Decrement(ref instanceCount);
             if (Parameters.Settings.ExtendedLogging)
             {
-                Console.WriteLine($"\t >>> DbCore - Close: {instanceId}, count = {Interlocked.Read(ref instanceCount)}");
+                Logger.LogInformation("DbCore - Close: {InstanceId}, count = {InstanceCount}", instanceId, Interlocked.Read(ref instanceCount));
             }
             instanceId = Guid.Empty;
         }

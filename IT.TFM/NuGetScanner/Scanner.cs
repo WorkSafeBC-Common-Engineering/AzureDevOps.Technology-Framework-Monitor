@@ -14,6 +14,14 @@ namespace NuGetScanner
     {
         #region Private Members
 
+        private readonly Microsoft.Extensions.Logging.ILogger<Scanner> Logger;
+
+        public Scanner(Microsoft.Extensions.Logging.ILogger<Scanner> logger)
+        {
+            ArgumentNullException.ThrowIfNull(logger);
+            Logger = logger;
+        }
+
         private string token = string.Empty;
         private string organization = string.Empty;
 
@@ -106,7 +114,7 @@ namespace NuGetScanner
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"NuGetScanner GetAsync: Exception when calling GetMetadataAsync(): {ex.Message}");
+                Microsoft.Extensions.Logging.LoggerExtensions.LogError(Logger, ex, "NuGetScanner GetAsync: Exception when calling GetMetadataAsync() for package {PackageName} {PackageVersion}: {ErrorMessage}", package.Name, package.Version, ex.Message);
             }
 
             if (metadata != null)

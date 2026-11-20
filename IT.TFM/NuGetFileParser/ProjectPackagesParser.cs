@@ -9,6 +9,11 @@ namespace NuGetFileParser
 {
     public class ProjectPackagesParser : Parser.ParseXmlFile, IFileParser
     {
+        public ProjectPackagesParser(Microsoft.Extensions.Logging.ILogger<ProjectPackagesParser> logger, Parser.XmlParserSettings settings)
+            : base(logger, settings)
+        {
+        }
+
         #region Private Members
 
         private const string NuGetPackageType = "NuGet";

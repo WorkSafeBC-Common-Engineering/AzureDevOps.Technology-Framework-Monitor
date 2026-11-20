@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 using AzureDevOps.Models;
 
+using Microsoft.Extensions.Logging;
+
 using ProjectData;
 using ProjectData.Interfaces;
 
@@ -20,6 +22,20 @@ namespace AzureDevOpsScannerFramework
     {
         #region Private Members
 
+        private readonly ILogger<Scanner> Logger;
+        private readonly ILogger<FileItem> fileLogger;
+        private readonly AzureDevOps.IRestApi api;
+
+        public Scanner(ILogger<Scanner> logger, ILogger<FileItem> fileLogger, AzureDevOps.IRestApi api)
+        {
+            ArgumentNullException.ThrowIfNull(logger);
+            ArgumentNullException.ThrowIfNull(fileLogger);
+            ArgumentNullException.ThrowIfNull(api);
+            Logger = logger;
+            this.fileLogger = fileLogger;
+            this.api = api;
+        }
+
         private const int projectCount = 100;
 
         private string azureDevOpsOrganizationUrl;
@@ -30,9 +46,7 @@ namespace AzureDevOpsScannerFramework
 
         private bool useFileFilter = false;
 
-        private static readonly AzureDevOps.IRestApi api = new AzureDevOps.RestApi();
-
-        private static readonly Dictionary<string, string> buildProperties = [];
+        private readonly Dictionary<string, string> buildProperties = [];
 
         #endregion
 
@@ -49,7 +63,7 @@ namespace AzureDevOpsScannerFramework
 
             if (Parameters.Settings.ExtendedLogging)
             {
-                Console.WriteLine($">>> IScanner.Initialize: org = {organizationName}, orgUrl = {azureDevOpsOrganizationUrl}, useFileFilter = {useFileFilter}");
+                Logger.LogInformation("IScanner.Initialize: org = {OrganizationName}, orgUrl = {OrganizationUrl}, useFileFilter = {UseFileFilter}", organizationName, azureDevOpsOrganizationUrl, useFileFilter);
             }
         }
 
@@ -254,7 +268,7 @@ namespace AzureDevOpsScannerFramework
             {
                 if (Parameters.Settings.ExtendedLogging)
                 {
-                    Console.WriteLine($"Release: {release.Id} - {release.Name}");
+                    Logger.LogInformation("Release: {ReleaseId} - {ReleaseName}", release.Id, release.Name);
                 }
 
                 var p = GetPipeline(release);
@@ -287,7 +301,7 @@ namespace AzureDevOpsScannerFramework
                     continue;
                 }
 
-                var file = new FileItem
+                var file = new FileItem(fileLogger)
                 {
                     FileType = f.Path.GetMatchedFileType(),
                     Id = f.ObjectId,
@@ -311,7 +325,7 @@ namespace AzureDevOpsScannerFramework
 
             if (Parameters.Settings.ExtendedLogging)
             {
-                Console.WriteLine($">>> IScanner.LoadFiles: Project ID = {api.Project}, Repo ID = {api.Repository}, Branch = {api.RepositoryBranch}, Checkout Dir = {api.CheckoutDirectory}");
+                Logger.LogInformation("IScanner.LoadFiles: Project ID = {ProjectId}, Repo ID = {RepositoryId}, Branch = {Branch}, Checkout Dir = {CheckoutDirectory}", api.Project, api.Repository, api.RepositoryBranch, api.CheckoutDirectory);
             }
 
             await api.DownloadRepositoryAsync();
@@ -322,7 +336,7 @@ namespace AzureDevOpsScannerFramework
             }
             else
             {
-                Console.WriteLine($"\t >>> Project: {api.Project}, Repository: {api.Repository} - Download directory not found: {api.CheckoutDirectory}");
+                Logger.LogWarning("Project: {ProjectId}, Repository: {RepositoryId} - Download directory not found: {CheckoutDirectory}", api.Project, api.Repository, api.CheckoutDirectory);
             }
         }
 
@@ -349,7 +363,7 @@ namespace AzureDevOpsScannerFramework
 
             if (Parameters.Settings.ExtendedLogging)
             {
-                Console.WriteLine($">>> IScanner.FileDetails: processing file {filePath}");
+                Logger.LogInformation("IScanner.FileDetails: processing file {FilePath}", filePath);
             }
 
             try
@@ -377,7 +391,7 @@ namespace AzureDevOpsScannerFramework
                     file.AddProperty("Error", $"Unable to retrieve file. File: {file.Path}, Error Msg: {ex.Message}");
                     if (Parameters.Settings.ExtendedLogging)
                     {
-                        Console.WriteLine($">>> IScanner.FileDetails: Unable to retrieve file. File: {{file.Path}}, Error Msg: {{ex.Message}}");
+                        Logger.LogWarning(ex, "IScanner.FileDetails: Unable to retrieve file. File: {FilePath}, Error Msg: {ErrorMessage}", file.Path, ex.Message);
                     }
                 }
             }
@@ -386,7 +400,7 @@ namespace AzureDevOpsScannerFramework
             {
                 if (Parameters.Settings.ExtendedLogging)
                 {
-                    Console.WriteLine($">>> IScanner.FileDetails: found properties = {hasProperties}");
+                    Logger.LogInformation("IScanner.FileDetails: found properties = {HasProperties}", hasProperties);
                 }
 
                 return file;
@@ -416,7 +430,7 @@ namespace AzureDevOpsScannerFramework
             azureDevOpsOrganizationUrl = configuration;
         }
 
-        private static void AddFileProperties(FileItem file, string[] content)
+        private void AddFileProperties(FileItem file, string[] content)
         {
             try
             {
@@ -446,7 +460,7 @@ namespace AzureDevOpsScannerFramework
             }
         }
 
-        private static void LoadDirectoryBuildProperties()
+        private void LoadDirectoryBuildProperties()
         {
             buildProperties.Clear();
 
@@ -474,7 +488,7 @@ namespace AzureDevOpsScannerFramework
             }
         }
 
-        private static ProjectData.Pipeline GetPipeline(AzDoPipeline pipeline)
+        private ProjectData.Pipeline GetPipeline(AzDoPipeline pipeline)
         {
             var p = new ProjectData.Pipeline
             {
@@ -486,7 +500,7 @@ namespace AzureDevOpsScannerFramework
                 Type = pipeline.Details.Configuration.Type,
             };
 
-            Console.WriteLine($"Pipeline: {pipeline.Name}, Type: {pipeline.Details.Configuration.Type}");
+            Logger.LogInformation("Pipeline: {PipelineName}, Type: {PipelineType}", pipeline.Name, pipeline.Details.Configuration.Type);
 
             switch (pipeline.Details.Configuration.Type)
             {

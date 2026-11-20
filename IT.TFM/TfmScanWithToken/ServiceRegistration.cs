@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 using Parser.Interfaces;
 using ProjectData.Interfaces;
@@ -14,13 +15,28 @@ namespace TfmScanWithToken
         {
             var services = new ServiceCollection();
 
+            services.AddLogging(builder => builder.AddSimpleConsole(options =>
+            {
+                options.SingleLine = true;
+                options.TimestampFormat = "HH:mm:ss ";
+            }));
+
+            services.AddTransient<RepoScan.FileLocator.Scanner>();
+            services.AddTransient<RepoScan.FileLocator.FileProcessor>();
+            services.AddSingleton<RepoScan.FileLocator.PipelineScanner>();
+            services.AddTransient<RepoScan.FileLocator.FileDetails>();
+            services.AddTransient<RepoScan.FileLocator.RuntimeMetricsScan>();
+            services.AddSingleton<AzureDevOps.IRestApi, AzureDevOps.RestApi>();
+            services.AddSingleton<ConfigurationFileData.ConfigurationSettings>();
+            services.AddSingleton<Parser.XmlParserSettings>();
+
             services.AddVisualStudioFileParsers();
             services.AddRepoScanSqlServerStorage();
 
             services.AddTransient<IFilterConfiguration, FilterConfigurationFromConfigFile.Configuration>();
             services.AddKeyedTransient<IFilter, ContentFilter.Filter>("Content");
             services.AddKeyedTransient<IContentParser, OpenSecretsDetection.SecretsParser>("OpenSecrets");
-            services.AddTransient<IEndOfLifeChecker, EndOfLifeConfigFile.Checker>();
+            services.AddSingleton<IEndOfLifeChecker, EndOfLifeConfigFile.Checker>();
 
             services.AddTransient<INuGetScanner, NuGetScanner.Scanner>();
             services.AddTransient<IRuntimeMetricsScanner, RuntimeMetricsScanner.Scanner>();
