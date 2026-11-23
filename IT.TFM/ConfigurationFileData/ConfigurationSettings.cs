@@ -68,7 +68,7 @@ namespace ConfigurationFileData
             return GetSectionDictionary(section, configuration);
         }
 
-        public ConfigurationSection GetSection(string file, string sectionName)
+        public static ConfigurationSection GetSection(string file, string sectionName)
         {
             var configuration = GetConfiguration(file);
             return configuration.GetSection(sectionName);

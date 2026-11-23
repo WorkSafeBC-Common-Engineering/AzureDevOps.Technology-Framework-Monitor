@@ -132,7 +132,7 @@ namespace PythonFileParser
         [GeneratedRegex(@"\bsetup\s*\(", RegexOptions.IgnoreCase, "en-US")]
         private static partial Regex MyRegex { get; }
 
-        [GeneratedRegex(@"\bpython_requires\s*=\s*([""'])(?<value>.*?)\1", RegexOptions.IgnoreCase, "en-US")]
+        [GeneratedRegex(@"\bpython_requires\s*=\s*(?:""(?<value>.*?)""|'(?<value>.*?)')", RegexOptions.IgnoreCase, "en-US")]
         private static partial Regex MyRegex1 { get; }
 
         #endregion

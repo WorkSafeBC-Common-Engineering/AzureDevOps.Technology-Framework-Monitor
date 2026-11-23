@@ -42,7 +42,7 @@ namespace PythonVersionUnitTests
             Assert.IsType<ConfigurationFileData.ConfigurationSettings>(provider.GetRequiredService<ConfigurationFileData.ConfigurationSettings>());
             foreach (var key in new[] { "CSProject", "SqlProject", "VSXSolution", "VSConfig" })
             {
-                Assert.IsAssignableFrom<IFileParser>(provider.GetRequiredKeyedService<IFileParser>(key));
+                Assert.IsType<IFileParser>(provider.GetRequiredKeyedService<IFileParser>(key), exactMatch: false);
             }
         }
 
@@ -125,7 +125,7 @@ namespace PythonVersionUnitTests
 
         private static bool HasExpectedPropertyContext(object? state)
         {
-            var properties = Assert.IsAssignableFrom<IEnumerable<KeyValuePair<string, object?>>>(state).ToDictionary();
+            var properties = Assert.IsType<IEnumerable<KeyValuePair<string, object?>>>(state, exactMatch: false).ToDictionary();
             Assert.Equal("Framework", properties["PropertyName"]);
             Assert.Equal("example.csproj", properties["FilePath"]);
             Assert.Equal("Unable to add property {PropertyName} to file {FilePath}", properties["{OriginalFormat}"]);

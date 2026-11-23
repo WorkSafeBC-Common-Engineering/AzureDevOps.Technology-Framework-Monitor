@@ -34,7 +34,7 @@ namespace RepoScan.FileLocator
 
         #region Public Methods
 
-        public async Task ScanAsync(IScanner scanner, Guid projectId, string repositoryId)
+        public static async Task ScanAsync(IScanner scanner, Guid projectId, string repositoryId)
         {
             var pipelineReader = StorageFactory.GetPipelineReader();
             var pipelineIds = new List<int>(pipelineReader.GetPipelineIds(projectId.ToString()));
@@ -95,7 +95,7 @@ namespace RepoScan.FileLocator
             }
         }
 
-        public async Task ScanReleasesAsync(IScanner scanner, Guid projectId, string repositoryId)
+        public static async Task ScanReleasesAsync(IScanner scanner, Guid projectId, string repositoryId)
         {
             var releases = await scanner.Releases(projectId, repositoryId);
             var pipelineWriter = StorageFactory.GetPipelineWriter();

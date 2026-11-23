@@ -105,6 +105,30 @@ namespace PythonVersionUnitTests
             AssertInconsistentVersionFlagIsNotSet(file);
         }
 
+        [Theory]
+        [InlineData("    PYTHON_REQUIRES=\">=3.10' ,<4\"", ">=3.10' ,<4")]
+        [InlineData("    PYTHON_REQUIRES='>=3.10\" ,<4'", ">=3.10\" ,<4")]
+        public void Parse_WhenPythonRequiresContainsOppositeQuote_PreservesEntireValue(string line, string expected)
+        {
+            var file = CreateFileItem();
+
+            Parse(file, "setup(", line, ")");
+
+            Assert.Equal(expected, file.Properties[VersionPropertyKey]);
+        }
+
+        [Theory]
+        [InlineData("    python_requires=\">=3.11'")]
+        [InlineData("    python_requires='>=3.11\"")]
+        public void Parse_WhenPythonRequiresHasMismatchedQuotes_DoesNotAddProperties(string line)
+        {
+            var file = CreateFileItem();
+
+            Parse(file, "setup(", line, ")");
+
+            Assert.Empty(file.Properties);
+        }
+
         [Fact]
         public void Parse_WhenPythonRequiresUsesVariableValue_DoesNotAddProperties()
         {
