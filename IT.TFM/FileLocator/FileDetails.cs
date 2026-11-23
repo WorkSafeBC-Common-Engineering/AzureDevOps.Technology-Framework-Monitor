@@ -28,7 +28,7 @@ namespace RepoScan.FileLocator
             this.fileLogger = fileLogger;
         }
 
-        public async Task GetDetailsAsync(int totalThreads, bool forceDetails, string projectId, string repositoryId, string[] excludedProjects)
+        public async Task GetDetailsAsync(int totalThreads, bool forceDetails, string projectId, string repositoryId)
         {
             Settings.Initialize();
 

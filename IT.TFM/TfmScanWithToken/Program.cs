@@ -55,7 +55,7 @@ namespace TfmScanWithToken
 
             if (partFour)
             {
-                await FileDetailsAsync(provider.GetRequiredService<RepoFileScan.FileDetails>(), threadCount, forceDetails, projectId, repositoryId, excludedProjects);
+                await FileDetailsAsync(provider.GetRequiredService<RepoFileScan.FileDetails>(), threadCount, forceDetails, projectId, repositoryId);
             }
 
             if (partFive)
@@ -101,11 +101,11 @@ namespace TfmScanWithToken
             Console.WriteLine($"Pipeline Scan complete at: {DateTime.Now:T}");
         }
 
-        private static async Task FileDetailsAsync(RepoFileScan.FileDetails fileDetails, int threadCount, bool forceDetails, string projectId, string repositoryId, string[] excludedProjects)
+        private static async Task FileDetailsAsync(RepoFileScan.FileDetails fileDetails, int threadCount, bool forceDetails, string projectId, string repositoryId)
         {
             Console.WriteLine($"Starting File Details Scan at: {DateTime.Now:T}");
 
-            await fileDetails.GetDetailsAsync(threadCount, forceDetails, projectId, repositoryId, excludedProjects);
+            await fileDetails.GetDetailsAsync(threadCount, forceDetails, projectId, repositoryId);
 
             Console.WriteLine($"File Details Scan complete at: {DateTime.Now:T}");
         }
