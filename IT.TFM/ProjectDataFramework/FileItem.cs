@@ -1,10 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Microsoft.Extensions.Logging;
+
 namespace ProjectData
 {
     public class FileItem
     {
+        private readonly ILogger<FileItem> Logger;
+
+        public FileItem(ILogger<FileItem> logger)
+        {
+            ArgumentNullException.ThrowIfNull(logger);
+            Logger = logger;
+        }
+
         #region Public Properties
 
         public FileItemType FileType { get; set; }
@@ -47,7 +57,7 @@ namespace ProjectData
             }
             catch(Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                Logger.LogError(ex, "Unable to add property {PropertyName} to file {FilePath}", name, Path);
             }
         }
 

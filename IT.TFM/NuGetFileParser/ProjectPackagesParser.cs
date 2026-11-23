@@ -7,7 +7,7 @@ using System.Xml;
 
 namespace NuGetFileParser
 {
-    public class ProjectPackagesParser : Parser.ParseXmlFile, IFileParser
+    public class ProjectPackagesParser(Microsoft.Extensions.Logging.ILogger<ProjectPackagesParser> logger, Parser.XmlParserSettings settings) : Parser.ParseXmlFile(logger, settings), IFileParser
     {
         #region Private Members
 

@@ -118,6 +118,29 @@ Microsoft C#
 34. Once it completes the scan, it will say “Press any key to exit” and you may safely **exit the program**.
 <p align="center"><img width="750" img src="https://github.com/WorkSafeBC-Common-Engineering/AzureDevOps.Technology-Framework-Monitor/assets/64446306/9b0605bb-9719-47aa-a385-2f917309b72b"></p>
 
+### Logging
+
+Application diagnostics use `Microsoft.Extensions.Logging.ILogger`. `TfmScanWithToken`
+and `TfmExport` initially send logs to the console, including timestamps, severity,
+and the originating class. Errors include their exception details. SQL export file
+contents are unchanged. The static `TfmScanWithToken` entry point is not registered
+with DI and writes its scan start/completion messages directly to the console;
+the scan services it resolves continue to use injected loggers.
+
+The existing `-l true` argument (or `extendedLogging` app setting) still enables
+additional scanner diagnostics. Normal progress, warnings, and errors do not require
+extended logging.
+
+Configure providers and filtering with `AddLogging` in
+`TfmScanWithToken/ServiceRegistration.cs` or, for the separate exporter executable,
+`TfmExport/Program.cs`. Logging classes receive `ILogger<T>` through constructor
+injection, including scan orchestration, REST, configuration, parser, and storage
+services. File models receive their logger from the service that constructs them.
+There is no global logger factory or logging service locator. Other hosts must
+register logging and supply these constructor dependencies; tests can explicitly
+supply `NullLogger<T>.Instance` when logging is not under test. Disposing the host's
+service provider on exit flushes queued console messages.
+
 ### Analyzing Data
 
 35. **Open a new Microsoft Excel** sheet

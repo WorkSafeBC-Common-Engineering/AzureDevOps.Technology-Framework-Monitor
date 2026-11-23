@@ -1,4 +1,6 @@
-﻿using ProjectScanner;
+﻿using Microsoft.Extensions.Logging;
+
+using ProjectScanner;
 
 using RepoScan.DataModels;
 
@@ -12,9 +14,17 @@ namespace RepoScan.FileLocator
 {
     public class RuntimeMetricsScan
     {
+        private readonly ILogger<RuntimeMetricsScan> Logger;
+
+        public RuntimeMetricsScan(ILogger<RuntimeMetricsScan> logger)
+        {
+            ArgumentNullException.ThrowIfNull(logger);
+            Logger = logger;
+        }
+
         #region Public Methods
 
-        public static async Task Run(string projectId, string repositoryId, string[] excludedProjects)
+        public async Task Run(string projectId, string repositoryId, string[] excludedProjects)
         {
             Settings.Initialize();
 
@@ -30,7 +40,7 @@ namespace RepoScan.FileLocator
 
                     foreach (var repo in repos)
                     {
-                        Console.WriteLine($"Running Runtime Metrics Scan for {organization} - {project.Name} - {repo.Name}");
+                        Logger.LogInformation("Running Runtime Metrics Scan for {Organization} - {ProjectName} - {RepositoryName}", organization, project.Name, repo.Name);
                         var metricsScanner = ScannerFactory.GetRuntimeMetricsScanner(scanner, project.Id.ToString("D").ToLower(), repo.Id.ToString("D").ToLower(), repo.Name);
                         await metricsScanner.RunAsync();
                     }

@@ -9,6 +9,14 @@ namespace RepoScan.FileLocator
 {
     public class Scanner
     {
+        private readonly PipelineScanner pipelineScanner;
+
+        public Scanner(PipelineScanner pipelineScanner)
+        {
+            ArgumentNullException.ThrowIfNull(pipelineScanner);
+            this.pipelineScanner = pipelineScanner;
+        }
+
         #region Private Members
 
         private readonly Guid scanId = Guid.NewGuid();

@@ -187,7 +187,7 @@ namespace PythonVersionUnitTests
 
         private static FileItem CreateFileItem()
         {
-            return new FileItem
+            return new FileItem(Microsoft.Extensions.Logging.Abstractions.NullLogger<FileItem>.Instance)
             {
                 FileType = FileItemType.PythonProjectToml,
                 Id = "test-id",

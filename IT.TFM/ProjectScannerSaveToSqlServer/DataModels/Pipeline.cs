@@ -93,6 +93,8 @@ namespace ProjectScannerSaveToSqlServer.DataModels
 
         public virtual ICollection<ReleaseArtifact> ReleaseArtifacts { get; set; }
 
+#nullable enable annotations
         public virtual PipelineType? BlueprintType { get; set; }
+#nullable disable annotations
     }
 }

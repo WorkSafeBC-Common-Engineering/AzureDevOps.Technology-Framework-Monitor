@@ -1,4 +1,6 @@
-﻿using ProjectData;
+﻿using Microsoft.Extensions.Logging;
+
+using ProjectData;
 using ProjectData.Interfaces;
 
 using ProjectScanner;
@@ -16,6 +18,17 @@ namespace RuntimeMetricsScanner
     public class Scanner : IRuntimeMetricsScanner
     {
         #region Private Members
+
+        private readonly ILogger<Scanner> Logger;
+        private readonly ILogger<ProjectData.FileItem> fileLogger;
+
+        public Scanner(ILogger<Scanner> logger, ILogger<ProjectData.FileItem> fileLogger)
+        {
+            ArgumentNullException.ThrowIfNull(logger);
+            ArgumentNullException.ThrowIfNull(fileLogger);
+            Logger = logger;
+            this.fileLogger = fileLogger;
+        }
 
         private string token = string.Empty;
         private string organization = string.Empty;
@@ -58,13 +71,13 @@ namespace RuntimeMetricsScanner
                     continue;
                 }
 
-                Console.WriteLine($"Metrics: \tProcessing pipeline: {pipeline.Name} (Run ID: {pipeline.RunId})");
+                Logger.LogInformation("Metrics: Processing pipeline: {PipelineName} (Run ID: {RunId})", pipeline.Name, pipeline.RunId);
                 var runId = pipeline.RunId.Value;
 
                 var logEntries = await GetLogsAsync(pipeline, runId);
                 if (logEntries == null)
                 {
-                    Console.WriteLine($"Metrics: \tNo log entries found for pipeline: {pipeline.Name} (Run ID: {runId})");
+                    Logger.LogWarning("Metrics: No log entries found for pipeline: {PipelineName} (Run ID: {RunId})", pipeline.Name, runId);
                     continue; // No log entry found for this pipeline run
                 }
 
@@ -81,7 +94,7 @@ namespace RuntimeMetricsScanner
 
                 foreach (var metrics in groupedMetrics)
                 {
-                    Console.WriteLine($"Metrics: \tProject: {metrics.ProjectPath}, Warnings: {metrics.TotalWarnings}, Errors: {metrics.TotalErrors}");
+                    Logger.LogInformation("Metrics: Project: {ProjectPath}, Warnings: {TotalWarnings}, Errors: {TotalErrors}", metrics.ProjectPath, metrics.TotalWarnings, metrics.TotalErrors);
                     await SaveMetricsAsync(repositoryId, metrics );
                 }
             }
@@ -281,10 +294,10 @@ namespace RuntimeMetricsScanner
             return projectPath[(index + repositoryName.Length)..];
         }
 
-        private static async Task SaveMetricsAsync(string repositoryId, ProjectRuntimeMetrics metrics)
+        private async Task SaveMetricsAsync(string repositoryId, ProjectRuntimeMetrics metrics)
         {
             var filePath = metrics.ProjectPath.Replace('\\', '/');
-            var fileItem = new ProjectData.FileItem { RepositoryId = new Guid(repositoryId), Path = filePath };
+            var fileItem = new ProjectData.FileItem(fileLogger) { RepositoryId = new Guid(repositoryId), Path = filePath };
             var writer = Storage.StorageFactory.GetStorageWriter();
             await writer.SaveMetricsAsync(fileItem, null, metrics);
         }

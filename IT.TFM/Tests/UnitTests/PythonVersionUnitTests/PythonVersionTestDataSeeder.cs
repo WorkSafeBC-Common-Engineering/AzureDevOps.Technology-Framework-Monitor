@@ -15,7 +15,7 @@ namespace PythonVersionUnitTests
 {
     internal static class PythonVersionTestDataSeeder
     {
-        private static readonly object _seedLock = new();
+        private static readonly Lock _seedLock = new();
         private static bool _isSeeded;
 
         internal static void SeedPythonVersions()
@@ -35,8 +35,8 @@ namespace PythonVersionUnitTests
         private static void SeedPythonVersionsInternal()
         {
             var mockReader = new Mock<IStorageReader>();
-            mockReader.Setup(reader => reader.GetEolVersions()).Returns(new List<EolVersion>
-            {
+            mockReader.Setup(reader => reader.GetEolVersions()).Returns(
+            [
                 new() { Version = "python 2.6", EolDate = new DateOnly(2013, 10, 29) },
                 new() { Version = "python 2.7", EolDate = new DateOnly(2020, 01, 01) },
                 new() { Version = "python 3.0", EolDate = new DateOnly(2009, 06, 27) },
@@ -54,7 +54,7 @@ namespace PythonVersionUnitTests
                 new() { Version = "python 3.10", EolDate = new DateOnly(2026, 10, 31) },
                 new() { Version = "python 3.11", EolDate = new DateOnly(2027, 10, 31) },
                 new() { Version = "python 3.12", EolDate = new DateOnly(2028, 10, 31) }
-            });
+            ]);
 
             PopulatePythonCommonCache(mockReader.Object);
         }

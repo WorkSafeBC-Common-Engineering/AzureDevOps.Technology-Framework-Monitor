@@ -7,6 +7,14 @@ namespace FilterConfigurationFromConfigFile
 {
     public class Configuration : IFilterConfiguration
     {
+        private readonly ConfigurationFileData.ConfigurationSettings configurationSettings;
+
+        public Configuration(ConfigurationFileData.ConfigurationSettings configurationSettings)
+        {
+            System.ArgumentNullException.ThrowIfNull(configurationSettings);
+            this.configurationSettings = configurationSettings;
+        }
+
         #region Private Members
 
         private readonly char[] filterTypeSeparator = [':'];
@@ -20,7 +28,7 @@ namespace FilterConfigurationFromConfigFile
 
         FilterData[] IFilterConfiguration.Load()
         {
-            var dataValues = ConfigurationFileData.ConfigurationSettings.LoadConfigurationValues(configurationFile, configurationSection);
+            var dataValues = configurationSettings.LoadConfigurationValues(configurationFile, configurationSection);
 
             var data = new List<FilterData>(dataValues.Length);
 

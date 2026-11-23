@@ -6,12 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using ProjectData;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace ProjectScannerSaveToSqlServer
 {
-    public class Save : DbCore, IStorageWriter
+    public class Save(ILogger<Save> logger) : DbCore(logger), IStorageWriter
     {
         #region IStorage Implementation
 
@@ -162,7 +163,7 @@ namespace ProjectScannerSaveToSqlServer
         {
             if (Parameters.Settings.ExtendedLogging)
             {
-                Console.WriteLine($"StorageWriter.SaveFile: writing file {file.Path}, saveDetails = {saveDetails}, forceDetails = {forceDetails}");
+                Logger.LogInformation("StorageWriter.SaveFile: writing file {FilePath}, saveDetails = {SaveDetails}, forceDetails = {ForceDetails}", file.Path, saveDetails, forceDetails);
             }
 
             var id = repoId.ToString("D").ToLower();
@@ -194,7 +195,7 @@ namespace ProjectScannerSaveToSqlServer
 
             if (Parameters.Settings.ExtendedLogging)
             {
-                Console.WriteLine($"StorageWriter.SaveFile: writing file {file.Path} - file will be processed");
+                Logger.LogInformation("StorageWriter.SaveFile: writing file {FilePath} - file will be processed", file.Path);
             }
 
 
@@ -210,7 +211,7 @@ namespace ProjectScannerSaveToSqlServer
 
                 if (Parameters.Settings.ExtendedLogging)
                 {
-                    Console.WriteLine($"StorageWriter.SaveFile: writing file {file.Path} - adding file");
+                    Logger.LogInformation("StorageWriter.SaveFile: writing file {FilePath} - adding file", file.Path);
                 }
             }
 
@@ -237,7 +238,7 @@ namespace ProjectScannerSaveToSqlServer
         {
             if (Parameters.Settings.ExtendedLogging)
             {
-                Console.WriteLine($"SavePipeline: PipelineId = {pipeline.Id}, ProjectId = {pipeline.ProjectId}, Repo ID = {pipeline.RepositoryId}, Pipeline Name = {pipeline.Name}, Pipeline URL = {pipeline.Url}, Pipeline Path = {pipeline.Path}");
+                Logger.LogInformation("SavePipeline: PipelineId = {PipelineId}, ProjectId = {ProjectId}, Repo ID = {RepositoryId}, Pipeline Name = {PipelineName}, Pipeline URL = {PipelineUrl}, Pipeline Path = {PipelinePath}", pipeline.Id, pipeline.ProjectId, pipeline.RepositoryId, pipeline.Name, pipeline.Url, pipeline.Path);
             }
 
             var dbProject = context.Projects
@@ -317,7 +318,7 @@ namespace ProjectScannerSaveToSqlServer
         {
             if (Parameters.Settings.ExtendedLogging)
             {
-                Console.WriteLine($"SavePipeline: PipelineId = {release.Id}, ProjectId = {release.ProjectId}, Pipeline Name = {release.Name}, Pipeline URL = {release.Url}, Pipeline Path = {release.Folder}");
+                Logger.LogInformation("SavePipeline: PipelineId = {PipelineId}, ProjectId = {ProjectId}, Pipeline Name = {PipelineName}, Pipeline URL = {PipelineUrl}, Pipeline Path = {PipelinePath}", release.Id, release.ProjectId, release.Name, release.Url, release.Folder);
             }
 
             var dbProject = context.Projects
@@ -370,7 +371,7 @@ namespace ProjectScannerSaveToSqlServer
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error saving release pipeline: {ex.Message}");
+                Logger.LogError(ex, "Error saving release pipeline: {ErrorMessage}", ex.Message);
                 throw;
             }
 

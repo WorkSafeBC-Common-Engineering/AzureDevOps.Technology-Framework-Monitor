@@ -25,13 +25,14 @@ namespace VisualStudioFileParser
 
         private const string secretsParser = "OpenSecrets";
 
-        private static readonly string[] ignoreUrls;
+        private readonly Lazy<string[]> ignoreUrls;
 
         #endregion
 
-        static ConfigParser()
+        public ConfigParser(ConfigurationFileData.ConfigurationSettings configurationSettings)
         {
-            ignoreUrls = ConfigurationFileData.ConfigurationSettings.LoadConfigurationValues(configurationFile, sectionIgnoreUrls);
+            ArgumentNullException.ThrowIfNull(configurationSettings);
+            ignoreUrls = new Lazy<string[]>(() => configurationSettings.LoadConfigurationValues(configurationFile, sectionIgnoreUrls));
         }
 
         #region IFileParser Implementation
@@ -93,9 +94,9 @@ namespace VisualStudioFileParser
             return WebUtility.HtmlDecode(url);
         }
 
-        private static bool IgnoreThisUrl(string url)
+        private bool IgnoreThisUrl(string url)
         {
-            return ignoreUrls.Any(u => url.StartsWith(u, StringComparison.InvariantCultureIgnoreCase));
+            return ignoreUrls.Value.Any(u => url.StartsWith(u, StringComparison.InvariantCultureIgnoreCase));
         }
 
         private static IEnumerable<string> GetPaths(string[] content, string url)

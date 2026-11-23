@@ -1,9 +1,20 @@
-﻿using TfmExport;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using TfmExport;
+
+var services = new ServiceCollection();
+services.AddLogging(builder => builder.AddSimpleConsole(options =>
+{
+    options.SingleLine = true;
+    options.TimestampFormat = "HH:mm:ss ";
+}));
+services.AddTransient<Exporter>();
+using var provider = services.BuildServiceProvider();
 
 var outputFile = "TfmData.sql";
 var connection = $"{Environment.GetEnvironmentVariable("TFM_DbConnection")};TrustServerCertificate=True";
 
-var exporter = new Exporter();
+var exporter = provider.GetRequiredService<Exporter>();
 
 exporter.Initialize(outputFile, connection);
 

@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace VisualStudioFileParser
 {
-    class CSProjectParser : Parser.ParseXmlFile, IFileParser
+    class CSProjectParser(Microsoft.Extensions.Logging.ILogger<CSProjectParser> logger, Parser.XmlParserSettings settings) : Parser.ParseXmlFile(logger, settings), IFileParser
     {
         #region IFileParser Implementation
 

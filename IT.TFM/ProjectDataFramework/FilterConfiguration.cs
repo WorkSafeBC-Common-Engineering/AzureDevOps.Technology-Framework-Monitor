@@ -1,31 +1,14 @@
-﻿using Microsoft.Practices.Unity.Configuration;
-
-using ProjectData.Interfaces;
-
-using System.Configuration;
-
-using Unity;
+﻿using ProjectData.Interfaces;
 
 namespace ProjectData
 {
     public static class FilterConfiguration
     {
-        #region Private Members
-
-        private const string configurationSection = "unity";
-        private const string dependencyInjectionContainer = "FilterContainer";
-
-        #endregion
-
         #region Constructors
 
         static FilterConfiguration()
         {
-            var container = new UnityContainer().AddExtension(new Diagnostic());
-            UnityConfigurationSection section = (UnityConfigurationSection)ConfigurationManager.GetSection(configurationSection);
-            section.Configure(container, dependencyInjectionContainer);
-
-            var configuration = container.Resolve<IFilterConfiguration>();
+            var configuration = ServiceProviderAccessor.GetRequiredService<IFilterConfiguration>();
             Configuration = configuration.Load();
         }
 

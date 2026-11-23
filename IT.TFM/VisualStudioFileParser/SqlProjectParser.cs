@@ -4,7 +4,7 @@ using System;
 
 namespace VisualStudioFileParser
 {
-    class SqlProjectParser : Parser.ParseXmlFile, IFileParser
+    class SqlProjectParser(Microsoft.Extensions.Logging.ILogger<SqlProjectParser> logger, Parser.XmlParserSettings settings) : Parser.ParseXmlFile(logger, settings), IFileParser
     {
         #region IFileParser Implementation
 

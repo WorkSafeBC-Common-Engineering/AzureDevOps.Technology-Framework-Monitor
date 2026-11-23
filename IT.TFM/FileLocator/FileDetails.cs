@@ -1,4 +1,6 @@
-﻿using ProjectData;
+﻿using Microsoft.Extensions.Logging;
+
+using ProjectData;
 using ProjectData.Interfaces;
 
 using ProjectScanner;
@@ -13,9 +15,20 @@ using System.Threading.Tasks;
 
 namespace RepoScan.FileLocator
 {
-    public static class FileDetails
+    public class FileDetails
     {
-        public static async Task GetDetailsAsync(int totalThreads, bool forceDetails, string projectId, string repositoryId, string[] excludedProjects)
+        private readonly ILogger<FileDetails> Logger;
+        private readonly ILogger<ProjectData.FileItem> fileLogger;
+
+        public FileDetails(ILogger<FileDetails> logger, ILogger<ProjectData.FileItem> fileLogger)
+        {
+            ArgumentNullException.ThrowIfNull(logger);
+            ArgumentNullException.ThrowIfNull(fileLogger);
+            Logger = logger;
+            this.fileLogger = fileLogger;
+        }
+
+        public async Task GetDetailsAsync(int totalThreads, bool forceDetails, string projectId, string repositoryId)
         {
             Settings.Initialize();
 
@@ -84,26 +97,26 @@ namespace RepoScan.FileLocator
                 {
                     if (Parameters.Settings.ExtendedLogging)
                     {
-                        Console.WriteLine($"*** Thread Start: {Environment.CurrentManagedThreadId} >>> FileDetails - GetDetailsAsync(): Processing {fileItem.Path}");
+                        Logger.LogInformation("Thread Start: {ThreadId} >>> FileDetails - GetDetailsAsync(): Processing {FilePath}", Environment.CurrentManagedThreadId, fileItem.Path);
                     }
 
                     var azDoFiles = fileList.Where(f => f.Path.Equals(fileItem.Path, StringComparison.InvariantCultureIgnoreCase));
                     if (Parameters.Settings.ExtendedLogging && azDoFiles.Count() > 1)
                     {
-                        Console.WriteLine($" >>> FileDetails - GetDetailsAsync(): !!! Multiple files returned for {fileItem.Path} - Url = {fileItem.Url}");
+                        Logger.LogWarning("FileDetails - GetDetailsAsync(): Multiple files returned for {FilePath} - Url = {Url}", fileItem.Path, fileItem.Url);
                     }
 
                     var azDoFile = azDoFiles.FirstOrDefault();
                     if (Parameters.Settings.ExtendedLogging && azDoFiles.Count() == 1)
                     {
-                        Console.WriteLine($" >>> FileDetails - GetDetailsAsync(): Matched AzDo file {fileItem.Path}");
+                        Logger.LogInformation("FileDetails - GetDetailsAsync(): Matched AzDo file {FilePath}", fileItem.Path);
                     }
 
                     if (azDoFile == null)
                     {
                         if (Parameters.Settings.ExtendedLogging)
                         {
-                            Console.WriteLine($"File Details: deleting file {fileItem.Path} in Project {repoItem.ProjectName}, Repository {repoItem.RepositoryName}");
+                            Logger.LogInformation("File Details: deleting file {FilePath} in Project {ProjectName}, Repository {RepositoryName}", fileItem.Path, repoItem.ProjectName, repoItem.RepositoryName);
                         }
 
                         DataModels.FileDetails fileDetails = new()
@@ -120,7 +133,7 @@ namespace RepoScan.FileLocator
 
                         if (Parameters.Settings.ExtendedLogging)
                         {
-                            Console.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId} >>> FileDetails - GetDetailsAsync(): Processing {fileItem.Path} (delete)");
+                            Logger.LogInformation("Thread End: {ThreadId} >>> FileDetails - GetDetailsAsync(): Processing {FilePath} (delete)", Environment.CurrentManagedThreadId, fileItem.Path);
                         }
 
                         return;
@@ -129,8 +142,8 @@ namespace RepoScan.FileLocator
                     {
                         if (Parameters.Settings.ExtendedLogging)
                         {
-                            Console.WriteLine($"File Details: no change to file {azDoFile.Path} in Project {repoItem.ProjectName}, Repository {repoItem.RepositoryName}");
-                            Console.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId} >>> FileDetails - GetDetailsAsync(): Processing {fileItem.Path}");
+                            Logger.LogInformation("File Details: no change to file {FilePath} in Project {ProjectName}, Repository {RepositoryName}", azDoFile.Path, repoItem.ProjectName, repoItem.RepositoryName);
+                            Logger.LogInformation("Thread End: {ThreadId} >>> FileDetails - GetDetailsAsync(): Processing {FilePath}", Environment.CurrentManagedThreadId, fileItem.Path);
                         }
 
                         return;
@@ -138,10 +151,10 @@ namespace RepoScan.FileLocator
 
                     if (Parameters.Settings.ExtendedLogging)
                     {
-                        Console.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId} >>> FileDetails - GetDetailsAsync(): Processing {fileItem.Path} (start of update)");
+                        Logger.LogInformation("Thread End: {ThreadId} >>> FileDetails - GetDetailsAsync(): Processing {FilePath} (start of update)", Environment.CurrentManagedThreadId, fileItem.Path);
                     }
 
-                    var fileInfo = new ProjectData.FileItem
+                    var fileInfo = new ProjectData.FileItem(fileLogger)
                     {
                         Id = fileItem.Id,
                         FileType = fileItem.FileType,
@@ -155,7 +168,7 @@ namespace RepoScan.FileLocator
                     {
                         if (Parameters.Settings.ExtendedLogging)
                         {
-                            Console.WriteLine($"File Details: updating details for file {azDoFile.Path} in Project {repoItem.ProjectName}, Repository {repoItem.RepositoryName}");
+                            Logger.LogInformation("File Details: updating details for file {FilePath} in Project {ProjectName}, Repository {RepositoryName}", azDoFile.Path, repoItem.ProjectName, repoItem.RepositoryName);
                         }
 
                         if (fileData.FileType == FileItemType.YamlPipeline && fileData.PipelineProperties.Count > 0)
@@ -187,8 +200,8 @@ namespace RepoScan.FileLocator
                             References = fileData.References,
                             UrlReferences = fileData.UrlReferences,
                             PackageReferences = fileData.PackageReferences,
-                            Properties = new SerializableDictionary<string, string>(fileData.Properties),
-                            FilteredItems = new SerializableDictionary<string, string>(fileData.FilteredItems)
+                            Properties = [with(fileData.Properties)],
+                            FilteredItems = [with(fileData.FilteredItems)]
                         };
 
                         IWriteFileDetails writer = StorageFactory.GetFileDetailsWriter();
@@ -215,7 +228,7 @@ namespace RepoScan.FileLocator
 
                     if (Parameters.Settings.ExtendedLogging)
                     {
-                        Console.WriteLine($"*** Thread End: {Environment.CurrentManagedThreadId} >>> FileDetails - GetDetailsAsync(): Processing {fileItem.Path}");
+                        Logger.LogInformation("Thread End: {ThreadId} >>> FileDetails - GetDetailsAsync(): Processing {FilePath}", Environment.CurrentManagedThreadId, fileItem.Path);
                     }
                 });
 
@@ -226,14 +239,14 @@ namespace RepoScan.FileLocator
 
                     foreach (var pipelineFile in pipelineFiles)
                     {
-                        Console.WriteLine($"Linking config.yml to pipeline file {pipelineFile.Path} in Project {repoItem.ProjectName}, Repository {repoItem.RepositoryName}");
+                        Logger.LogInformation("Linking config.yml to pipeline file {FilePath} in Project {ProjectName}, Repository {RepositoryName}", pipelineFile.Path, repoItem.ProjectName, repoItem.RepositoryName);
 
                         var portfolio = pipelineFile.PipelineProperties.TryGetValue("portfolio", out string value) ? value : string.Empty;
                         var product = pipelineFile.PipelineProperties.TryGetValue("product", out value) ? value : string.Empty;
 
                         if (string.IsNullOrEmpty(portfolio) || string.IsNullOrEmpty(product))
                         {
-                            Console.WriteLine($"Skipping pipeline {pipelineFile.Path} as it does not have portfolio or product defined.");
+                            Logger.LogWarning("Skipping pipeline {FilePath} as it does not have portfolio or product defined.", pipelineFile.Path);
                             continue;
                         }
 
@@ -248,7 +261,7 @@ namespace RepoScan.FileLocator
 
                         if (configFile == null)
                         {
-                            Console.WriteLine($"No config.yml file found for portfolio {portfolio} and product {product} in Project {repoItem.ProjectName}, Repository {repoItem.RepositoryName}");
+                            Logger.LogWarning("No config.yml file found for portfolio {Portfolio} and product {Product} in Project {ProjectName}, Repository {RepositoryName}", portfolio, product, repoItem.ProjectName, repoItem.RepositoryName);
                             continue;
                         }
 

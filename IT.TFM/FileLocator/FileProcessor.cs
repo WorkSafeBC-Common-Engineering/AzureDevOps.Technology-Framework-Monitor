@@ -1,4 +1,6 @@
-﻿using ProjectData;
+﻿using Microsoft.Extensions.Logging;
+
+using ProjectData;
 using ProjectData.Interfaces;
 
 using ProjectScanner;
@@ -14,9 +16,17 @@ namespace RepoScan.FileLocator
 {
     public class FileProcessor
     {
+        private readonly ILogger<FileProcessor> Logger;
+
+        public FileProcessor(ILogger<FileProcessor> logger)
+        {
+            ArgumentNullException.ThrowIfNull(logger);
+            Logger = logger;
+        }
+
         #region Public Methods
 
-        public static async Task GetFiles(int totalThreads, bool forceDetails, string projectId, string repositoryId, string[] excludedProjects)
+        public async Task GetFiles(int totalThreads, bool forceDetails, string projectId, string repositoryId, string[] excludedProjects)
         {
             Settings.Initialize();
 
@@ -44,7 +54,7 @@ namespace RepoScan.FileLocator
                 {
                     if (Parameters.Settings.ExtendedLogging)
                     {
-                        Console.WriteLine($"=> File Scan GetFiles(): Skipping repo {repoItem.RepositoryName} - ProjectNoScan = {repoItem.ProjectNoScan}, ProjectIsDeleted = {repoItem.ProjectIsDeleted}, RepositoryNoScan = {repoItem.RepositoryNoScan}, IsDeleted = {repoItem.IsDeleted}");
+                        Logger.LogInformation("File Scan GetFiles(): Skipping repo {RepositoryName} - ProjectNoScan = {ProjectNoScan}, ProjectIsDeleted = {ProjectIsDeleted}, RepositoryNoScan = {RepositoryNoScan}, IsDeleted = {IsDeleted}", repoItem.RepositoryName, repoItem.ProjectNoScan, repoItem.ProjectIsDeleted, repoItem.RepositoryNoScan, repoItem.IsDeleted);
                     }
 
                     continue;
@@ -64,7 +74,7 @@ namespace RepoScan.FileLocator
 
                     if (Parameters.Settings.ExtendedLogging)
                     {
-                        Console.WriteLine($"=> File Scan, GetFiles(): Get Project IDs returned {projectList.Count()} items");
+                        Logger.LogInformation("File Scan, GetFiles(): Get Project IDs returned {ProjectCount} items", projectList.Count());
                     }
                 }
 
@@ -76,7 +86,7 @@ namespace RepoScan.FileLocator
 
                     if (Parameters.Settings.ExtendedLogging)
                     {
-                        Console.WriteLine($"=> File Scan GetFiles(): Project {repoItem.ProjectName} was deleted");
+                        Logger.LogInformation("File Scan GetFiles(): Project {ProjectName} was deleted", repoItem.ProjectName);
                     }
 
                     continue;
@@ -95,7 +105,7 @@ namespace RepoScan.FileLocator
 
                     if (Parameters.Settings.ExtendedLogging)
                     {
-                        Console.WriteLine($"=> File Scan GetFiles(): Project {repoItem.ProjectName} returned {repoList.Count()} repositories");
+                        Logger.LogInformation("File Scan GetFiles(): Project {ProjectName} returned {RepositoryCount} repositories", repoItem.ProjectName, repoList.Count());
                     }
                 }
 
@@ -108,7 +118,7 @@ namespace RepoScan.FileLocator
                 {
                     if (r.LastCommitId == repoItem.RepositoryLastCommitId)
                     {
-                        Console.WriteLine($"\t>>> Repo {r.Name} - not changed since last commit (Commit ID: {r.LastCommitId})");
+                        Logger.LogInformation("Repo {RepositoryName} - not changed since last commit (Commit ID: {CommitId})", r.Name, r.LastCommitId);
                         repoUnchanged = true;
                     }
                     else
@@ -125,13 +135,13 @@ namespace RepoScan.FileLocator
                     repoItem.IsDeleted = true;
                     dbProjectId = repoWriter.Write(repoItem, dbProjectId, false);
 
-                    Console.WriteLine($"\t>>> File Scan GetFiles(): repository {repoItem.RepositoryName} was deleted");
+                    Logger.LogInformation("File Scan GetFiles(): repository {RepositoryName} was deleted", repoItem.RepositoryName);
                     continue;
                 }
 
                 if (repoUnchanged && !forceDetails)
                 {
-                    Console.WriteLine($"\t>>> File Scan GetFiles(): repository {repoItem.RepositoryName} is unchanged");
+                    Logger.LogInformation("File Scan GetFiles(): repository {RepositoryName} is unchanged", repoItem.RepositoryName);
                     continue;
                 }
 
@@ -145,7 +155,7 @@ namespace RepoScan.FileLocator
 
                 Parallel.ForEach(fileList, options, (file) =>
                 {
-                    Console.WriteLine($"\t>>> File Scan GetFiles(): Getting File: Repository = {repoItem.RepositoryName}, File Path = {file.Path}");
+                    Logger.LogInformation("File Scan GetFiles(): Getting File: Repository = {RepositoryName}, File Path = {FilePath}", repoItem.RepositoryName, file.Path);
 
                     if (file.FileType != FileItemType.NoMatch || FileFiltering.Filter.CanFilterFile(file))
                     {
@@ -163,7 +173,7 @@ namespace RepoScan.FileLocator
                         // Then each thread could have this created ahead of time without
                         // the cost of creating a fresh DB connection every time.
                         IWriteFileItem writer = StorageFactory.GetFileItemWriter();
-                        Console.WriteLine($"\t>>> File Scan GetFiles(): sending file to writer - ${file.Path}");
+                        Logger.LogInformation("File Scan GetFiles(): sending file to writer - {FilePath}", file.Path);
                         writer.Write(fileItem, false, true);
                     }
                 });
