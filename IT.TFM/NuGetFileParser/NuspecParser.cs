@@ -6,15 +6,10 @@ using System.Xml;
 
 namespace NuGetFileParser
 {
-    public class NuspecParser : Parser.ParseXmlFile, IFileParser
+    public class NuspecParser(Microsoft.Extensions.Logging.ILogger<NuspecParser> logger, Parser.XmlParserSettings settings) : Parser.ParseXmlFile(logger, settings), IFileParser
     {
-        public NuspecParser(Microsoft.Extensions.Logging.ILogger<NuspecParser> logger, Parser.XmlParserSettings settings)
-            : base(logger, settings)
-        {
-        }
-
         #region Private Members
-        
+
         private const string xmlNuspecPackage = "package";
         private const string xmlMetadata = "metadata";
         private const string xmlId = "id";

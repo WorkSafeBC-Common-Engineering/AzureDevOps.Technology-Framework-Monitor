@@ -61,10 +61,11 @@ namespace AzureDevOpsScannerFramework
 
             UseFileFilter();
 
-            if (Parameters.Settings.ExtendedLogging)
+            if (!Parameters.Settings.ExtendedLogging || !Logger.IsEnabled(LogLevel.Information))
             {
-                Logger.LogInformation("IScanner.Initialize: org = {OrganizationName}, orgUrl = {OrganizationUrl}, useFileFilter = {UseFileFilter}", organizationName, azureDevOpsOrganizationUrl, useFileFilter);
+                return;
             }
+            Logger.LogInformation("IScanner.Initialize: org = {OrganizationName}, orgUrl = {OrganizationUrl}, useFileFilter = {UseFileFilter}", organizationName, azureDevOpsOrganizationUrl, useFileFilter);
         }
 
         Organization IScanner.GetOrganization()

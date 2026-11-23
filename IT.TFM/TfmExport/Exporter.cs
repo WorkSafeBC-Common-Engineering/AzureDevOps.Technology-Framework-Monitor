@@ -44,7 +44,10 @@ namespace TfmExport
             Output.WriteLine("-- Clearing Tables");
             foreach (var table in tables)
             {
-                logger.LogInformation("Clearing {TableName}...", table.Name);
+                if (logger.IsEnabled(LogLevel.Information))
+                {
+                    logger.LogInformation("Clearing {TableName}...", table.Name);
+                }
                 Truncate(table);
             }
 
@@ -66,7 +69,10 @@ namespace TfmExport
             var reverseTables = tables.ToArray().Reverse();
             foreach (var table in reverseTables)
             {
-                logger.LogInformation("Exporting {TableName}...", table.Name);
+                if (logger.IsEnabled(LogLevel.Information))
+                {
+                    logger.LogInformation("Exporting {TableName}...", table.Name);
+                }
 
                 if (table.HasIdentity)
                 {

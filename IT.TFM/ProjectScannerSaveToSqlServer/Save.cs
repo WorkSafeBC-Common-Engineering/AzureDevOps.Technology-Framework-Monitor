@@ -12,12 +12,8 @@ using System.Threading.Tasks;
 
 namespace ProjectScannerSaveToSqlServer
 {
-    public class Save : DbCore, IStorageWriter
+    public class Save(ILogger<Save> logger) : DbCore(logger), IStorageWriter
     {
-        public Save(ILogger<Save> logger) : base(logger)
-        {
-        }
-
         #region IStorage Implementation
 
         void IStorageWriter.Initialize(string configuration)

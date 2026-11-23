@@ -7,13 +7,8 @@ using System.Xml;
 
 namespace VisualStudioFileParser
 {
-    class SolutionXParser : Parser.ParseXmlFile, IFileParser
+    class SolutionXParser(Microsoft.Extensions.Logging.ILogger<SolutionXParser> logger, Parser.XmlParserSettings settings) : Parser.ParseXmlFile(logger, settings), IFileParser
     {
-        public SolutionXParser(Microsoft.Extensions.Logging.ILogger<SolutionXParser> logger, Parser.XmlParserSettings settings)
-            : base(logger, settings)
-        {
-        }
-
         #region Private Members
 
         private const string xmlSolution = "Solution";
