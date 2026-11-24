@@ -13,4 +13,13 @@ BEGIN
 	INSERT INTO [dbo].[PipelineTypes] ([Id], [Value]) VALUES (8,  N'WinAppAppSync')
 	INSERT INTO [dbo].[PipelineTypes] ([Id], [Value]) VALUES (9,  N'Angular')
 	INSERT INTO [dbo].[PipelineTypes] ([Id], [Value]) VALUES (10, N'WinService')
+	INSERT INTO [dbo].[PipelineTypes] ([Id], [Value]) VALUES (11, N'ApimApi')
+	INSERT INTO [dbo].[PipelineTypes] ([Id], [Value]) VALUES (12, N'AppConfig')
+	INSERT INTO [dbo].[PipelineTypes] ([Id], [Value]) VALUES (13, N'AzureFunctionNodeJs')
+	INSERT INTO [dbo].[PipelineTypes] ([Id], [Value]) VALUES (14, N'BlobStorage')
+	INSERT INTO [dbo].[PipelineTypes] ([Id], [Value]) VALUES (15, N'Kubernetes')
+	INSERT INTO [dbo].[PipelineTypes] ([Id], [Value]) VALUES (16, N'SchemaRegistry')
+	INSERT INTO [dbo].[PipelineTypes] ([Id], [Value]) VALUES (17, N'WebApiPython')
+	INSERT INTO [dbo].[PipelineTypes] ([Id], [Value]) VALUES (18, N'WebAppPython')
+	INSERT INTO [dbo].[PipelineTypes] ([Id], [Value]) VALUES (19, N'LegacyWebApp')
 END

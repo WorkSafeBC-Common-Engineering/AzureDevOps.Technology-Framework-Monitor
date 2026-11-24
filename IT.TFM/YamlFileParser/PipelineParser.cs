@@ -213,10 +213,24 @@ namespace YamlFileParser
                     {
                         file.PipelineProperties["suppressCD"] = "false";
                     }
+
+                    if (!file.PipelineProperties["blueprintType"].StartsWith("Generic") && file.PipelineProperties["suppressCD"] == "false")
+                    {
+                        // We want to find the config.yml file for this blueprint, and then parse it based on the type of blueprint.
+                        ParseDeploymentSettings(file);
+                    }
+
                     break;
             }
 
             ParseUsePythonVersionTasks(cleanContent, variables, file);
+        }
+
+        private static void ParseDeploymentSettings(FileItem file)
+        {
+            // First we need to determine the name of the config.yml file specific to this pipeline.
+
+            throw new NotImplementedException();
         }
 
         private static void ParseUsePythonVersionTasks(string[] content, Dictionary<string, string> variables, FileItem file)
@@ -821,6 +835,15 @@ namespace YamlFileParser
                 "azure-pipeline-winapp-appsync-control.yml" => BlueprintType.WinAppAppSync,
                 "azure-pipeline-angular-control.yml" => BlueprintType.Angular,
                 "azure-pipeline-win-service-control.yml" => BlueprintType.WinService,
+                "azure-pipeline-apim-api-control.yml" => BlueprintType.ApimApi,
+                "azure-pipeline-app-config-control.yml" => BlueprintType.AppConfig,
+                "azure-pipeline-azure-function-nodejs-control.yml" => BlueprintType.AzureFunctionNodeJs,
+                "azure-pipeline-blob-storage-control.yml" => BlueprintType.BlobStorage,
+                "azure-pipeline-kubernetes-control.yml" => BlueprintType.Kubernetes,
+                "azure-pipeline-schema-registry-control.yml" => BlueprintType.SchemaRegistry,
+                "azure-pipeline-web-api-python-control.yml" => BlueprintType.WebApiPython,
+                "azure-pipeline-web-app-python-control.yml" => BlueprintType.WebAppPython,
+                "azure-pipeline-legacy-webapp-control.yml" => BlueprintType.LegacyWebApp,
                 _ => BlueprintType.None,
             };
         }
