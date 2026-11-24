@@ -3,6 +3,7 @@
 using ProjectData;
 
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Reflection.Metadata;
 using System.Runtime;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -229,7 +230,170 @@ namespace YamlFileParser
         private static void ParseDeploymentSettings(FileItem file)
         {
             // First we need to determine the name of the config.yml file specific to this pipeline.
+            var portfolio = file.PipelineProperties["portfolio"].ToLower();
+            var product = file.PipelineProperties["product"].ToLower();
 
+            var configFile = Path.Combine(Storage.Settings.CheckoutDirectory, $"deploy/{portfolio}.{product}-config.yml");
+            if (!File.Exists(configFile))
+            {
+                configFile = Path.Combine(Storage.Settings.CheckoutDirectory, $"deploy/{portfolio}-{product}-config.yml");
+            }
+
+            if (!File.Exists(configFile))
+            {
+                return;
+            }
+
+            var contents = File.ReadAllLines(configFile);
+            var cleanContent = StripComments(contents);
+
+            // We now have the path to the config.yml file. Use the blueprint type to determine how to parse it.
+            var blueprint = Enum.Parse<BlueprintType>(file.PipelineProperties["blueprintType"]);
+            switch (blueprint)
+            {
+                case BlueprintType.Angular:
+                    ParseAngularDeployment(file, cleanContent);
+                    break;                    
+
+                case BlueprintType.ApimApi:
+                    ParseApimApiDeployment(file, cleanContent);
+                    break;
+
+                case BlueprintType.AppConfig:
+                    ParseAppConfigDeployment(file, cleanContent);
+                    break;
+
+                case BlueprintType.AzureFunction:
+                    ParseAzureFunctionDeployment(file, cleanContent);
+                    break;
+
+                case BlueprintType.AzureFunctionNodeJs:
+                    ParseAzureFunctionNodeJsDeployment(file, cleanContent);
+                    break;
+
+                case BlueprintType.BatchConsole:
+                    ParseBatchConsoleDeployment(file, cleanContent);
+                    break;
+
+                case BlueprintType.BlobStorage:
+                    ParseBlobStorageDeployment(file, cleanContent);
+                    break;
+
+                case BlueprintType.Kubernetes:
+                    ParseKubernetesDeployment(file, cleanContent);
+                    break;
+
+                case BlueprintType.LegacyWebApp:
+                    ParseLegacyWebAppDeployment(file, cleanContent);
+                    break;
+
+                case BlueprintType.NugetPackage:
+                    ParseNuGetPackageDeployment(file, cleanContent);
+                    break;
+
+                case BlueprintType.SchemaRegistry:
+                    ParseSchemaRegistryDeployment(file, cleanContent);
+                    break;
+
+                case BlueprintType.WebApiPython:
+                    ParseWebApiPythonDeployment(file, cleanContent);
+                    break;
+
+                case BlueprintType.WebApp:
+                    ParseWebAppDeployment(file, cleanContent);
+                    break;
+
+                case BlueprintType.WebAppPython:
+                    ParseWebAppPythonDeployment(file, cleanContent);
+                    break;
+
+                case BlueprintType.WinAppAppSync:
+                    ParseWinAppAppSyncDeployment(file, cleanContent);
+                    break;
+
+                case BlueprintType.WinService:
+                    ParseWinServiceDeployment(file, cleanContent);
+                    break;
+            }
+        }
+
+        private static void ParseAngularDeployment(FileItem file, string[] content)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void ParseApimApiDeployment(FileItem file, string[] cleanContent)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void ParseAppConfigDeployment(FileItem file, string[] cleanContent)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void ParseAzureFunctionDeployment(FileItem file, string[] cleanContent)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void ParseAzureFunctionNodeJsDeployment(FileItem file, string[] cleanContent)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void ParseBatchConsoleDeployment(FileItem file, string[] cleanContent)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void ParseBlobStorageDeployment(FileItem file, string[] cleanContent)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void ParseKubernetesDeployment(FileItem file, string[] cleanContent)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void ParseLegacyWebAppDeployment(FileItem file, string[] cleanContent)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void ParseNuGetPackageDeployment(FileItem file, string[] cleanContent)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void ParseSchemaRegistryDeployment(FileItem file, string[] cleanContent)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void ParseWebApiPythonDeployment(FileItem file, string[] cleanContent)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void ParseWebAppDeployment(FileItem file, string[] cleanContent)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void ParseWebAppPythonDeployment(FileItem file, string[] cleanContent)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void ParseWinAppAppSyncDeployment(FileItem file, string[] cleanContent)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void ParseWinServiceDeployment(FileItem file, string[] cleanContent)
+        {
             throw new NotImplementedException();
         }
 

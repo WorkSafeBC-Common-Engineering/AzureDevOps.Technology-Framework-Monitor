@@ -24,8 +24,6 @@ namespace AzureDevOps
 
         string RepositoryBranch { get; set; }
 
-        string CheckoutDirectory { get; set; }
-
         int PagingTop { get; set; }
 
         int PagingSkip { get; set; }

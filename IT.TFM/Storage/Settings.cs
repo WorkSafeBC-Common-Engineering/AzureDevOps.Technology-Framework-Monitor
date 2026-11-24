@@ -31,11 +31,22 @@ namespace Storage
 
         #endregion
 
+        #region Public Methods
+
+        public static void SetCheckoutPath(string path)
+        {
+            CheckoutDirectory = path;
+        }
+
+        #endregion
+
         #region Public Properties
 
         internal static string Storage { get; private set; }
 
         internal static string Configuration { get; private set; }
+
+        public static string CheckoutDirectory { get; private set; }
 
         #endregion
     }

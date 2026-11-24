@@ -4,7 +4,10 @@ using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
 
+using Parameters;
+
 using System;
+using System.Data.SqlTypes;
 using System.IO.Compression;
 using System.Text;
 
@@ -106,8 +109,6 @@ namespace AzureDevOps
 
         public string RepositoryBranch { get; set; } = string.Empty;
 
-        public string CheckoutDirectory { get; set; } = string.Empty;
-
         public int PagingTop { get; set; }
 
         public int PagingSkip { get; set; }
@@ -132,7 +133,7 @@ namespace AzureDevOps
             {
                 BaseUrl = url;
                 Organization = string.Empty;
-                CheckoutDirectory = Path.Combine(workingDirectory, BaseUrl);
+                Storage.Settings.SetCheckoutPath(Path.Combine(workingDirectory, BaseUrl));
             }
             else
             {
@@ -140,12 +141,12 @@ namespace AzureDevOps
 
                 BaseUrl = fields[0];
                 Organization = fields[1];
-                CheckoutDirectory = Path.Combine(System.Environment.CurrentDirectory, Organization);
+                Storage.Settings.SetCheckoutPath(Path.Combine(System.Environment.CurrentDirectory, Organization));
             }
 
             if (Parameters.Settings.ExtendedLogging)
             {
-                Logger.LogInformation("Checkout Directory = {CheckoutDirectory}, Working Directory = {WorkingDirectory}", CheckoutDirectory, workingDirectory);
+                Logger.LogInformation("Checkout Directory = {CheckoutDirectory}, Working Directory = {WorkingDirectory}", Storage.Settings.CheckoutDirectory, workingDirectory);
             }
 
             Token = ConfidentialSettings.Values.Token;
@@ -495,14 +496,14 @@ namespace AzureDevOps
             {
                 var semResult = waitOnApiCall.WaitOne();
 
-                if (unzipContent && Directory.Exists(CheckoutDirectory))
+                if (unzipContent && Directory.Exists(Storage.Settings.CheckoutDirectory))
                 {
                     if (Parameters.Settings.ExtendedLogging)
                     {
-                        Logger.LogInformation("CallApiAsync - unzipContent: start by deleting the checkout directory {CheckoutDirectory} first.", CheckoutDirectory);
+                        Logger.LogInformation("CallApiAsync - unzipContent: start by deleting the checkout directory {CheckoutDirectory} first.", Storage.Settings.CheckoutDirectory);
                     }
 
-                    Directory.Delete(CheckoutDirectory, true);
+                    Directory.Delete(Storage.Settings.CheckoutDirectory, true);
                 }
 
                 HttpClient httpClient = GetClient(url);
@@ -568,7 +569,7 @@ namespace AzureDevOps
                 {
                     if (Parameters.Settings.ExtendedLogging)
                     {
-                        Logger.LogInformation("CallApiAsync - unzipContent: extract files to {CheckoutDirectory}", CheckoutDirectory);
+                        Logger.LogInformation("CallApiAsync - unzipContent: extract files to {CheckoutDirectory}", Storage.Settings.CheckoutDirectory);
                     }
 
                     await GetZipContentAsync(response.Content.ReadAsStream());
@@ -683,16 +684,16 @@ namespace AzureDevOps
 
         private async Task GetZipContentAsync(Stream zipStream)
         {
-            await ZipFile.ExtractToDirectoryAsync(zipStream, CheckoutDirectory, true);
+            await ZipFile.ExtractToDirectoryAsync(zipStream, Storage.Settings.CheckoutDirectory, true);
 
             if (Parameters.Settings.ExtendedLogging)
             {
-                if (!Directory.Exists(CheckoutDirectory))
+                if (!Directory.Exists(Storage.Settings.CheckoutDirectory))
                 {
-                    Directory.CreateDirectory(CheckoutDirectory);
+                    Directory.CreateDirectory(Storage.Settings.CheckoutDirectory);
                 }
 
-                var files = Directory.GetFiles(CheckoutDirectory, "*.*", SearchOption.AllDirectories);
+                var files = Directory.GetFiles(Storage.Settings.CheckoutDirectory, "*.*", SearchOption.AllDirectories);
                 Logger.LogInformation("GetZipContent: List of files, total = {TotalFiles}", files.Length);
                 foreach (var file in files)
                 {

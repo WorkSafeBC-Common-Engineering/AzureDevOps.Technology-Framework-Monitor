@@ -326,26 +326,26 @@ namespace AzureDevOpsScannerFramework
 
             if (Parameters.Settings.ExtendedLogging)
             {
-                Logger.LogInformation("IScanner.LoadFiles: Project ID = {ProjectId}, Repo ID = {RepositoryId}, Branch = {Branch}, Checkout Dir = {CheckoutDirectory}", api.Project, api.Repository, api.RepositoryBranch, api.CheckoutDirectory);
+                Logger.LogInformation("IScanner.LoadFiles: Project ID = {ProjectId}, Repo ID = {RepositoryId}, Branch = {Branch}, Checkout Dir = {CheckoutDirectory}", api.Project, api.Repository, api.RepositoryBranch, Storage.Settings.CheckoutDirectory);
             }
 
             await api.DownloadRepositoryAsync();
 
-            if (Directory.Exists(api.CheckoutDirectory))
+            if (Directory.Exists(Storage.Settings.CheckoutDirectory))
             {
                 LoadDirectoryBuildProperties();
             }
             else
             {
-                Logger.LogWarning("Project: {ProjectId}, Repository: {RepositoryId} - Download directory not found: {CheckoutDirectory}", api.Project, api.Repository, api.CheckoutDirectory);
+                Logger.LogWarning("Project: {ProjectId}, Repository: {RepositoryId} - Download directory not found: {CheckoutDirectory}", api.Project, api.Repository, Storage.Settings.CheckoutDirectory);
             }
         }
 
         void IScanner.DeleteFiles()
         {
-            if (Directory.Exists(api.CheckoutDirectory))
+            if (Directory.Exists(Storage.Settings.CheckoutDirectory))
             {
-                DeleteDirectory(api.CheckoutDirectory);
+                DeleteDirectory(Storage.Settings.CheckoutDirectory);
             }
         }
 
@@ -360,7 +360,7 @@ namespace AzureDevOpsScannerFramework
             bool hasProperties = false;
 
             var dir = file.Path.StartsWith('/') ? file.Path[1..] : file.Path;
-            var filePath = Path.Combine(api.CheckoutDirectory, dir);
+            var filePath = Path.Combine(Storage.Settings.CheckoutDirectory, dir);
 
             if (Parameters.Settings.ExtendedLogging)
             {
@@ -418,7 +418,7 @@ namespace AzureDevOpsScannerFramework
         {
             get
             {
-                return api.CheckoutDirectory;
+                return Storage.Settings.CheckoutDirectory;
             }
         }
 
@@ -465,7 +465,7 @@ namespace AzureDevOpsScannerFramework
         {
             buildProperties.Clear();
 
-            foreach (var f in Directory.EnumerateFiles(api.CheckoutDirectory, "Directory.Build.props", SearchOption.AllDirectories))
+            foreach (var f in Directory.EnumerateFiles(Storage.Settings.CheckoutDirectory, "Directory.Build.props", SearchOption.AllDirectories))
             {
                 var xmlDocument = new System.Xml.XmlDocument();
                 xmlDocument.Load(f);
