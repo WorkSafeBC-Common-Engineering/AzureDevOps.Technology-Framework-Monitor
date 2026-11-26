@@ -247,78 +247,7 @@ namespace YamlFileParser
             var contents = File.ReadAllLines(configFile);
             var cleanContent = StripComments(contents);
 
-            // We now have the path to the config.yml file. Use the blueprint type to determine how to parse it.
-            var blueprint = Enum.Parse<BlueprintType>(file.PipelineProperties["blueprintType"]);
-            switch (blueprint)
-            {
-                case BlueprintType.Angular:
-                    PipelineDeploymentParser.Angular(file, cleanContent);
-                    break;                    
-
-                case BlueprintType.ApimApi:
-                    PipelineDeploymentParser.ApimApi(file, cleanContent);
-                    break;
-
-                case BlueprintType.AppConfig:
-                    PipelineDeploymentParser.AppConfig(file, cleanContent);
-                    break;
-
-                case BlueprintType.AzureFunction:
-                    PipelineDeploymentParser.AzureFunction(file, cleanContent);
-                    break;
-
-                case BlueprintType.AzureFunctionNodeJs:
-                    PipelineDeploymentParser.AzureFunctionNodeJs(file, cleanContent);
-                    break;
-
-                case BlueprintType.BatchConsole:
-                    PipelineDeploymentParser.BatchConsole(file, cleanContent);
-                    break;
-
-                case BlueprintType.BlobStorage:
-                    PipelineDeploymentParser.BlobStorage(file, cleanContent);
-                    break;
-
-                case BlueprintType.Kubernetes:
-                    PipelineDeploymentParser.Kubernetes(file, cleanContent);
-                    break;
-
-                case BlueprintType.LegacyAic:
-                    PipelineDeploymentParser.LegacyAic(file, cleanContent);
-                    break;
-
-                case BlueprintType.LegacyWebApp:
-                    PipelineDeploymentParser.LegacyWebApp(file, cleanContent);
-                    break;
-
-                case BlueprintType.NugetPackage:
-                    PipelineDeploymentParser.NuGetPackage(file, cleanContent);
-                    break;
-
-                case BlueprintType.SchemaRegistry:
-                    PipelineDeploymentParser.SchemaRegistry(file, cleanContent);
-                    break;
-
-                case BlueprintType.WebApiPython:
-                    PipelineDeploymentParser.WebApiPython(file, cleanContent);
-                    break;
-
-                case BlueprintType.WebApp:
-                    PipelineDeploymentParser.WebApp(file, cleanContent);
-                    break;
-
-                case BlueprintType.WebAppPython:
-                    PipelineDeploymentParser.WebAppPython(file, cleanContent);
-                    break;
-
-                case BlueprintType.WinAppAppSync:
-                    PipelineDeploymentParser.WinAppAppSync(file, cleanContent);
-                    break;
-
-                case BlueprintType.WinService:
-                    PipelineDeploymentParser.WinService(file, cleanContent);
-                    break;
-            }
+            PipelineDeploymentParser.Parse(file, cleanContent);
         }
 
         private static void ParseUsePythonVersionTasks(string[] content, Dictionary<string, string> variables, FileItem file)

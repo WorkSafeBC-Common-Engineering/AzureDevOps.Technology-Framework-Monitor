@@ -45,6 +45,8 @@ namespace ProjectData
 
         public Dictionary<string, string> PipelineProperties { get; } = [];
 
+        public DeploymentSettings DeploymentSettings { get; } = new DeploymentSettings();
+
         #endregion
 
         #region Public Methods
