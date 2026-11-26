@@ -1,10 +1,13 @@
-﻿using Parameters;
+﻿using Microsoft.Extensions.Primitives;
+
+using Parameters;
 
 using ProjectData;
 
 using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.Dynamic;
 using System.Linq;
 using System.Reflection.PortableExecutable;
@@ -45,6 +48,36 @@ namespace YamlFileParser
         private const string tagAzureResourceGroup = "ResourceGroup";
 
         private const string tagAzureResourceName = "AzureResource";
+
+        private const string tagKeyVault = "KeyVault";
+
+        private const string tagKeyVaultApp = "KeyVault.AppSecrets";
+
+        private const string tagKeyVaultAppFilter = "KeyVault.AppSecretsFilter";
+
+        private const string tagKeyVaultAppSpecific = "KeyVault.AppSpecificSecrets";
+
+        private const string tagKeyVaultAppSpecificFilter = "KeyVault.AppSpecificFilter";
+
+        private const string tagTargetServers = "TargetServers";
+
+        private const string tagAdmin = "AdminUser";
+
+        private const string tagAppConfig = "AppConfigFile";
+
+        private const string tagCmdFolder = "CmdFolder";
+
+        private const string tagCybExecFolder = "CybExecFolder";
+
+        private const string tagServerPath = "ServerPath";
+
+        private const string tagEventSource = "EventSource";
+
+        private const string tagContainer = "Container";
+
+        private const string tagPrefix = "Prefix";
+
+        private const string tagCleanTarget = "CleanTarget";
 
         #endregion
 
@@ -178,16 +211,29 @@ namespace YamlFileParser
                     continue;
                 }
 
-                string environmentName = section.SingleOrDefault(s => s.Item1.StartsWith(envNameLine))?.Item2 ?? string.Empty;
-                string pool = section.SingleOrDefault(s => s.Item1.StartsWith(poolLine))?.Item2 ?? string.Empty;
-                string vmImage = section.SingleOrDefault(s => s.Item1.StartsWith(vmImageLine))?.Item2 ?? string.Empty;
+                var envNameEntry = section.SingleOrDefault(s => s.Item1.Equals(envNameLine));
+                string environmentName = envNameEntry?.Item2 ?? string.Empty;
 
-                if (!bool.TryParse(section.SingleOrDefault(s => s.Item1.StartsWith(activeLine))?.Item2 ?? bool.FalseString, out var active))
+                var poolEntry = section.SingleOrDefault(s => s.Item1.Equals(poolLine));
+                string pool = poolEntry?.Item2 ?? string.Empty;
+
+                var vmImageEntry = section.SingleOrDefault(s => s.Item1.Equals(vmImageLine));
+                string vmImage = vmImageEntry?.Item2 ?? string.Empty;
+
+                var activeEntry = section.SingleOrDefault(s => s.Item1.StartsWith(activeLine));
+                if (!bool.TryParse(activeEntry?.Item2 ?? bool.FalseString, out var active))
                 {
                     active = false; 
                 }
 
                 file.DeploymentSettings.Environments.Add(new DeploymentEnvironments(key, active, environmentName, pool, vmImage));
+
+                // clear these so that they do not get processed again.
+                var emptyEntry = new Tuple<string, string>(string.Empty, string.Empty);
+                envNameEntry = emptyEntry;
+                poolEntry = emptyEntry;
+                vmImageEntry = emptyEntry;
+                activeEntry = emptyEntry;
             }
         }
 
@@ -208,22 +254,104 @@ namespace YamlFileParser
 
         private static void AzureFunction(FileItem file, Dictionary<string, Tuple<string, string>[]> sections)
         {
-            throw new NotImplementedException();
+            const string subscription = "StagerAzRmWebDeployAzureSubscription";
+            const string resourceGroup = "StageAzResourceGroup";
+            const string webAppName = "StageAzRmWebDeployWebAppName";
+
+            foreach (var section in sections)
+            {
+                var environment = file.DeploymentSettings.Environments.SingleOrDefault(env => env.Name == section.Key);
+                if (environment == null)
+                {
+                    continue;
+                }
+
+                AddEntry(environment, section.Value, subscription, tagSubscription);
+                AddEntry(environment, section.Value, resourceGroup, tagAzureResourceGroup);
+                AddEntry(environment, section.Value, webAppName, tagAzureResourceName);
+            }
         }
 
         private static void AzureFunctionNodeJs(FileItem file, Dictionary<string, Tuple<string, string>[]> sections)
         {
-            throw new NotImplementedException();
+            const string subscription = "AzureSubscription";
+            const string appName = "AppName";
+
+            foreach (var section in sections)
+            {
+                var environment = file.DeploymentSettings.Environments.SingleOrDefault(env => env.Name == section.Key);
+                if (environment == null)
+                {
+                    continue;
+                }
+
+                AddEntry(environment, section.Value, subscription, tagSubscription);
+                AddEntry(environment, section.Value, appName, tagAzureResourceName);
+            }
         }
 
         private static void BatchConsole(FileItem file, Dictionary<string, Tuple<string, string>[]> sections)
         {
-            throw new NotImplementedException();
+            const string kvSubscription = "StageKeyVaultSubscription";
+            const string kvPipeline = "StageKeyVaultName";
+            const string kvAppSecrets = "StageKeyVaultAppSecrets";
+            const string kvAppSecretsFilter = "StageKeyVaultAppSecretsFilter";
+            const string kvAppSpecific = "StageKeyVaultAppSpecificSecrets";
+            const string kvAppSpecificFilter = "StageKeyVaultAppSpecificSecretsFilter";
+            const string targetServers = "StageTargetServers";
+            const string targetAdmin = "StageTargetAdminUser";
+            const string appConfigName = "StageAppConfigName";
+            const string cmdFolder = "StageCmdFolder";
+            const string cybExecFolder = "StageCybExecFolder";
+            const string serverPath = "StageServerPath";
+            const string eventSource = "StageEventSource";
+
+            foreach (var section in sections)
+            {
+                var environment = file.DeploymentSettings.Environments.SingleOrDefault(env => env.Name == section.Key);
+                if (environment == null)
+                {
+                    continue;
+                }
+
+                AddEntry(environment, section.Value, kvSubscription, tagSubscription);
+                AddEntry(environment, section.Value, kvPipeline, tagKeyVault);
+                AddEntry(environment, section.Value, kvAppSecrets, tagKeyVaultApp);
+                AddEntry(environment, section.Value, kvAppSecretsFilter, tagKeyVaultAppFilter);
+                AddEntry(environment, section.Value, kvAppSpecific, tagKeyVaultAppSpecific);
+                AddEntry(environment, section.Value, kvAppSpecificFilter, tagKeyVaultAppSpecificFilter);
+                AddEntry(environment, section.Value, targetServers, tagTargetServers);
+                AddEntry(environment, section.Value, targetAdmin, tagAdmin);
+                AddEntry(environment, section.Value, appConfigName, tagAppConfig);
+                AddEntry(environment, section.Value, cmdFolder, tagCmdFolder);
+                AddEntry(environment, section.Value, cybExecFolder, tagCybExecFolder);
+                AddEntry(environment, section.Value, serverPath, tagServerPath);
+                AddEntry(environment, section.Value, eventSource, tagEventSource);
+            }
         }
 
         private static void BlobStorage(FileItem file, Dictionary<string, Tuple<string, string>[]> sections)
         {
-            throw new NotImplementedException();
+            const string subscription = "AzureSubscription";
+            const string storageAccount = "StorageAccountName";
+            const string container = "containerName";
+            const string destinationPrefix = "DestinationPrefix";
+            const string cleanDestination = "CleanDestination";
+
+            foreach (var section in sections)
+            {
+                var environment = file.DeploymentSettings.Environments.SingleOrDefault(env => env.Name == section.Key);
+                if (environment == null)
+                {
+                    continue;
+                }
+
+                AddEntry(environment, section.Value, subscription, tagSubscription);
+                AddEntry(environment, section.Value, storageAccount, tagAzureResourceName);
+                AddEntry(environment, section.Value, container, tagContainer);
+                AddEntry(environment, section.Value, destinationPrefix, tagPrefix);
+                AddEntry(environment, section.Value, cleanDestination, tagCleanTarget);
+            }
         }
 
         private static void Kubernetes(FileItem file, Dictionary<string, Tuple<string, string>[]> sections)
@@ -274,6 +402,15 @@ namespace YamlFileParser
         private static void WinService(FileItem file, Dictionary<string, Tuple<string, string>[]> sections)
         {
             throw new NotImplementedException();
+        }
+
+        private static void AddEntry(DeploymentEnvironments environment, Tuple<string, string>[] section, string variableName, string variableKey)
+        {
+            var entry = section.SingleOrDefault(e => e.Item2.Equals(variableName));
+            if (entry != null)
+            {
+                environment.Variables.Add(variableKey, entry.Item2);
+            }
         }
 
         #endregion
