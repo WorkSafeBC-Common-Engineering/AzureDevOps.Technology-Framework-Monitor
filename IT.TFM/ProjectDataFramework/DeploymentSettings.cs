@@ -8,11 +8,6 @@ namespace ProjectData
 {
     public class DeploymentEnvironments(string name, bool active, string environmentName, string pool, string vmImage)
     {
-
-        #region Constructors
-
-        #endregion
-
         #region Public Properties
 
         public string Name { get; set; } = name;
@@ -26,12 +21,6 @@ namespace ProjectData
         public string VmImage { get; set; } = vmImage;
 
         public Dictionary<string, string> Variables { get; private set; } = [];
-
-        #endregion
-
-        #region Public Methods
-
-        
 
         #endregion
     }
