@@ -252,163 +252,74 @@ namespace YamlFileParser
             switch (blueprint)
             {
                 case BlueprintType.Angular:
-                    ParseAngularDeployment(file, cleanContent);
+                    PipelineDeploymentParser.Angular(file, cleanContent);
                     break;                    
 
                 case BlueprintType.ApimApi:
-                    ParseApimApiDeployment(file, cleanContent);
+                    PipelineDeploymentParser.ApimApi(file, cleanContent);
                     break;
 
                 case BlueprintType.AppConfig:
-                    ParseAppConfigDeployment(file, cleanContent);
+                    PipelineDeploymentParser.AppConfig(file, cleanContent);
                     break;
 
                 case BlueprintType.AzureFunction:
-                    ParseAzureFunctionDeployment(file, cleanContent);
+                    PipelineDeploymentParser.AzureFunction(file, cleanContent);
                     break;
 
                 case BlueprintType.AzureFunctionNodeJs:
-                    ParseAzureFunctionNodeJsDeployment(file, cleanContent);
+                    PipelineDeploymentParser.AzureFunctionNodeJs(file, cleanContent);
                     break;
 
                 case BlueprintType.BatchConsole:
-                    ParseBatchConsoleDeployment(file, cleanContent);
+                    PipelineDeploymentParser.BatchConsole(file, cleanContent);
                     break;
 
                 case BlueprintType.BlobStorage:
-                    ParseBlobStorageDeployment(file, cleanContent);
+                    PipelineDeploymentParser.BlobStorage(file, cleanContent);
                     break;
 
                 case BlueprintType.Kubernetes:
-                    ParseKubernetesDeployment(file, cleanContent);
+                    PipelineDeploymentParser.Kubernetes(file, cleanContent);
                     break;
 
                 case BlueprintType.LegacyAic:
-                    ParseLegacyAicDeployment(file, cleanContent);
+                    PipelineDeploymentParser.LegacyAic(file, cleanContent);
                     break;
 
                 case BlueprintType.LegacyWebApp:
-                        ParseLegacyWebAppDeployment(file, cleanContent);
-                        break;
+                    PipelineDeploymentParser.LegacyWebApp(file, cleanContent);
+                    break;
 
                 case BlueprintType.NugetPackage:
-                    ParseNuGetPackageDeployment(file, cleanContent);
+                    PipelineDeploymentParser.NuGetPackage(file, cleanContent);
                     break;
 
                 case BlueprintType.SchemaRegistry:
-                    ParseSchemaRegistryDeployment(file, cleanContent);
+                    PipelineDeploymentParser.SchemaRegistry(file, cleanContent);
                     break;
 
                 case BlueprintType.WebApiPython:
-                    ParseWebApiPythonDeployment(file, cleanContent);
+                    PipelineDeploymentParser.WebApiPython(file, cleanContent);
                     break;
 
                 case BlueprintType.WebApp:
-                    ParseWebAppDeployment(file, cleanContent);
+                    PipelineDeploymentParser.WebApp(file, cleanContent);
                     break;
 
                 case BlueprintType.WebAppPython:
-                    ParseWebAppPythonDeployment(file, cleanContent);
+                    PipelineDeploymentParser.WebAppPython(file, cleanContent);
                     break;
 
                 case BlueprintType.WinAppAppSync:
-                    ParseWinAppAppSyncDeployment(file, cleanContent);
+                    PipelineDeploymentParser.WinAppAppSync(file, cleanContent);
                     break;
 
                 case BlueprintType.WinService:
-                    ParseWinServiceDeployment(file, cleanContent);
+                    PipelineDeploymentParser.WinService(file, cleanContent);
                     break;
             }
         }
-
-        #region Blueprint Config Parsers
-
-        private static void ParseAngularDeployment(FileItem file, string[] content)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static void ParseApimApiDeployment(FileItem file, string[] cleanContent)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static void ParseAppConfigDeployment(FileItem file, string[] cleanContent)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static void ParseAzureFunctionDeployment(FileItem file, string[] cleanContent)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static void ParseAzureFunctionNodeJsDeployment(FileItem file, string[] cleanContent)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static void ParseBatchConsoleDeployment(FileItem file, string[] cleanContent)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static void ParseBlobStorageDeployment(FileItem file, string[] cleanContent)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static void ParseKubernetesDeployment(FileItem file, string[] cleanContent)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static void ParseLegacyAicDeployment(FileItem file, string[] cleanContent)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static void ParseLegacyWebAppDeployment(FileItem file, string[] cleanContent)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static void ParseNuGetPackageDeployment(FileItem file, string[] cleanContent)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static void ParseSchemaRegistryDeployment(FileItem file, string[] cleanContent)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static void ParseWebApiPythonDeployment(FileItem file, string[] cleanContent)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static void ParseWebAppDeployment(FileItem file, string[] cleanContent)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static void ParseWebAppPythonDeployment(FileItem file, string[] cleanContent)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static void ParseWinAppAppSyncDeployment(FileItem file, string[] cleanContent)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static void ParseWinServiceDeployment(FileItem file, string[] cleanContent)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
 
         private static void ParseUsePythonVersionTasks(string[] content, Dictionary<string, string> variables, FileItem file)
         {
