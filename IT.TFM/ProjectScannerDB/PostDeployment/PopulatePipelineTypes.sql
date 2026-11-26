@@ -22,4 +22,5 @@ BEGIN
 	INSERT INTO [dbo].[PipelineTypes] ([Id], [Value]) VALUES (17, N'WebApiPython')
 	INSERT INTO [dbo].[PipelineTypes] ([Id], [Value]) VALUES (18, N'WebAppPython')
 	INSERT INTO [dbo].[PipelineTypes] ([Id], [Value]) VALUES (19, N'LegacyWebApp')
+	INSERT INTO [dbo].[PipelineTypes] ([Id], [Value]) VALUES (20, N'LegacyAic')
 END

@@ -21,6 +21,7 @@
         SchemaRegistry = 16,
         WebApiPython = 17,
         WebAppPython = 18,
-        LegacyWebApp = 19
+        LegacyWebApp = 19,
+        LegacyAic = 20
     }
 }

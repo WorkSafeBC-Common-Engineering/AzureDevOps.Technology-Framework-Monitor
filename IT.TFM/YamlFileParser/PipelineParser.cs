@@ -283,9 +283,13 @@ namespace YamlFileParser
                     ParseKubernetesDeployment(file, cleanContent);
                     break;
 
-                case BlueprintType.LegacyWebApp:
-                    ParseLegacyWebAppDeployment(file, cleanContent);
+                case BlueprintType.LegacyAic:
+                    ParseLegacyAicDeployment(file, cleanContent);
                     break;
+
+                case BlueprintType.LegacyWebApp:
+                        ParseLegacyWebAppDeployment(file, cleanContent);
+                        break;
 
                 case BlueprintType.NugetPackage:
                     ParseNuGetPackageDeployment(file, cleanContent);
@@ -316,6 +320,8 @@ namespace YamlFileParser
                     break;
             }
         }
+
+        #region Blueprint Config Parsers
 
         private static void ParseAngularDeployment(FileItem file, string[] content)
         {
@@ -353,6 +359,11 @@ namespace YamlFileParser
         }
 
         private static void ParseKubernetesDeployment(FileItem file, string[] cleanContent)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void ParseLegacyAicDeployment(FileItem file, string[] cleanContent)
         {
             throw new NotImplementedException();
         }
@@ -396,6 +407,8 @@ namespace YamlFileParser
         {
             throw new NotImplementedException();
         }
+
+        #endregion
 
         private static void ParseUsePythonVersionTasks(string[] content, Dictionary<string, string> variables, FileItem file)
         {
@@ -1008,6 +1021,7 @@ namespace YamlFileParser
                 "azure-pipeline-web-api-python-control.yml" => BlueprintType.WebApiPython,
                 "azure-pipeline-web-app-python-control.yml" => BlueprintType.WebAppPython,
                 "azure-pipeline-legacy-webapp-control.yml" => BlueprintType.LegacyWebApp,
+                "azure-pipeline-legacy-aic-control.yml" => BlueprintType.LegacyAic,
                 _ => BlueprintType.None,
             };
         }
