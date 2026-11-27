@@ -148,6 +148,10 @@ namespace YamlFileParser
 
         private const string tagFlagAppPool32Bit = "Flag.32BitAppPool";
 
+        private const string tagArtifactFeed = "ArtifactFeed";
+
+        private const string tagArtifactPackage = "ArtifactPackage";
+
         #endregion
 
         #region Internal Methods
@@ -228,6 +232,10 @@ namespace YamlFileParser
 
                 case BlueprintType.WinService:
                     WinService(file, sections);
+                    break;
+
+                case BlueprintType.UniversalArtifact:
+                    UniversalArtifact(file, sections);
                     break;
             }
         }
@@ -619,6 +627,24 @@ namespace YamlFileParser
                 AddEntry(environment, section.Value, resourceGroup, tagAzureResourceGroup);
                 AddEntry(environment, section.Value, nameSpace, tagNameSpace);
                 AddEntry(environment, section.Value, schemaGroup, tagSchemaGroup);
+            }
+        }
+
+        private static void UniversalArtifact(FileItem file, Dictionary<string, Tuple<string, string>[]> sections)
+        {
+            const string feedPublish = "StageFeedPublish";
+            const string packagePublish = "StagePackagePublish";
+
+            foreach (var section in sections)
+            {
+                var environment = file.DeploymentSettings.Environments.SingleOrDefault(env => env.Name == section.Key);
+                if (environment == null)
+                {
+                    continue;
+                }
+
+                AddEntry(environment, section.Value, feedPublish, tagArtifactFeed);
+                AddEntry(environment, section.Value, packagePublish, tagArtifactPackage);
             }
         }
 
