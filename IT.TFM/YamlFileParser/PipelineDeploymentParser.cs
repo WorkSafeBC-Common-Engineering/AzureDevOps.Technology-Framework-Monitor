@@ -11,6 +11,7 @@ using System.Diagnostics.Tracing;
 using System.Dynamic;
 using System.Linq;
 using System.Reflection.PortableExecutable;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Xml;
 
@@ -108,6 +109,44 @@ namespace YamlFileParser
         private const string tagServiceFolder = "ServiceFolder";
 
         private const string tagAppFolder = "AppFolder";
+
+        private const string tagFlagWebDeploy = "Flag.WebDeploy";
+
+        private const string tagFlagRemoveFiles = "Flag.RemoveAdditionalFiles";
+
+        private const string tagFlagEnableXmlTransforms = "Flag.EnableXmlTransforms";
+
+        private const string tagFlagRunPostDeploymentScript = "Flag.RunPostDeploymentScript";
+
+        private const string tagFlagUseAzMan = "Flag.UseAzMan";
+
+        private const string tagFlagCreateEventLog = "Flag.CreateEventLog";
+
+        private const string tagFlagReplaceTokens = "Flag.ReplaceTokens";
+
+        private const string tagFlagCustomAppPoolIdentity = "Flag.CustomAppPoolIdentity";
+
+        private const string tagFlagWindowsIdentity = "Flag.WindowsIdentity";
+
+        private const string tagFlagSetIisPort = "Flag.SetIisPort";
+
+        private const string tagPasswordSecretName = "PasswordSecretName";
+
+        private const string tagIisPort = "IisPort";
+
+        private const string tagTempFolder = "TempFolder";
+
+        private const string tagProduct = "Product";
+
+        private const string tagWebServiceName = "WebServiceName";
+
+        private const string tagZipfile = "ZipFile";
+
+        private const string tagLayer7 = "Layer7Folder";
+
+        private const string tagCustomIdentity = "CustomAppPoolIdentity";
+
+        private const string tagFlagAppPool32Bit = "Flag.32BitAppPool";
 
         #endregion
 
@@ -433,6 +472,7 @@ namespace YamlFileParser
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Standard format for these function calls")]
         private static void Kubernetes(FileItem file, Dictionary<string, Tuple<string, string>[]> sections)
         {
             // Only the common deployment variables are used in this blueprint - no further parsing required.
@@ -440,12 +480,108 @@ namespace YamlFileParser
 
         private static void LegacyAic(FileItem file, Dictionary<string, Tuple<string, string>[]> sections)
         {
-            throw new NotImplementedException();
+            const string keyvault = "StageKeyVaultName";
+            const string subscription = "StageKeyVaultSubscription";
+            const string serverName = "StageTargetServer";
+            const string userName = "StageTargetAdminUser";
+            const string serverPath = "StageServerPath";
+            const string eventSource = "StageEventSource";
+            const string appConfigName = "StageAppConfigName";
+            const string restartService = "StageRestartServices'";
+
+            foreach (var section in sections)
+            {
+                var environment = file.DeploymentSettings.Environments.SingleOrDefault(env => env.Name == section.Key);
+                if (environment == null)
+                {
+                    continue;
+                }
+
+                AddEntry(environment, section.Value, keyvault, tagKeyVault);
+                AddEntry(environment, section.Value, subscription, tagSubscription);
+                AddEntry(environment, section.Value, serverName, tagTargetServers);
+                AddEntry(environment, section.Value, userName, tagAdmin);
+                AddEntry(environment, section.Value, serverPath, tagServerPath);
+                AddEntry(environment, section.Value, eventSource, tagEventSource);
+                AddEntry(environment, section.Value, appConfigName, tagAppConfig);
+                AddEntry(environment, section.Value, restartService, tagRestartService);
+            }
         }
 
         private static void LegacyWebApp(FileItem file, Dictionary<string, Tuple<string, string>[]> sections)
         {
-            throw new NotImplementedException();
+            const string subscription = "AzureSubscription";
+
+            // appService deployment
+            const string appType = "AppType";
+            const string appName = "AppName";
+            const string useWebDeploy = "UseWebDeploy";
+            const string removeFiles = "RemoveAdditionalFilesFlag";
+            const string enableXmlTransforms = "EnableXmlTransform";
+            const string runPostDeployScript = "RunPostDeploymentScript";
+
+            // IIS deployment
+            const string copyAzMan = "CopyAzMan'";
+            const string createEventLog = "CreateEventLog'";
+            const string replaceTokens = "ReplaceTokens'";
+            const string useCustomAppPoolIdentity = "UseCustomAppPoolIdentity'";
+            const string useWindowsIdentity = "UseWindowsIdentity'";
+            const string setIisPort = "SetIisPort'";
+            const string keyvault = "KeyVault'";
+            const string apiServer = "ApiServer'";
+            const string username = "Username'";
+            const string passwordName = "Password'";
+            const string iisPort = "IisPort'";
+            const string tempFolder = "TempRootFolder'";
+            const string productName = "ProductFamilyName'";
+            const string webserviceName = "WebServiceName'";
+            const string zipfileName = "ZipFileName'";
+            const string layer7Name = "WebsiteNameLayer7'";
+            const string appRootFolder = "AppRootFolder'";
+            const string customAppPoolIdentity = "CustomAppPoolIdentityName'";
+            const string azManPrefix = "AzManFilePrefix'";
+            const string appPool32Bit = "AppPool32Bit'";
+
+            foreach (var section in sections)
+            {
+                var environment = file.DeploymentSettings.Environments.SingleOrDefault(env => env.Name == section.Key);
+                if (environment == null)
+                {
+                    continue;
+                }
+
+                AddEntry(environment, section.Value, subscription, tagSubscription);
+
+                // appService
+                AddEntry(environment, section.Value, appType, tagAppType);
+                AddEntry(environment, section.Value, appName, tagAppName);
+                AddEntry(environment, section.Value, useWebDeploy, tagFlagWebDeploy);
+                AddEntry(environment, section.Value, removeFiles, tagFlagRemoveFiles);
+                AddEntry(environment, section.Value, enableXmlTransforms, tagFlagEnableXmlTransforms);
+                AddEntry(environment, section.Value, runPostDeployScript, tagFlagRunPostDeploymentScript);
+
+                // IIS
+                AddEntry(environment, section.Value, copyAzMan, tagFlagUseAzMan);
+                AddEntry(environment, section.Value, createEventLog, tagFlagCreateEventLog);
+                AddEntry(environment, section.Value, replaceTokens, tagFlagReplaceTokens);
+                AddEntry(environment, section.Value, useCustomAppPoolIdentity, tagFlagCustomAppPoolIdentity);
+                AddEntry(environment, section.Value, useWindowsIdentity, tagFlagWindowsIdentity);
+                AddEntry(environment, section.Value, setIisPort, tagFlagSetIisPort);
+                AddEntry(environment, section.Value, keyvault, tagKeyVault);
+                AddEntry(environment, section.Value, apiServer, tagTargetServers);
+                AddEntry(environment, section.Value, username, tagAdmin);
+                AddEntry(environment, section.Value, passwordName, tagPasswordSecretName);
+                AddEntry(environment, section.Value, iisPort, tagIisPort);
+                AddEntry(environment, section.Value, tempFolder, tagTempFolder);
+                AddEntry(environment, section.Value, productName, tagProduct);
+                AddEntry(environment, section.Value, webserviceName, tagWebServiceName);
+                AddEntry(environment, section.Value, zipfileName, tagZipfile);
+                AddEntry(environment, section.Value, layer7Name, tagLayer7);
+                AddEntry(environment, section.Value, appRootFolder, tagRootFolder);
+                AddEntry(environment, section.Value, customAppPoolIdentity, tagCustomIdentity);
+                AddEntry(environment, section.Value, azManPrefix, tagPrefix);
+                AddEntry(environment, section.Value, appPool32Bit, tagFlagAppPool32Bit);
+            }
         }
 
         private static void NuGetPackage(FileItem file, Dictionary<string, Tuple<string, string>[]> sections)
