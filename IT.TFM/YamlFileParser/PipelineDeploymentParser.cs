@@ -49,6 +49,12 @@ namespace YamlFileParser
 
         private const string tagAzureResourceName = "AzureResource";
 
+        private const string tagAzureResourceAnonymous = "AzureResource.Anonymous";
+
+        private const string tagAzureResourceAad = "AzureResource.Aad";
+
+        private const string tagAzureResourceCiam = "AzureResource.Ciam";
+
         private const string tagKeyVault = "KeyVault";
 
         private const string tagKeyVaultApp = "KeyVault.AppSecrets";
@@ -78,6 +84,30 @@ namespace YamlFileParser
         private const string tagPrefix = "Prefix";
 
         private const string tagCleanTarget = "CleanTarget";
+
+        private const string tagShortEnvironmentName = "Environment.ShortName";
+
+        private const string tagNuGetFeed = "NuGetFeed";
+
+        private const string tagNameSpace = "NameSpace";
+
+        private const string tagSchemaGroup = "SchemaGroup";
+
+        private const string tagAppType = "AppType";
+
+        private const string tagAppName = "AppName";
+
+        private const string tagAppNameShort = "AppName.Short";
+
+        private const string tagServiceNames = "ServiceNames";
+
+        private const string tagRestartService = "RestartService";
+
+        private const string tagRootFolder = "RootFolder";
+
+        private const string tagServiceFolder = "ServiceFolder";
+
+        private const string tagAppFolder = "AppFolder";
 
         #endregion
 
@@ -238,23 +268,72 @@ namespace YamlFileParser
         }
 
         private static void Angular(FileItem file, Dictionary<string, Tuple<string, string>[]> sections)
-        { 
-            throw new NotImplementedException();
+        {
+            const string subscription = "AzureSubscription";
+            const string anonymousAppName = "AppNameAnonymous";
+            const string aadAppName = "AppNameAad";
+            const string ciamAppName = "AppNameCiam";
+            const string keyVault = "KeyVaultName";
+
+            foreach (var section in sections)
+            {
+                var environment = file.DeploymentSettings.Environments.SingleOrDefault(env => env.Name == section.Key);
+                if (environment == null)
+                {
+                    continue;
+                }
+
+                AddEntry(environment, section.Value, subscription, tagSubscription);
+                AddEntry(environment, section.Value, anonymousAppName, tagAzureResourceAnonymous);
+                AddEntry(environment, section.Value, aadAppName, tagAzureResourceAad);
+                AddEntry(environment, section.Value, ciamAppName, tagAzureResourceCiam);
+                AddEntry(environment, section.Value, keyVault, tagKeyVault);
+            }
         }
 
         private static void ApimApi(FileItem file, Dictionary<string, Tuple<string, string>[]> sections)
         {
-            throw new NotImplementedException();
+            const string subscription = "StageAzureSubscription";
+            const string envName = "StageEnvironment";
+
+            foreach (var section in sections)
+            {
+                var environment = file.DeploymentSettings.Environments.SingleOrDefault(env => env.Name == section.Key);
+                if (environment == null)
+                {
+                    continue;
+                }
+
+                AddEntry(environment, section.Value, subscription, tagSubscription);
+                AddEntry(environment, section.Value, envName, tagShortEnvironmentName);
+            }
         }
 
         private static void AppConfig(FileItem file, Dictionary<string, Tuple<string, string>[]> sections)
         {
-            throw new NotImplementedException();
+            const string subscription = "AzureSubscription";
+            const string appConfigName = "AppConfigName";
+            const string envLabel = "Label";
+            const string keyPrefix = "KeyPrefix";
+
+            foreach (var section in sections)
+            {
+                var environment = file.DeploymentSettings.Environments.SingleOrDefault(env => env.Name == section.Key);
+                if (environment == null)
+                {
+                    continue;
+                }
+
+                AddEntry(environment, section.Value, subscription, tagSubscription);
+                AddEntry(environment, section.Value, appConfigName, tagAppConfig);
+                AddEntry(environment, section.Value, envLabel, tagShortEnvironmentName);
+                AddEntry(environment, section.Value, keyPrefix, tagPrefix);
+            }
         }
 
         private static void AzureFunction(FileItem file, Dictionary<string, Tuple<string, string>[]> sections)
         {
-            const string subscription = "StagerAzRmWebDeployAzureSubscription";
+            const string subscription = "StageAzRmWebDeployAzureSubscription";
             const string resourceGroup = "StageAzResourceGroup";
             const string webAppName = "StageAzRmWebDeployWebAppName";
 
@@ -356,7 +435,7 @@ namespace YamlFileParser
 
         private static void Kubernetes(FileItem file, Dictionary<string, Tuple<string, string>[]> sections)
         {
-            throw new NotImplementedException();
+            // Only the common deployment variables are used in this blueprint - no further parsing required.
         }
 
         private static void LegacyAic(FileItem file, Dictionary<string, Tuple<string, string>[]> sections)
@@ -371,37 +450,154 @@ namespace YamlFileParser
 
         private static void NuGetPackage(FileItem file, Dictionary<string, Tuple<string, string>[]> sections)
         {
-            throw new NotImplementedException();
+            const string targetFeed = "TargetFeed";
+
+            foreach (var section in sections)
+            {
+                var environment = file.DeploymentSettings.Environments.SingleOrDefault(env => env.Name == section.Key);
+                if (environment == null)
+                {
+                    continue;
+                }
+
+                AddEntry(environment, section.Value, targetFeed, tagNuGetFeed);
+            }
         }
 
         private static void SchemaRegistry(FileItem file, Dictionary<string, Tuple<string, string>[]> sections)
         {
-            throw new NotImplementedException();
+            const string subscription = "StageAzServiceConnection";
+            const string resourceGroup = "StageAzResourceGroup";
+            const string nameSpace = "StageAzNameSpace";
+            const string schemaGroup = "StageAzSchemaGroup";
+
+            foreach (var section in sections)
+            {
+                var environment = file.DeploymentSettings.Environments.SingleOrDefault(env => env.Name == section.Key);
+                if (environment == null)
+                {
+                    continue;
+                }
+
+                AddEntry(environment, section.Value, subscription, tagSubscription);
+                AddEntry(environment, section.Value, resourceGroup, tagAzureResourceGroup);
+                AddEntry(environment, section.Value, nameSpace, tagNameSpace);
+                AddEntry(environment, section.Value, schemaGroup, tagSchemaGroup);
+            }
         }
 
         private static void WebApiPython(FileItem file, Dictionary<string, Tuple<string, string>[]> sections)
         {
-            throw new NotImplementedException();
+            const string subscription = "StageAzureSubscription";
+            const string appName = "StageAppName";
+
+            foreach (var section in sections)
+            {
+                var environment = file.DeploymentSettings.Environments.SingleOrDefault(env => env.Name == section.Key);
+                if (environment == null)
+                {
+                    continue;
+                }
+
+                AddEntry(environment, section.Value, subscription, tagSubscription);
+                AddEntry(environment, section.Value, appName, tagAzureResourceName);
+            }
         }
 
         private static void WebApp(FileItem file, Dictionary<string, Tuple<string, string>[]> sections)
         {
-            throw new NotImplementedException();
+            const string subscription = "AzureSubscription";
+            const string appType = "AppType";
+            const string appName = "AppName";
+
+            foreach (var section in sections)
+            {
+                var environment = file.DeploymentSettings.Environments.SingleOrDefault(env => env.Name == section.Key);
+                if (environment == null)
+                {
+                    continue;
+                }
+
+                AddEntry(environment, section.Value, subscription, tagSubscription);
+                AddEntry(environment, section.Value, appType, tagAppType);
+                AddEntry(environment, section.Value, appName, tagAzureResourceName);
+            }
         }
 
         private static void WebAppPython(FileItem file, Dictionary<string, Tuple<string, string>[]> sections)
         {
-            throw new NotImplementedException();
+            const string subscription = "StageAzureSubscription";
+            const string appName = "StageAppName";
+
+            foreach (var section in sections)
+            {
+                var environment = file.DeploymentSettings.Environments.SingleOrDefault(env => env.Name == section.Key);
+                if (environment == null)
+                {
+                    continue;
+                }
+
+                AddEntry(environment, section.Value, subscription, tagSubscription);
+                AddEntry(environment, section.Value, appName, tagAzureResourceName);
+            }
         }
 
         private static void WinAppAppSync(FileItem file, Dictionary<string, Tuple<string, string>[]> sections)
         {
-            throw new NotImplementedException();
+            const string keyvault = "StageKeyVaultName";
+            const string subscription = "StageKeyVaultSubscription";
+            const string targetServers = "StageTargetServers";
+            const string targetAdmin = "StageTargetAdminUser";
+
+            foreach (var section in sections)
+            {
+                var environment = file.DeploymentSettings.Environments.SingleOrDefault(env => env.Name == section.Key);
+                if (environment == null)
+                {
+                    continue;
+                }
+
+                AddEntry(environment, section.Value, keyvault, tagKeyVault);
+                AddEntry(environment, section.Value, subscription, tagSubscription);
+                AddEntry(environment, section.Value, targetServers, tagTargetServers);
+                AddEntry(environment, section.Value, targetAdmin, tagAdmin);
+            }
         }
 
         private static void WinService(FileItem file, Dictionary<string, Tuple<string, string>[]> sections)
         {
-            throw new NotImplementedException();
+            const string keyvault = "StageKeyVaultName";
+            const string subscription = "StageKeyVaultSubscription";
+            const string serverName = "ServerName";
+            const string userName = "UserName";
+            const string appRootFolder = "AppRootFolder";
+            const string serviceFolder = "ServiceFolder";
+            const string appFolder = "AppFolder";
+            const string webAppShortName = "WebAppShortName";
+            const string webAppName = "WebAppName";
+            const string serviceNames = "ServiceNames";
+            const string restartService = "RestartService";
+
+            foreach (var section in sections)
+            {
+                var environment = file.DeploymentSettings.Environments.SingleOrDefault(env => env.Name == section.Key);
+                if (environment == null)
+                {
+                    continue;
+                }
+
+                AddEntry(environment, section.Value, keyvault, tagKeyVault);
+                AddEntry(environment, section.Value, subscription, tagSubscription);
+                AddEntry(environment, section.Value, serverName, tagTargetServers);
+                AddEntry(environment, section.Value, userName, tagAdmin);
+                AddEntry(environment, section.Value, appRootFolder, tagRootFolder);
+                AddEntry(environment, section.Value, serviceFolder, tagServiceFolder);
+                AddEntry(environment, section.Value, appFolder, tagAppFolder);
+                AddEntry(environment, section.Value, webAppShortName, tagAppNameShort);
+                AddEntry(environment, section.Value, webAppName, tagAppName);
+                AddEntry(environment, section.Value, serviceNames, tagServiceNames);
+                AddEntry(environment, section.Value, restartService, tagRestartService);
+            }
         }
 
         private static void AddEntry(DeploymentEnvironments environment, Tuple<string, string>[] section, string variableName, string variableKey)
